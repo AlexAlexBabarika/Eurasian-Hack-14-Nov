@@ -12,7 +12,7 @@ import { DataFlow } from "@/components/DataFlow";
 import { FindingsList } from "@/components/FindingsList";
 import type { CellKey } from "@/components/Matrix";
 import { Matrix } from "@/components/Matrix";
-import { latestByStep, progressPercent, ProgressTimeline } from "@/components/ProgressTimeline";
+import { latestByStep, ProgressTimeline, useProgressPercent } from "@/components/ProgressTimeline";
 import { RecheckForm } from "@/components/RecheckForm";
 import { ReportInputs } from "@/components/ReportInputs";
 import LetterGlitch from "@/components/reactbits/LetterGlitch";
@@ -124,7 +124,7 @@ function ScanConsole({ events }: { events: Events }) {
 }
 
 function Running({ id, events, skip }: { id: string; events: Events; skip?: () => void }) {
-  const { percent } = progressPercent(events);
+  const { percent } = useProgressPercent(events);
   return (
     <Shell>
       <div className="grid gap-8 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:gap-12">
@@ -132,7 +132,7 @@ function Running({ id, events, skip }: { id: string; events: Events; skip?: () =
           <div className="space-y-2">
             <p aria-hidden className="text-7xl leading-none font-semibold tracking-tighter text-signal tabular-nums">
               {percent}
-              <span className="text-3xl text-signal/60">%</span>
+              <span className="ml-1 text-[0.8em] tracking-normal">%</span>
             </p>
             <h1 className="text-2xl font-semibold tracking-tight text-foreground">
               Audit in progress…
@@ -143,7 +143,7 @@ function Running({ id, events, skip }: { id: string; events: Events; skip?: () =
                 : "This usually takes about a minute. You can keep this tab open in the background."}
             </p>
           </div>
-          <ProgressTimeline events={events} />
+          <ProgressTimeline events={events} percent={percent} />
           {skip && (
             <Button variant="outline" size="sm" onClick={skip}>
               Skip to the report

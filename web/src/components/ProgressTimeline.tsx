@@ -1,9 +1,10 @@
+import { useState } from "react";
 import { Check, Circle, LoaderCircle, Minus, X } from "lucide-react";
 import { cn } from "cn";
 
 import { STEP_LABEL } from "@/lib/labels";
 import type { ProgressEvent, Step } from "@/lib/types";
-import { STEPS } from "@/lib/types";
+import { AREAS, JURISDICTIONS, STEPS } from "@/lib/types";
 
 type StepState = ProgressEvent["status"] | "pending";
 
@@ -54,18 +55,51 @@ const STATE_TEXT: Record<StepState, string> = {
   skipped: "Skipped",
 };
 
-export function progressPercent(events: ProgressEvent[]): { finished: number; percent: number } {
-  const latest = latestByStep(events);
-  const finished = STEPS.filter((step) => {
-    const status = latest[step]?.status;
-    return status === "done" || status === "skipped" || status === "error";
-  }).length;
-  return { finished, percent: Math.round((finished / STEPS.length) * 100) };
+// Rough share of a typical run spent in each step; writing verdicts takes most of it.
+const STEP_WEIGHT: Record<Step, number> = {
+  clone: 6,
+  manifests: 3,
+  bearer: 8,
+  site_scan: 8,
+  policy_fetch: 3,
+  claims: 8,
+  diff: 2,
+  law: 2,
+  verdict: 58,
+  done: 2,
+};
+const TOTAL_WEIGHT = STEPS.reduce((sum, step) => sum + STEP_WEIGHT[step], 0);
+// One verdict per jurisdiction and area unless the run says otherwise.
+const DEFAULT_CELLS = JURISDICTIONS.length * AREAS.length;
+
+function isFinished(event: ProgressEvent | undefined): boolean {
+  return event?.status === "done" || event?.status === "skipped" || event?.status === "error";
 }
 
-export function ProgressTimeline({ events }: { events: ProgressEvent[] }) {
+export function progressPercent(events: ProgressEvent[], cells = DEFAULT_CELLS): { finished: number; percent: number } {
   const latest = latestByStep(events);
-  const { finished, percent } = progressPercent(events);
+  const finished = STEPS.filter((step) => isFinished(latest[step])).length;
+  let weight = STEPS.reduce((sum, step) => sum + (isFinished(latest[step]) ? STEP_WEIGHT[step] : 0), 0);
+  // While verdicts are written, the API reports how many cells are finished in `count`.
+  const verdict = latest.verdict;
+  if (verdict?.status === "running" && typeof verdict.count === "number" && cells > 0) {
+    weight += STEP_WEIGHT.verdict * Math.min(verdict.count / cells, 0.98);
+  }
+  const percent = finished === STEPS.length ? 100 : Math.min(99, Math.floor((weight / TOTAL_WEIGHT) * 100));
+  return { finished, percent };
+}
+
+// The percent shown on screen: it only ever moves forward, even if events arrive out of order.
+export function useProgressPercent(events: ProgressEvent[]): { finished: number; percent: number } {
+  const progress = progressPercent(events);
+  const [highest, setHighest] = useState(progress.percent);
+  if (progress.percent > highest) setHighest(progress.percent);
+  return { finished: progress.finished, percent: Math.max(progress.percent, highest) };
+}
+
+export function ProgressTimeline({ events, percent }: { events: ProgressEvent[]; percent: number }) {
+  const latest = latestByStep(events);
+  const { finished } = progressPercent(events);
 
   return (
     <div className="space-y-5">

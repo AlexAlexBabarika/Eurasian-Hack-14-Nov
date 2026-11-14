@@ -7,7 +7,7 @@ import SpotlightCard from "@/components/reactbits/SpotlightCard";
 import { StatusIcon } from "@/components/StatusBadge";
 import { AREA_LABEL, JURISDICTION_LABEL, STATUS_LABEL } from "@/lib/labels";
 import { previousStatus } from "@/lib/compare";
-import { SPOTLIGHT_COLOR, spotlightSurface, STATUS_STYLE } from "@/lib/status";
+import { cellSurface, LOUD_STATUS, SPOTLIGHT_COLOR, STATUS_STYLE } from "@/lib/status";
 import type { Area, CellVerdict, Jurisdiction, Status } from "@/lib/types";
 import { AREAS, JURISDICTIONS } from "@/lib/types";
 
@@ -17,6 +17,14 @@ const LEGEND: Status[] = ["red", "amber", "green", "grey"];
 
 function plural(count: number, word: string) {
   return `${count} ${word}${count === 1 ? "" : "s"}`;
+}
+
+function footerText(cell: CellVerdict): string {
+  if (cell.finding_ids.length > 0)
+    return `${plural(cell.finding_ids.length, "finding")}, ${plural(cell.provision_ids.length, "provision")}`;
+  if (cell.status === "grey") return "Why not assessed";
+  if (cell.status === "green") return "What was checked";
+  return "See details";
 }
 
 function Cell({
@@ -33,6 +41,7 @@ function Cell({
   const style = STATUS_STYLE[cell.status];
   const area = AREA_LABEL[cell.area].name;
   const jurisdiction = JURISDICTION_LABEL[cell.jurisdiction].name;
+  const loud = LOUD_STATUS[cell.status];
   const grey = cell.status === "grey";
   return (
     // The wrapper carries the entrance, the hover lift and, for red cells, the travelling arc.
@@ -42,15 +51,15 @@ function Cell({
         "animate-power-on rounded-xl transition-transform duration-200 hover:-translate-y-0.5",
         style.tone,
         cell.status === "red" && "arc-border",
-        grey && "border border-dashed border-white/15",
+        grey && "border border-dashed border-white/12",
       )}
     >
       <SpotlightCard
-        spotlightColor={SPOTLIGHT_COLOR[cell.status]}
-        intensity={0.26}
+        spotlightColor={loud ? SPOTLIGHT_COLOR[cell.status] : SPOTLIGHT_COLOR.grey}
+        intensity={loud ? 0.26 : 0.12}
         spotlightSize={260}
-        borderGlow={1}
-        style={spotlightSurface(cell.status, 0)}
+        borderGlow={loud ? 1 : 0.4}
+        style={cellSurface(cell.status)}
         className="h-full"
       >
         <button
@@ -62,28 +71,39 @@ function Cell({
           className="group flex h-full min-h-[124px] w-full flex-col gap-2 rounded-xl p-4 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/70 focus-visible:ring-inset"
         >
           <span className="text-xs font-medium text-muted-foreground lg:hidden">{area}</span>
-          <span className={cn("flex items-center gap-1.5 text-sm font-semibold", style.text)}>
-            <StatusIcon status={cell.status} />
-            {STATUS_LABEL[cell.status].name}
-          </span>
+          {loud ? (
+            <span className={cn("flex items-center gap-1.5 text-sm font-semibold", style.text)}>
+              <StatusIcon status={cell.status} />
+              {STATUS_LABEL[cell.status].name}
+            </span>
+          ) : (
+            <span className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span
+                aria-hidden
+                className={cn("size-2 shrink-0 rounded-full", grey ? "border border-status-grey/70" : style.dot)}
+              />
+              {STATUS_LABEL[cell.status].name}
+            </span>
+          )}
           {was && (
             <span className="-mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
               <span aria-hidden className={cn("size-1.5 shrink-0 rounded-full", STATUS_STYLE[was].dot)} />
               Was: {STATUS_LABEL[was].name}
             </span>
           )}
-          <span className={cn("line-clamp-3 text-sm leading-snug", grey ? "text-muted-foreground" : "text-foreground/90")}>
+          <span
+            className={cn(
+              "text-sm leading-snug text-pretty break-words",
+              loud ? "text-foreground/90" : grey ? "text-muted-foreground" : "text-foreground/70",
+            )}
+          >
             {cell.headline}
           </span>
-          <span className="mt-auto flex items-center justify-between gap-2 text-xs text-muted-foreground">
-            <span>
-              {cell.finding_ids.length > 0
-                ? `${plural(cell.finding_ids.length, "finding")}, ${plural(cell.provision_ids.length, "provision")}`
-                : "Why not assessed"}
-            </span>
+          <span className="mt-auto flex items-center justify-between gap-2 pt-1 text-xs text-muted-foreground">
+            <span>{footerText(cell)}</span>
             <ChevronRight
               aria-hidden
-              className={cn("size-4 opacity-50 transition group-hover:translate-x-1 group-hover:opacity-100", !grey && style.text)}
+              className={cn("size-4 opacity-50 transition group-hover:translate-x-1 group-hover:opacity-100", loud && style.text)}
             />
           </span>
         </button>
@@ -146,10 +166,22 @@ export function Matrix({
 
       <ul className="flex flex-wrap gap-x-5 gap-y-1 pt-2 text-xs text-muted-foreground">
         {LEGEND.map((status) => (
-          <li key={status} className="flex items-center gap-1.5">
-            <StatusIcon status={status} className="size-3.5" />
-            <span className="text-foreground/80">{STATUS_LABEL[status].name}:</span>
-            {STATUS_LABEL[status].description}
+          <li key={status} className="flex items-start gap-1.5">
+            <span aria-hidden className="flex h-4 shrink-0 items-center">
+              {LOUD_STATUS[status] ? (
+                <StatusIcon status={status} className="size-3.5" />
+              ) : (
+                <span
+                  className={cn(
+                    "size-2 rounded-full",
+                    status === "grey" ? "border border-status-grey/70" : STATUS_STYLE[status].dot,
+                  )}
+                />
+              )}
+            </span>
+            <span>
+              <span className="text-foreground/80">{STATUS_LABEL[status].name}:</span> {STATUS_LABEL[status].description}
+            </span>
           </li>
         ))}
       </ul>

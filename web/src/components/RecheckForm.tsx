@@ -100,7 +100,9 @@ export function RecheckForm({ id, report }: { id: string; report: AuditReport })
           {error instanceof ApiError && error.kind === "network" && (
             <>
               {" "}
-              Start the API with <code className="rounded bg-muted px-1 py-0.5 font-mono">make api</code> and try again.
+              Start the API with <code className="rounded bg-muted px-1 py-0.5 font-mono">make api</code>, or, if it is
+              running, add this page&apos;s address to <code className="rounded bg-muted px-1 py-0.5 font-mono">WEB_ORIGINS</code>{" "}
+              and restart it.
             </>
           )}
         </p>
