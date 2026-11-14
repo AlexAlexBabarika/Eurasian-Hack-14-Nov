@@ -4,6 +4,7 @@ import re
 from pathlib import Path
 
 from app import llm
+from app.claims import ru_kz
 from app.detect.catalog import load_catalog, policy_names
 from app.models import PolicyClaims
 
@@ -26,7 +27,7 @@ def _sentences(text: str) -> list[str]:
     return [s for s in (_norm(p) for p in re.split(r"(?<=[.!?])\s+|\n+", text)) if len(s) > 15]
 
 
-def heuristic(policy_text: str) -> PolicyClaims:
+def _heuristic_en(policy_text: str) -> PolicyClaims:
     sents = _sentences(policy_text)
     quotes: dict[str, str] = {}
 
@@ -95,6 +96,13 @@ def heuristic(policy_text: str) -> PolicyClaims:
         cookie_consent_described=find("cookie_consent_described", r"cookie.{0,120}\bconsent|\bconsent.{0,120}cookie"),
         quotes=quotes,
     )
+
+
+def heuristic(policy_text: str) -> PolicyClaims:
+    claims = _heuristic_en(policy_text)
+    if ru_kz.is_cyrillic(policy_text):
+        claims = ru_kz.merge(claims, ru_kz.heuristic(policy_text))
+    return claims
 
 
 async def extract(policy_text: str) -> tuple[PolicyClaims, str]:
