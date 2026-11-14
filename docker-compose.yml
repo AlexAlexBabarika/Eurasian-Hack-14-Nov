@@ -1,0 +1,11 @@
+# API in a container (Chromium + git + Bearer included). Run the web app locally with `make web`.
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api/data:/srv/api/data

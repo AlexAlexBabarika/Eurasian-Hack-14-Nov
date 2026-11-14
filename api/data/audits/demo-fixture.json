@@ -1,0 +1,2201 @@
+{
+  "status": "done",
+  "events": [
+    {
+      "step": "clone",
+      "status": "running",
+      "message": "Fetching repository",
+      "count": null
+    },
+    {
+      "step": "clone",
+      "status": "done",
+      "message": "8 files ready to scan",
+      "count": 8
+    },
+    {
+      "step": "manifests",
+      "status": "running",
+      "message": "Matching dependencies and imports against the SDK catalog",
+      "count": null
+    },
+    {
+      "step": "manifests",
+      "status": "done",
+      "message": "Vendors in code: Sentry, Mixpanel, OpenAI, PostHog, Stripe",
+      "count": 5
+    },
+    {
+      "step": "bearer",
+      "status": "running",
+      "message": "Running Bearer data-flow scan",
+      "count": null
+    },
+    {
+      "step": "bearer",
+      "status": "skipped",
+      "message": "Bearer CLI not installed; using manifest detector only",
+      "count": null
+    },
+    {
+      "step": "site_scan",
+      "status": "running",
+      "message": "Loading the site in a clean browser, clicking nothing",
+      "count": null
+    },
+    {
+      "step": "site_scan",
+      "status": "done",
+      "message": "4 requests before consent; trackers: Google Tag Manager, PostHog, Google Analytics",
+      "count": 3
+    },
+    {
+      "step": "policy_fetch",
+      "status": "running",
+      "message": "Fetching the privacy policy",
+      "count": null
+    },
+    {
+      "step": "policy_fetch",
+      "status": "done",
+      "message": "Policy text extracted (1,229 characters)",
+      "count": 1229
+    },
+    {
+      "step": "claims",
+      "status": "running",
+      "message": "Extracting what the policy claims",
+      "count": null
+    },
+    {
+      "step": "claims",
+      "status": "done",
+      "message": "Claims extracted (heuristic); sharing statement: no_sharing",
+      "count": null
+    },
+    {
+      "step": "diff",
+      "status": "running",
+      "message": "Comparing observed behaviour with policy claims",
+      "count": null
+    },
+    {
+      "step": "diff",
+      "status": "done",
+      "message": "9 possible inconsistencies",
+      "count": 9
+    },
+    {
+      "step": "law",
+      "status": "running",
+      "message": "Retrieving provisions from the curated corpus",
+      "count": null
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts per jurisdiction",
+      "count": null
+    },
+    {
+      "step": "law",
+      "status": "done",
+      "message": "44 provisions cited",
+      "count": 44
+    },
+    {
+      "step": "verdict",
+      "status": "done",
+      "message": "12 matrix cells (deterministic)",
+      "count": 12
+    },
+    {
+      "step": "done",
+      "status": "done",
+      "message": "Audit finished in 0.0s",
+      "count": null
+    }
+  ],
+  "report": {
+    "id": "demo-fixture",
+    "inputs": {
+      "repo_url": "https://github.com/AlexAlexBabarika/Eurasian-Hack-14-Nov/tree/main/demo/fixture-app",
+      "site_url": "http://localhost:4100/public/index.html",
+      "policy_url": "http://localhost:4100/privacy.html",
+      "jurisdictions": null
+    },
+    "observations": [
+      {
+        "id": "obs-1",
+        "vendor": "Sentry",
+        "vendor_country": "US",
+        "data_categories": [
+          "device_id",
+          "ip",
+          "usage",
+          "email"
+        ],
+        "purpose_guess": "error_monitoring",
+        "is_ai": false,
+        "pre_consent": false,
+        "evidence": [
+          {
+            "kind": "manifest",
+            "summary": "@sentry/nextjs declared as a dependency",
+            "file": "package.json",
+            "line": 11,
+            "snippet": "\"@sentry/nextjs\": \"^8.40.0\",",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Sentry SDK imported",
+            "file": "src/lib/sentry.ts",
+            "line": 1,
+            "snippet": "import * as Sentry from \"@sentry/nextjs\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "email handled in a file that calls Sentry",
+            "file": "src/lib/sentry.ts",
+            "line": 9,
+            "snippet": "});\n\nexport function setSentryUser(user: { id: string; email: string }) {\n  Sentry.setUser({ id: user.id, email: user.email });\n}",
+            "url": null,
+            "quote": null
+          }
+        ]
+      },
+      {
+        "id": "obs-2",
+        "vendor": "Mixpanel",
+        "vendor_country": "US",
+        "data_categories": [
+          "usage",
+          "device_id",
+          "ip",
+          "email",
+          "name"
+        ],
+        "purpose_guess": "analytics",
+        "is_ai": false,
+        "pre_consent": false,
+        "evidence": [
+          {
+            "kind": "manifest",
+            "summary": "mixpanel-browser declared as a dependency",
+            "file": "package.json",
+            "line": 12,
+            "snippet": "\"mixpanel-browser\": \"^2.56.0\",",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Mixpanel SDK imported",
+            "file": "src/lib/analytics.ts",
+            "line": 1,
+            "snippet": "import mixpanel from \"mixpanel-browser\";\nimport posthog from \"posthog-js\";",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "email handled in a file that calls Mixpanel",
+            "file": "src/lib/analytics.ts",
+            "line": 7,
+            "snippet": "posthog.init(\"phc_demo_key\", { api_host: \"https://eu.i.posthog.com\" });\n\nexport type User = { id: string; email: string; name: string };\n\nexport function identifyUser(user: User) {",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "name handled in a file that calls Mixpanel",
+            "file": "src/lib/analytics.ts",
+            "line": 13,
+            "snippet": "  mixpanel.people.set({\n    $email: user.email,\n    $name: user.name,\n  });\n  posthog.identify(user.id, { email: user.email, name: user.name });",
+            "url": null,
+            "quote": null
+          }
+        ]
+      },
+      {
+        "id": "obs-3",
+        "vendor": "OpenAI",
+        "vendor_country": "US",
+        "data_categories": [
+          "email",
+          "user_content"
+        ],
+        "purpose_guess": "ai_processing",
+        "is_ai": true,
+        "pre_consent": false,
+        "evidence": [
+          {
+            "kind": "manifest",
+            "summary": "openai declared as a dependency",
+            "file": "package.json",
+            "line": 14,
+            "snippet": "\"openai\": \"^4.73.0\",",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "OpenAI SDK imported",
+            "file": "src/app/api/chat/route.ts",
+            "line": 1,
+            "snippet": "import OpenAI from \"openai\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "email handled in a file that calls OpenAI",
+            "file": "src/app/api/chat/route.ts",
+            "line": 8,
+            "snippet": "  const { user, message } = await req.json();\n\n  console.log(\"chat request from\", user.email, message);\n\n  const completion = await openai.chat.completions.create({",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "User-provided content passed to OpenAI",
+            "file": "src/app/api/chat/route.ts",
+            "line": 12,
+            "snippet": "  const completion = await openai.chat.completions.create({\n    model: \"gpt-4o-mini\",\n    messages: [\n      { role: \"system\", content: \"You are Notely, a helpful note-taking assistant.\" },\n      { role: \"user\", content: message },",
+            "url": null,
+            "quote": null
+          }
+        ]
+      },
+      {
+        "id": "obs-4",
+        "vendor": "PostHog",
+        "vendor_country": "US",
+        "data_categories": [
+          "usage",
+          "device_id",
+          "ip",
+          "email",
+          "name"
+        ],
+        "purpose_guess": "analytics",
+        "is_ai": false,
+        "pre_consent": true,
+        "evidence": [
+          {
+            "kind": "manifest",
+            "summary": "posthog-js declared as a dependency",
+            "file": "package.json",
+            "line": 15,
+            "snippet": "\"posthog-js\": \"^1.188.0\",",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "PostHog SDK imported",
+            "file": "src/lib/analytics.ts",
+            "line": 2,
+            "snippet": "import mixpanel from \"mixpanel-browser\";\nimport posthog from \"posthog-js\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "email handled in a file that calls PostHog",
+            "file": "src/lib/analytics.ts",
+            "line": 7,
+            "snippet": "posthog.init(\"phc_demo_key\", { api_host: \"https://eu.i.posthog.com\" });\n\nexport type User = { id: string; email: string; name: string };\n\nexport function identifyUser(user: User) {",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "name handled in a file that calls PostHog",
+            "file": "src/lib/analytics.ts",
+            "line": 13,
+            "snippet": "  mixpanel.people.set({\n    $email: user.email,\n    $name: user.name,\n  });\n  posthog.identify(user.id, { email: user.email, name: user.name });",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "network",
+            "summary": "Request to PostHog before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://eu.i.posthog.com/e/?ip=1&_=1700000000000",
+            "quote": null
+          },
+          {
+            "kind": "cookie",
+            "summary": "Cookie `ph_phc_demo_key_posthog` (PostHog) set before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "http://localhost:4100/public/index.html",
+            "quote": null
+          }
+        ]
+      },
+      {
+        "id": "obs-5",
+        "vendor": "Stripe",
+        "vendor_country": "US",
+        "data_categories": [
+          "payment",
+          "email",
+          "name"
+        ],
+        "purpose_guess": "payments",
+        "is_ai": false,
+        "pre_consent": false,
+        "evidence": [
+          {
+            "kind": "manifest",
+            "summary": "stripe declared as a dependency",
+            "file": "package.json",
+            "line": 18,
+            "snippet": "\"stripe\": \"^17.4.0\"",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "src/lib/billing.ts",
+            "line": 1,
+            "snippet": "import Stripe from \"stripe\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "email handled in a file that calls Stripe",
+            "file": "src/lib/billing.ts",
+            "line": 5,
+            "snippet": "const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? \"\");\n\nexport async function createCustomer(user: { email: string; name: string }) {\n  return stripe.customers.create({ email: user.email, name: user.name });\n}",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "name handled in a file that calls Stripe",
+            "file": "src/lib/billing.ts",
+            "line": 6,
+            "snippet": "\nexport async function createCustomer(user: { email: string; name: string }) {\n  return stripe.customers.create({ email: user.email, name: user.name });\n}",
+            "url": null,
+            "quote": null
+          }
+        ]
+      },
+      {
+        "id": "obs-6",
+        "vendor": "Google Tag Manager",
+        "vendor_country": "US",
+        "data_categories": [
+          "usage",
+          "device_id",
+          "ip"
+        ],
+        "purpose_guess": "analytics",
+        "is_ai": false,
+        "pre_consent": true,
+        "evidence": [
+          {
+            "kind": "network",
+            "summary": "Request to Google Tag Manager before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://www.googletagmanager.com/gtag/js?id=G-DEMO000000",
+            "quote": null
+          }
+        ]
+      },
+      {
+        "id": "obs-7",
+        "vendor": "Google Analytics",
+        "vendor_country": "US",
+        "data_categories": [
+          "usage",
+          "device_id",
+          "ip"
+        ],
+        "purpose_guess": "analytics",
+        "is_ai": false,
+        "pre_consent": true,
+        "evidence": [
+          {
+            "kind": "network",
+            "summary": "Request to Google Analytics before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-DEMO000000&en=page_view",
+            "quote": null
+          },
+          {
+            "kind": "cookie",
+            "summary": "Cookie `_ga` (Google Analytics) set before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "http://localhost:4100/public/index.html",
+            "quote": null
+          }
+        ]
+      }
+    ],
+    "claims": {
+      "data_categories": [
+        "email",
+        "usage"
+      ],
+      "named_processors": [],
+      "sharing_statement": "no_sharing",
+      "mentions_ai": false,
+      "international_transfers": false,
+      "retention_stated": false,
+      "rights_listed": [
+        "access"
+      ],
+      "deletion_method": null,
+      "cookie_consent_described": false,
+      "quotes": {
+        "data_categories": "We collect your email address and password when you create an account.",
+        "data_usage": "We also collect basic usage information to keep the service running.",
+        "sharing_statement": "We never share your data with third parties.",
+        "right_access": "You may contact us at any time to request access to the information we hold about you."
+      }
+    },
+    "findings": [
+      {
+        "id": "F1",
+        "rule": "R1_UNDISCLOSED_PROCESSOR",
+        "title": "Sentry, Mixpanel, OpenAI and 4 more observed in code or network traffic; policy names no such recipients",
+        "severity": "medium",
+        "areas": [
+          "personal_data"
+        ],
+        "observation_ids": [
+          "obs-1",
+          "obs-2",
+          "obs-3",
+          "obs-4",
+          "obs-5",
+          "obs-6",
+          "obs-7"
+        ],
+        "evidence": [
+          {
+            "kind": "code",
+            "summary": "Sentry SDK imported",
+            "file": "src/lib/sentry.ts",
+            "line": 1,
+            "snippet": "import * as Sentry from \"@sentry/nextjs\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Mixpanel SDK imported",
+            "file": "src/lib/analytics.ts",
+            "line": 1,
+            "snippet": "import mixpanel from \"mixpanel-browser\";\nimport posthog from \"posthog-js\";",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "OpenAI SDK imported",
+            "file": "src/app/api/chat/route.ts",
+            "line": 1,
+            "snippet": "import OpenAI from \"openai\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "PostHog SDK imported",
+            "file": "src/lib/analytics.ts",
+            "line": 2,
+            "snippet": "import mixpanel from \"mixpanel-browser\";\nimport posthog from \"posthog-js\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "src/lib/billing.ts",
+            "line": 1,
+            "snippet": "import Stripe from \"stripe\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "network",
+            "summary": "Request to Google Tag Manager before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://www.googletagmanager.com/gtag/js?id=G-DEMO000000",
+            "quote": null
+          },
+          {
+            "kind": "network",
+            "summary": "Request to Google Analytics before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-DEMO000000&en=page_view",
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "email handled in a file that calls Sentry",
+            "file": "src/lib/sentry.ts",
+            "line": 9,
+            "snippet": "});\n\nexport function setSentryUser(user: { id: string; email: string }) {\n  Sentry.setUser({ id: user.id, email: user.email });\n}",
+            "url": null,
+            "quote": null
+          }
+        ],
+        "policy_quote": null
+      },
+      {
+        "id": "F2",
+        "rule": "R2_SHARING_CONTRADICTION",
+        "title": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+        "severity": "high",
+        "areas": [
+          "personal_data",
+          "consumer"
+        ],
+        "observation_ids": [
+          "obs-1",
+          "obs-2",
+          "obs-3",
+          "obs-4",
+          "obs-5",
+          "obs-6",
+          "obs-7"
+        ],
+        "evidence": [
+          {
+            "kind": "policy_quote",
+            "summary": "Policy statement on sharing",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "http://localhost:4100/privacy.html",
+            "quote": "We never share your data with third parties."
+          },
+          {
+            "kind": "code",
+            "summary": "Sentry SDK imported",
+            "file": "src/lib/sentry.ts",
+            "line": 1,
+            "snippet": "import * as Sentry from \"@sentry/nextjs\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Mixpanel SDK imported",
+            "file": "src/lib/analytics.ts",
+            "line": 1,
+            "snippet": "import mixpanel from \"mixpanel-browser\";\nimport posthog from \"posthog-js\";",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "OpenAI SDK imported",
+            "file": "src/app/api/chat/route.ts",
+            "line": 1,
+            "snippet": "import OpenAI from \"openai\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "PostHog SDK imported",
+            "file": "src/lib/analytics.ts",
+            "line": 2,
+            "snippet": "import mixpanel from \"mixpanel-browser\";\nimport posthog from \"posthog-js\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "src/lib/billing.ts",
+            "line": 1,
+            "snippet": "import Stripe from \"stripe\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "network",
+            "summary": "Request to Google Tag Manager before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://www.googletagmanager.com/gtag/js?id=G-DEMO000000",
+            "quote": null
+          }
+        ],
+        "policy_quote": "We never share your data with third parties."
+      },
+      {
+        "id": "F3",
+        "rule": "R3_UNDISCLOSED_DATA_CATEGORY",
+        "title": "Data categories observed but not described in the policy: device_id, ip, name, payment, user_content",
+        "severity": "medium",
+        "areas": [
+          "personal_data"
+        ],
+        "observation_ids": [
+          "obs-1",
+          "obs-2",
+          "obs-3",
+          "obs-4",
+          "obs-5",
+          "obs-6",
+          "obs-7"
+        ],
+        "evidence": [
+          {
+            "kind": "code",
+            "summary": "Sentry SDK imported",
+            "file": "src/lib/sentry.ts",
+            "line": 1,
+            "snippet": "import * as Sentry from \"@sentry/nextjs\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Mixpanel SDK imported",
+            "file": "src/lib/analytics.ts",
+            "line": 1,
+            "snippet": "import mixpanel from \"mixpanel-browser\";\nimport posthog from \"posthog-js\";",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Sentry SDK imported",
+            "file": "src/lib/sentry.ts",
+            "line": 1,
+            "snippet": "import * as Sentry from \"@sentry/nextjs\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Mixpanel SDK imported",
+            "file": "src/lib/analytics.ts",
+            "line": 1,
+            "snippet": "import mixpanel from \"mixpanel-browser\";\nimport posthog from \"posthog-js\";",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "name handled in a file that calls Mixpanel",
+            "file": "src/lib/analytics.ts",
+            "line": 13,
+            "snippet": "  mixpanel.people.set({\n    $email: user.email,\n    $name: user.name,\n  });\n  posthog.identify(user.id, { email: user.email, name: user.name });",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "name handled in a file that calls PostHog",
+            "file": "src/lib/analytics.ts",
+            "line": 13,
+            "snippet": "  mixpanel.people.set({\n    $email: user.email,\n    $name: user.name,\n  });\n  posthog.identify(user.id, { email: user.email, name: user.name });",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "src/lib/billing.ts",
+            "line": 1,
+            "snippet": "import Stripe from \"stripe\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "email handled in a file that calls Stripe",
+            "file": "src/lib/billing.ts",
+            "line": 5,
+            "snippet": "const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? \"\");\n\nexport async function createCustomer(user: { email: string; name: string }) {\n  return stripe.customers.create({ email: user.email, name: user.name });\n}",
+            "url": null,
+            "quote": null
+          }
+        ],
+        "policy_quote": "We collect your email address and password when you create an account."
+      },
+      {
+        "id": "F4",
+        "rule": "R4_AI_PROCESSING_UNDISCLOSED",
+        "title": "User content is sent to OpenAI (AI provider); policy does not mention AI processing",
+        "severity": "high",
+        "areas": [
+          "ai_transparency",
+          "personal_data"
+        ],
+        "observation_ids": [
+          "obs-3"
+        ],
+        "evidence": [
+          {
+            "kind": "code",
+            "summary": "User-provided content passed to OpenAI",
+            "file": "src/app/api/chat/route.ts",
+            "line": 12,
+            "snippet": "  const completion = await openai.chat.completions.create({\n    model: \"gpt-4o-mini\",\n    messages: [\n      { role: \"system\", content: \"You are Notely, a helpful note-taking assistant.\" },\n      { role: \"user\", content: message },",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "policy_quote",
+            "summary": "Policy text does not mention AI, machine learning or automated processing",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "http://localhost:4100/privacy.html",
+            "quote": null
+          }
+        ],
+        "policy_quote": null
+      },
+      {
+        "id": "F5",
+        "rule": "R5_TRACKING_BEFORE_CONSENT",
+        "title": "PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site",
+        "severity": "high",
+        "areas": [
+          "personal_data",
+          "consumer"
+        ],
+        "observation_ids": [
+          "obs-4",
+          "obs-6",
+          "obs-7"
+        ],
+        "evidence": [
+          {
+            "kind": "network",
+            "summary": "Request to PostHog before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://eu.i.posthog.com/e/?ip=1&_=1700000000000",
+            "quote": null
+          },
+          {
+            "kind": "network",
+            "summary": "Request to Google Tag Manager before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://www.googletagmanager.com/gtag/js?id=G-DEMO000000",
+            "quote": null
+          },
+          {
+            "kind": "network",
+            "summary": "Request to Google Analytics before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-DEMO000000&en=page_view",
+            "quote": null
+          },
+          {
+            "kind": "cookie",
+            "summary": "Cookie `ph_phc_demo_key_posthog` (PostHog) set before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "http://localhost:4100/public/index.html",
+            "quote": null
+          },
+          {
+            "kind": "cookie",
+            "summary": "Cookie `_ga` (Google Analytics) set before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "http://localhost:4100/public/index.html",
+            "quote": null
+          }
+        ],
+        "policy_quote": null
+      },
+      {
+        "id": "F6",
+        "rule": "R6_TRANSFER_UNDISCLOSED",
+        "title": "Personal data goes to vendors based in US (Sentry, Mixpanel, OpenAI and 4 more); policy does not mention international transfers",
+        "severity": "medium",
+        "areas": [
+          "personal_data"
+        ],
+        "observation_ids": [
+          "obs-1",
+          "obs-2",
+          "obs-3",
+          "obs-4",
+          "obs-5",
+          "obs-6",
+          "obs-7"
+        ],
+        "evidence": [
+          {
+            "kind": "code",
+            "summary": "Sentry SDK imported",
+            "file": "src/lib/sentry.ts",
+            "line": 1,
+            "snippet": "import * as Sentry from \"@sentry/nextjs\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Mixpanel SDK imported",
+            "file": "src/lib/analytics.ts",
+            "line": 1,
+            "snippet": "import mixpanel from \"mixpanel-browser\";\nimport posthog from \"posthog-js\";",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "OpenAI SDK imported",
+            "file": "src/app/api/chat/route.ts",
+            "line": 1,
+            "snippet": "import OpenAI from \"openai\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "PostHog SDK imported",
+            "file": "src/lib/analytics.ts",
+            "line": 2,
+            "snippet": "import mixpanel from \"mixpanel-browser\";\nimport posthog from \"posthog-js\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "src/lib/billing.ts",
+            "line": 1,
+            "snippet": "import Stripe from \"stripe\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "network",
+            "summary": "Request to Google Tag Manager before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://www.googletagmanager.com/gtag/js?id=G-DEMO000000",
+            "quote": null
+          },
+          {
+            "kind": "policy_quote",
+            "summary": "Policy text does not mention international transfers",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "http://localhost:4100/privacy.html",
+            "quote": null
+          }
+        ],
+        "policy_quote": null
+      },
+      {
+        "id": "F7",
+        "rule": "R7_NO_DELETION_PATH",
+        "title": "No way to delete an account or data: not in the policy, no route found in code",
+        "severity": "medium",
+        "areas": [
+          "personal_data",
+          "consumer"
+        ],
+        "observation_ids": [],
+        "evidence": [
+          {
+            "kind": "policy_quote",
+            "summary": "Policy text lists no right to erasure and no deletion method; no delete-account route found in 8 scanned files",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "http://localhost:4100/privacy.html",
+            "quote": null
+          }
+        ],
+        "policy_quote": null
+      },
+      {
+        "id": "F8",
+        "rule": "R8_PII_IN_LOGS",
+        "title": "Personal data is written to application logs",
+        "severity": "medium",
+        "areas": [
+          "personal_data"
+        ],
+        "observation_ids": [],
+        "evidence": [
+          {
+            "kind": "code",
+            "summary": "`email` written to application logs",
+            "file": "src/app/api/chat/route.ts",
+            "line": 8,
+            "snippet": "  const { user, message } = await req.json();\n\n  console.log(\"chat request from\", user.email, message);\n\n  const completion = await openai.chat.completions.create({",
+            "url": null,
+            "quote": null
+          }
+        ],
+        "policy_quote": null
+      },
+      {
+        "id": "F9",
+        "rule": "R9_NO_RETENTION_PERIOD",
+        "title": "Policy states no retention period or criteria",
+        "severity": "low",
+        "areas": [
+          "personal_data"
+        ],
+        "observation_ids": [],
+        "evidence": [
+          {
+            "kind": "policy_quote",
+            "summary": "Policy text does not state how long personal data is kept",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "http://localhost:4100/privacy.html",
+            "quote": null
+          }
+        ],
+        "policy_quote": null
+      }
+    ],
+    "matrix": [
+      {
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "status": "red",
+        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with UK GDPR Art. 13(1)(e); UK GDPR Art. 5(1)(a). User content is sent to OpenAI (AI provider); policy does not mention AI processing. Possible inconsistency with UK GDPR Art. 13(1)(c). Sentry, Mixpanel, OpenAI and 4 more observed in code or network traffic; policy names no such recipients. Possible inconsistency with UK GDPR Art. 13(1)(e); UK GDPR Art. 28. Data categories observed but not described in the policy: device_id, ip, name, payment, user_content. Possible inconsistency with UK GDPR Art. 13(1)(c); UK GDPR Art. 5(1)(a). 5 more findings are listed below.",
+        "finding_ids": [
+          "F2",
+          "F4",
+          "F1",
+          "F3",
+          "F5",
+          "F6",
+          "F7",
+          "F8",
+          "F9"
+        ],
+        "provision_ids": [
+          "UK-GDPR-13-1-e",
+          "UK-GDPR-5-1-a",
+          "UK-GDPR-13-1-c",
+          "UK-GDPR-28",
+          "UK-PECR-6",
+          "UK-PECR-SCHA1-5",
+          "UK-GDPR-13-1-f",
+          "UK-GDPR-44",
+          "UK-GDPR-17",
+          "UK-GDPR-5-1-f",
+          "UK-GDPR-5-1-e",
+          "UK-GDPR-13-2-a"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
+            "code_change": "Or stop the sharing: send a pseudonymous user id instead of email/name (see src/lib/sentry.ts:1)."
+          },
+          {
+            "policy_clause": "Some features of our service use artificial intelligence. When you use them, the content you submit is sent to OpenAI (based in US), which processes it to generate a response.",
+            "code_change": "Show a visible notice in the product that responses are AI-generated (feature at src/app/api/chat/route.ts:12)."
+          },
+          {
+            "policy_clause": "We use the following service providers to run our service: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). They process personal data on our behalf and only on our instructions.",
+            "code_change": null
+          },
+          {
+            "policy_clause": "We collect and process the following categories of personal data: device id, ip, name, payment, user content. We use them to [purposes].",
+            "code_change": null
+          },
+          {
+            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. You can object to these cookies at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+          },
+          {
+            "policy_clause": "Some of our service providers are based outside the UK: Sentry (US), Mixpanel (US), OpenAI (US), PostHog (US), Stripe (US), Google Tag Manager (US), Google Analytics (US). When we transfer personal data to them we rely on [transfer mechanism].",
+            "code_change": null
+          },
+          {
+            "policy_clause": "You can delete your account and personal data at any time from [Settings > Account] or by emailing [contact address]. We delete your data within [period].",
+            "code_change": "Add a delete-account endpoint (for example DELETE /api/account) that removes the user's data, including at third-party vendors."
+          },
+          {
+            "policy_clause": null,
+            "code_change": "Remove personal data from the log statement at src/app/api/chat/route.ts:8; log an internal user id instead."
+          },
+          {
+            "policy_clause": "We keep your account data for as long as your account is active and delete it within [period] after you close it. Analytics data is kept for [period].",
+            "code_change": null
+          }
+        ],
+        "unverified_notes": [
+          "All cited provisions are awaiting human verification against the official text."
+        ],
+        "finding_statuses": {
+          "F2": "red",
+          "F4": "red",
+          "F1": "amber",
+          "F3": "amber",
+          "F5": "amber",
+          "F6": "amber",
+          "F7": "amber",
+          "F8": "amber",
+          "F9": "amber"
+        }
+      },
+      {
+        "jurisdiction": "UK",
+        "area": "ai_transparency",
+        "status": "amber",
+        "headline": "User content is sent to OpenAI (AI provider); policy does not mention AI processing",
+        "reasoning": "User content is sent to OpenAI (AI provider); policy does not mention AI processing. Possible inconsistency with ICO Guidance on AI and data protection Transparency in AI. UK has no AI-specific statute; this cell relies on ICO guidance, so status is capped at amber.",
+        "finding_ids": [
+          "F4"
+        ],
+        "provision_ids": [
+          "UK-ICO-AI-GUIDANCE"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "Some features of our service use artificial intelligence. When you use them, the content you submit is sent to OpenAI (based in US), which processes it to generate a response.",
+            "code_change": "Show a visible notice in the product that responses are AI-generated (feature at src/app/api/chat/route.ts:12)."
+          }
+        ],
+        "unverified_notes": [
+          "All cited provisions are awaiting human verification against the official text."
+        ],
+        "finding_statuses": {
+          "F4": "amber"
+        }
+      },
+      {
+        "jurisdiction": "UK",
+        "area": "consumer",
+        "status": "red",
+        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 227; Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 226. PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 225. UK: since the Data (Use and Access) Act 2025, analytics used solely for statistical purposes to improve the service may not need consent, if users get clear information and a simple way to object. The same evidence is treated more strictly in the EU. No way to delete an account or data: not in the policy, no route found in code. Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 227.",
+        "finding_ids": [
+          "F2",
+          "F5",
+          "F7"
+        ],
+        "provision_ids": [
+          "UK-DMCC-227",
+          "UK-DMCC-226",
+          "UK-DMCC-225"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
+            "code_change": "Or stop the sharing: send a pseudonymous user id instead of email/name (see src/lib/sentry.ts:1)."
+          },
+          {
+            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. You can object to these cookies at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+          },
+          {
+            "policy_clause": "You can delete your account and personal data at any time from [Settings > Account] or by emailing [contact address]. We delete your data within [period].",
+            "code_change": "Add a delete-account endpoint (for example DELETE /api/account) that removes the user's data, including at third-party vendors."
+          }
+        ],
+        "unverified_notes": [
+          "All cited provisions are awaiting human verification against the official text."
+        ],
+        "finding_statuses": {
+          "F2": "red",
+          "F5": "amber",
+          "F7": "amber"
+        }
+      },
+      {
+        "jurisdiction": "UK",
+        "area": "financial",
+        "status": "grey",
+        "headline": "Needs questionnaire",
+        "reasoning": "Financial licensing cannot be assessed from code and policy alone. Out of scope for this scan.",
+        "finding_ids": [],
+        "provision_ids": [],
+        "fixes": [],
+        "unverified_notes": [],
+        "finding_statuses": {}
+      },
+      {
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "status": "red",
+        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Regulation Art. 5(1)(a); Regulation Art. 13(1)(e). User content is sent to OpenAI (AI provider); policy does not mention AI processing. Possible inconsistency with Regulation Art. 13(1)(c). PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Directive 2002/58/EC Art. 5(3); Regulation Art. 7; Regulation Art. 6(1). EU: consent is required before non-essential cookies or trackers, including analytics. Sentry, Mixpanel, OpenAI and 4 more observed in code or network traffic; policy names no such recipients. Possible inconsistency with Regulation Art. 13(1)(e); Regulation Art. 28. 5 more findings are listed below.",
+        "finding_ids": [
+          "F2",
+          "F4",
+          "F5",
+          "F1",
+          "F3",
+          "F6",
+          "F7",
+          "F8",
+          "F9"
+        ],
+        "provision_ids": [
+          "EU-GDPR-5-1-a",
+          "EU-GDPR-13-1-e",
+          "EU-GDPR-13-1-c",
+          "EU-EPRIVACY-5-3",
+          "EU-GDPR-7",
+          "EU-GDPR-6",
+          "EU-GDPR-28",
+          "EU-GDPR-13-1-f",
+          "EU-GDPR-44",
+          "EU-GDPR-17",
+          "EU-GDPR-13-2-b",
+          "EU-GDPR-5-1-f",
+          "EU-GDPR-5-1-e",
+          "EU-GDPR-13-2-a"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
+            "code_change": "Or stop the sharing: send a pseudonymous user id instead of email/name (see src/lib/sentry.ts:1)."
+          },
+          {
+            "policy_clause": "Some features of our service use artificial intelligence. When you use them, the content you submit is sent to OpenAI (based in US), which processes it to generate a response.",
+            "code_change": "Show a visible notice in the product that responses are AI-generated (feature at src/app/api/chat/route.ts:12)."
+          },
+          {
+            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+          },
+          {
+            "policy_clause": "We use the following service providers to run our service: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). They process personal data on our behalf and only on our instructions.",
+            "code_change": null
+          },
+          {
+            "policy_clause": "We collect and process the following categories of personal data: device id, ip, name, payment, user content. We use them to [purposes].",
+            "code_change": null
+          },
+          {
+            "policy_clause": "Some of our service providers are based outside the European Economic Area: Sentry (US), Mixpanel (US), OpenAI (US), PostHog (US), Stripe (US), Google Tag Manager (US), Google Analytics (US). When we transfer personal data to them we rely on [transfer mechanism].",
+            "code_change": null
+          },
+          {
+            "policy_clause": "You can delete your account and personal data at any time from [Settings > Account] or by emailing [contact address]. We delete your data within [period].",
+            "code_change": "Add a delete-account endpoint (for example DELETE /api/account) that removes the user's data, including at third-party vendors."
+          },
+          {
+            "policy_clause": null,
+            "code_change": "Remove personal data from the log statement at src/app/api/chat/route.ts:8; log an internal user id instead."
+          },
+          {
+            "policy_clause": "We keep your account data for as long as your account is active and delete it within [period] after you close it. Analytics data is kept for [period].",
+            "code_change": null
+          }
+        ],
+        "unverified_notes": [
+          "All cited provisions are awaiting human verification against the official text."
+        ],
+        "finding_statuses": {
+          "F2": "red",
+          "F4": "red",
+          "F5": "red",
+          "F1": "amber",
+          "F3": "amber",
+          "F6": "amber",
+          "F7": "amber",
+          "F8": "amber",
+          "F9": "amber"
+        }
+      },
+      {
+        "jurisdiction": "EU",
+        "area": "ai_transparency",
+        "status": "red",
+        "headline": "User content is sent to OpenAI (AI provider); policy does not mention AI processing",
+        "reasoning": "User content is sent to OpenAI (AI provider); policy does not mention AI processing. Possible inconsistency with Regulation Art. 50(1).",
+        "finding_ids": [
+          "F4"
+        ],
+        "provision_ids": [
+          "EU-AIACT-50-1"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "Some features of our service use artificial intelligence. When you use them, the content you submit is sent to OpenAI (based in US), which processes it to generate a response.",
+            "code_change": "Show a visible notice in the product that responses are AI-generated (feature at src/app/api/chat/route.ts:12)."
+          }
+        ],
+        "unverified_notes": [
+          "All cited provisions are awaiting human verification against the official text."
+        ],
+        "finding_statuses": {
+          "F4": "red"
+        }
+      },
+      {
+        "jurisdiction": "EU",
+        "area": "consumer",
+        "status": "red",
+        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Directive 2005/29/EC Art. 6; Directive 2005/29/EC Art. 7. PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Directive 2005/29/EC Art. 5. EU: consent is required before non-essential cookies or trackers, including analytics. No way to delete an account or data: not in the policy, no route found in code. Possible inconsistency with Directive 2005/29/EC Art. 7.",
+        "finding_ids": [
+          "F2",
+          "F5",
+          "F7"
+        ],
+        "provision_ids": [
+          "EU-UCPD-6",
+          "EU-UCPD-7",
+          "EU-UCPD-5"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
+            "code_change": "Or stop the sharing: send a pseudonymous user id instead of email/name (see src/lib/sentry.ts:1)."
+          },
+          {
+            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+          },
+          {
+            "policy_clause": "You can delete your account and personal data at any time from [Settings > Account] or by emailing [contact address]. We delete your data within [period].",
+            "code_change": "Add a delete-account endpoint (for example DELETE /api/account) that removes the user's data, including at third-party vendors."
+          }
+        ],
+        "unverified_notes": [
+          "All cited provisions are awaiting human verification against the official text."
+        ],
+        "finding_statuses": {
+          "F2": "red",
+          "F5": "red",
+          "F7": "amber"
+        }
+      },
+      {
+        "jurisdiction": "EU",
+        "area": "financial",
+        "status": "grey",
+        "headline": "Needs questionnaire",
+        "reasoning": "Financial licensing cannot be assessed from code and policy alone. Out of scope for this scan.",
+        "finding_ids": [],
+        "provision_ids": [],
+        "fixes": [],
+        "unverified_notes": [],
+        "finding_statuses": {}
+      },
+      {
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "status": "red",
+        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Art. 7 (Conditions for collection and processing); Art. 8(4) (Required content of consent). User content is sent to OpenAI (AI provider); policy does not mention AI processing. Personal data goes to vendors based in US (Sentry, Mixpanel, OpenAI and 4 more); policy does not mention international transfers. Possible inconsistency with Art. 12(2) (Storage in Kazakhstan and retention period); Art. 16 (Cross-border transfer); Art. 8(4) (Required content of consent). Kazakhstan requires personal data to be stored in a database located in Kazakhstan and restricts cross-border transfer; confirm where data of Kazakhstan users is stored. Sentry, Mixpanel, OpenAI and 4 more observed in code or network traffic; policy names no such recipients. Possible inconsistency with Art. 8(4) (Required content of consent); Art. 7 (Conditions for collection and processing). 5 more findings are listed below.",
+        "finding_ids": [
+          "F2",
+          "F4",
+          "F6",
+          "F1",
+          "F3",
+          "F5",
+          "F7",
+          "F8",
+          "F9"
+        ],
+        "provision_ids": [
+          "KZ-PD-7",
+          "KZ-PD-8",
+          "KZ-PD-12-2",
+          "KZ-PD-16",
+          "KZ-PD-25",
+          "KZ-PD-24"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
+            "code_change": "Or stop the sharing: send a pseudonymous user id instead of email/name (see src/lib/sentry.ts:1)."
+          },
+          {
+            "policy_clause": "Some features of our service use artificial intelligence. When you use them, the content you submit is sent to OpenAI (based in US), which processes it to generate a response.",
+            "code_change": "Show a visible notice in the product that responses are AI-generated (feature at src/app/api/chat/route.ts:12)."
+          },
+          {
+            "policy_clause": "Some of our service providers are based outside Kazakhstan: Sentry (US), Mixpanel (US), OpenAI (US), PostHog (US), Stripe (US), Google Tag Manager (US), Google Analytics (US). When we transfer personal data to them we rely on [transfer mechanism].",
+            "code_change": "Confirm that personal data of users in Kazakhstan is stored in a database located in Kazakhstan."
+          },
+          {
+            "policy_clause": "We use the following service providers to run our service: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). They process personal data on our behalf and only on our instructions.",
+            "code_change": null
+          },
+          {
+            "policy_clause": "We collect and process the following categories of personal data: device id, ip, name, payment, user content. We use them to [purposes].",
+            "code_change": null
+          },
+          {
+            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+          },
+          {
+            "policy_clause": "You can delete your account and personal data at any time from [Settings > Account] or by emailing [contact address]. We delete your data within [period].",
+            "code_change": "Add a delete-account endpoint (for example DELETE /api/account) that removes the user's data, including at third-party vendors."
+          },
+          {
+            "policy_clause": null,
+            "code_change": "Remove personal data from the log statement at src/app/api/chat/route.ts:8; log an internal user id instead."
+          },
+          {
+            "policy_clause": "We keep your account data for as long as your account is active and delete it within [period] after you close it. Analytics data is kept for [period].",
+            "code_change": null
+          }
+        ],
+        "unverified_notes": [
+          "All cited provisions are awaiting human verification against the official text."
+        ],
+        "finding_statuses": {
+          "F2": "red",
+          "F4": "red",
+          "F6": "red",
+          "F1": "amber",
+          "F3": "amber",
+          "F5": "amber",
+          "F7": "amber",
+          "F8": "amber",
+          "F9": "amber"
+        }
+      },
+      {
+        "jurisdiction": "KZ",
+        "area": "ai_transparency",
+        "status": "red",
+        "headline": "User content is sent to OpenAI (AI provider); policy does not mention AI processing",
+        "reasoning": "User content is sent to OpenAI (AI provider); policy does not mention AI processing. Possible inconsistency with Art. 16(1) (User rights when interacting with AI systems); Art. 21(1) (Users must be informed that AI is used).",
+        "finding_ids": [
+          "F4"
+        ],
+        "provision_ids": [
+          "KZ-AI-16",
+          "KZ-AI-21-1"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "Some features of our service use artificial intelligence. When you use them, the content you submit is sent to OpenAI (based in US), which processes it to generate a response.",
+            "code_change": "Show a visible notice in the product that responses are AI-generated (feature at src/app/api/chat/route.ts:12)."
+          }
+        ],
+        "unverified_notes": [
+          "All cited provisions are awaiting human verification against the official text."
+        ],
+        "finding_statuses": {
+          "F4": "red"
+        }
+      },
+      {
+        "jurisdiction": "KZ",
+        "area": "consumer",
+        "status": "red",
+        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Art. 10 (Consumer right to information); Art. 25 (Seller's duty to provide information). PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Art. 10 (Consumer right to information). Kazakhstan has no cookie-specific rule; general consent requirements for collection apply. No way to delete an account or data: not in the policy, no route found in code. Possible inconsistency with Art. 10 (Consumer right to information); Art. 25 (Seller's duty to provide information).",
+        "finding_ids": [
+          "F2",
+          "F5",
+          "F7"
+        ],
+        "provision_ids": [
+          "KZ-CP-10",
+          "KZ-CP-25"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
+            "code_change": "Or stop the sharing: send a pseudonymous user id instead of email/name (see src/lib/sentry.ts:1)."
+          },
+          {
+            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+          },
+          {
+            "policy_clause": "You can delete your account and personal data at any time from [Settings > Account] or by emailing [contact address]. We delete your data within [period].",
+            "code_change": "Add a delete-account endpoint (for example DELETE /api/account) that removes the user's data, including at third-party vendors."
+          }
+        ],
+        "unverified_notes": [
+          "All cited provisions are awaiting human verification against the official text."
+        ],
+        "finding_statuses": {
+          "F2": "red",
+          "F5": "amber",
+          "F7": "amber"
+        }
+      },
+      {
+        "jurisdiction": "KZ",
+        "area": "financial",
+        "status": "grey",
+        "headline": "Needs questionnaire",
+        "reasoning": "Financial licensing cannot be assessed from code and policy alone. Out of scope for this scan.",
+        "finding_ids": [],
+        "provision_ids": [],
+        "fixes": [],
+        "unverified_notes": [],
+        "finding_statuses": {}
+      }
+    ],
+    "provisions": {
+      "UK-GDPR-13-1-e": {
+        "id": "UK-GDPR-13-1-e",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 13(1)(e)",
+        "title": "Recipients must be disclosed",
+        "summary": "When collecting data, the controller must tell the person the recipients or categories of recipients of the personal data.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/13",
+        "tags": [
+          "processors",
+          "recipients",
+          "transparency",
+          "sharing"
+        ],
+        "verified": false
+      },
+      "UK-GDPR-5-1-a": {
+        "id": "UK-GDPR-5-1-a",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 5(1)(a)",
+        "title": "Lawfulness, fairness and transparency",
+        "summary": "Personal data must be processed lawfully, fairly and in a transparent manner in relation to the data subject.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/5",
+        "tags": [
+          "fairness",
+          "transparency",
+          "sharing",
+          "data_categories"
+        ],
+        "verified": false
+      },
+      "UK-GDPR-13-1-c": {
+        "id": "UK-GDPR-13-1-c",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 13(1)(c)",
+        "title": "Purposes and legal basis must be disclosed",
+        "summary": "When collecting data from the person, the controller must state the purposes of the processing and its legal basis.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/13",
+        "tags": [
+          "purposes",
+          "transparency",
+          "data_categories",
+          "ai"
+        ],
+        "verified": false
+      },
+      "UK-GDPR-28": {
+        "id": "UK-GDPR-28",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 28",
+        "title": "Processors",
+        "summary": "A controller may only use processors that provide sufficient guarantees, under a contract that sets out the processing.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/28",
+        "tags": [
+          "processors"
+        ],
+        "verified": false
+      },
+      "UK-PECR-6": {
+        "id": "UK-PECR-6",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "Privacy and Electronic Communications (EC Directive) Regulations 2003 (PECR)",
+        "ref": "reg. 6(1), as substituted by Data (Use and Access) Act 2025 s. 112",
+        "title": "Storing or accessing information on a user's device",
+        "summary": "A person must not store information, or gain access to information stored, in a user's terminal equipment unless an exception in Schedule A1 applies (for example consent, or strict necessity).",
+        "official_url": "https://www.legislation.gov.uk/ukpga/2025/18/section/112",
+        "tags": [
+          "cookies",
+          "consent",
+          "tracking"
+        ],
+        "verified": false
+      },
+      "UK-PECR-SCHA1-5": {
+        "id": "UK-PECR-SCHA1-5",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "PECR Schedule A1, inserted by Data (Use and Access) Act 2025 Sch. 12",
+        "ref": "Sch. A1 para. 5",
+        "title": "Statistical-purposes exception for analytics cookies",
+        "summary": "Consent is not required where storage or access is solely to collect statistical information about how a service or website is used, with a view to improving it, provided the user is given clear information and a simple means to object. Advertising and cross-site tracking are outside the exception.",
+        "official_url": "https://www.legislation.gov.uk/ukpga/2025/18/schedule/12",
+        "tags": [
+          "cookies",
+          "consent",
+          "tracking",
+          "statistical",
+          "analytics"
+        ],
+        "verified": false
+      },
+      "UK-GDPR-13-1-f": {
+        "id": "UK-GDPR-13-1-f",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 13(1)(f)",
+        "title": "International transfers must be disclosed",
+        "summary": "The controller must tell the person if it intends to transfer personal data to a third country or international organisation, and the safeguards relied on.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/13",
+        "tags": [
+          "transfers",
+          "transparency"
+        ],
+        "verified": false
+      },
+      "UK-GDPR-44": {
+        "id": "UK-GDPR-44",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 44",
+        "title": "General principle for transfers",
+        "summary": "Personal data may be transferred outside the UK only if the conditions of Chapter V are met.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/44",
+        "tags": [
+          "transfers"
+        ],
+        "verified": false
+      },
+      "UK-GDPR-17": {
+        "id": "UK-GDPR-17",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 17",
+        "title": "Right to erasure",
+        "summary": "The person has the right to have personal data erased without undue delay in listed cases.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/17",
+        "tags": [
+          "erasure",
+          "deletion",
+          "rights"
+        ],
+        "verified": false
+      },
+      "UK-GDPR-5-1-f": {
+        "id": "UK-GDPR-5-1-f",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 5(1)(f)",
+        "title": "Integrity and confidentiality",
+        "summary": "Personal data must be processed with appropriate security, including protection against unauthorised access.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/5",
+        "tags": [
+          "security",
+          "logs"
+        ],
+        "verified": false
+      },
+      "UK-GDPR-5-1-e": {
+        "id": "UK-GDPR-5-1-e",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 5(1)(e)",
+        "title": "Storage limitation",
+        "summary": "Personal data must be kept in identifiable form no longer than necessary for the purposes for which it is processed.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/5",
+        "tags": [
+          "retention"
+        ],
+        "verified": false
+      },
+      "UK-GDPR-13-2-a": {
+        "id": "UK-GDPR-13-2-a",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 13(2)(a)",
+        "title": "Retention period must be stated",
+        "summary": "The controller must state the period for which personal data will be stored or the criteria used to determine that period.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/13",
+        "tags": [
+          "retention",
+          "transparency"
+        ],
+        "verified": false
+      },
+      "UK-ICO-AI-GUIDANCE": {
+        "id": "UK-ICO-AI-GUIDANCE",
+        "jurisdiction": "UK",
+        "area": "ai_transparency",
+        "instrument": "ICO Guidance on AI and data protection (regulator guidance, not statute)",
+        "ref": "Transparency in AI",
+        "title": "Be transparent about AI processing of personal data",
+        "summary": "The UK has no AI-specific statute. ICO guidance expects organisations to tell people when and how their personal data is processed by AI systems, as part of UK GDPR transparency. Guidance only, so status is capped at amber.",
+        "official_url": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/guidance-on-ai-and-data-protection/",
+        "tags": [
+          "ai",
+          "transparency",
+          "chatbot"
+        ],
+        "verified": false
+      },
+      "UK-DMCC-227": {
+        "id": "UK-DMCC-227",
+        "jurisdiction": "UK",
+        "area": "consumer",
+        "instrument": "Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1",
+        "ref": "s. 227",
+        "title": "Misleading omissions",
+        "summary": "A practice involves a misleading omission if it omits or hides material information the average consumer needs to take an informed transactional decision.",
+        "official_url": "https://www.legislation.gov.uk/ukpga/2024/13/section/227",
+        "tags": [
+          "misleading",
+          "information",
+          "erasure",
+          "omission"
+        ],
+        "verified": false
+      },
+      "UK-DMCC-226": {
+        "id": "UK-DMCC-226",
+        "jurisdiction": "UK",
+        "area": "consumer",
+        "instrument": "Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1",
+        "ref": "s. 226",
+        "title": "Misleading actions",
+        "summary": "A practice involves a misleading action if it provides false or misleading information relating to the product or trader and is likely to cause the average consumer to take a transactional decision they would not otherwise take.",
+        "official_url": "https://www.legislation.gov.uk/ukpga/2024/13/section/226",
+        "tags": [
+          "misleading",
+          "sharing",
+          "fairness"
+        ],
+        "verified": false
+      },
+      "UK-DMCC-225": {
+        "id": "UK-DMCC-225",
+        "jurisdiction": "UK",
+        "area": "consumer",
+        "instrument": "Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1",
+        "ref": "s. 225",
+        "title": "Prohibition of unfair commercial practices",
+        "summary": "Unfair commercial practices are prohibited, including misleading actions, misleading omissions and practices that contravene professional diligence.",
+        "official_url": "https://www.legislation.gov.uk/ukpga/2024/13/section/225",
+        "tags": [
+          "fairness",
+          "dark_patterns",
+          "consent",
+          "tracking"
+        ],
+        "verified": false
+      },
+      "EU-GDPR-5-1-a": {
+        "id": "EU-GDPR-5-1-a",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 5(1)(a)",
+        "title": "Lawfulness, fairness and transparency",
+        "summary": "Personal data must be processed lawfully, fairly and in a transparent manner in relation to the data subject. A policy statement that contradicts actual processing is hard to square with transparency.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "fairness",
+          "transparency",
+          "sharing",
+          "data_categories"
+        ],
+        "verified": false
+      },
+      "EU-GDPR-13-1-e": {
+        "id": "EU-GDPR-13-1-e",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 13(1)(e)",
+        "title": "Recipients must be disclosed",
+        "summary": "When collecting data, the controller must tell the person the recipients or categories of recipients of the personal data.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "processors",
+          "recipients",
+          "transparency",
+          "sharing"
+        ],
+        "verified": false
+      },
+      "EU-GDPR-13-1-c": {
+        "id": "EU-GDPR-13-1-c",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 13(1)(c)",
+        "title": "Purposes and legal basis must be disclosed",
+        "summary": "When collecting data from the person, the controller must state the purposes of the processing and its legal basis.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "purposes",
+          "transparency",
+          "data_categories",
+          "ai"
+        ],
+        "verified": false
+      },
+      "EU-EPRIVACY-5-3": {
+        "id": "EU-EPRIVACY-5-3",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Directive 2002/58/EC (ePrivacy Directive)",
+        "ref": "Art. 5(3)",
+        "title": "Consent for cookies and similar technologies",
+        "summary": "Storing information, or accessing information stored, on a user's device is only allowed with the user's consent after clear information, unless strictly necessary to provide a service the user requested. There is no exemption for analytics.",
+        "official_url": "https://eur-lex.europa.eu/eli/dir/2002/58/oj",
+        "tags": [
+          "cookies",
+          "consent",
+          "tracking"
+        ],
+        "verified": false
+      },
+      "EU-GDPR-7": {
+        "id": "EU-GDPR-7",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 7",
+        "title": "Conditions for consent",
+        "summary": "Where processing relies on consent, the controller must be able to demonstrate that the person consented, and consent must be as easy to withdraw as to give.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "consent",
+          "tracking"
+        ],
+        "verified": false
+      },
+      "EU-GDPR-6": {
+        "id": "EU-GDPR-6",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 6(1)",
+        "title": "Lawful basis for processing",
+        "summary": "Processing is lawful only if at least one legal basis applies, such as consent, contract, legal obligation or legitimate interests.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "lawfulness",
+          "consent",
+          "tracking"
+        ],
+        "verified": false
+      },
+      "EU-GDPR-28": {
+        "id": "EU-GDPR-28",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 28",
+        "title": "Processors",
+        "summary": "A controller may only use processors that provide sufficient guarantees, under a contract that sets out the subject matter, duration, nature and purpose of the processing.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "processors"
+        ],
+        "verified": false
+      },
+      "EU-GDPR-13-1-f": {
+        "id": "EU-GDPR-13-1-f",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 13(1)(f)",
+        "title": "Third-country transfers must be disclosed",
+        "summary": "The controller must tell the person if it intends to transfer personal data to a third country, and reference the adequacy decision or safeguards relied on.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "transfers",
+          "transparency"
+        ],
+        "verified": false
+      },
+      "EU-GDPR-44": {
+        "id": "EU-GDPR-44",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 44",
+        "title": "General principle for transfers",
+        "summary": "Personal data may be transferred to a third country only if the conditions of Chapter V (adequacy decision or appropriate safeguards) are met.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "transfers"
+        ],
+        "verified": false
+      },
+      "EU-GDPR-17": {
+        "id": "EU-GDPR-17",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 17",
+        "title": "Right to erasure",
+        "summary": "The person has the right to have personal data erased without undue delay in listed cases, for example when it is no longer necessary or consent is withdrawn.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "erasure",
+          "deletion",
+          "rights"
+        ],
+        "verified": false
+      },
+      "EU-GDPR-13-2-b": {
+        "id": "EU-GDPR-13-2-b",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 13(2)(b)",
+        "title": "Data subject rights must be listed",
+        "summary": "The controller must inform the person of the rights to access, rectification, erasure, restriction, objection and data portability.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "erasure",
+          "rights",
+          "transparency"
+        ],
+        "verified": false
+      },
+      "EU-GDPR-5-1-f": {
+        "id": "EU-GDPR-5-1-f",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 5(1)(f)",
+        "title": "Integrity and confidentiality",
+        "summary": "Personal data must be processed with appropriate security, including protection against unauthorised access. Personal data written to application logs widens who can access it.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "security",
+          "logs"
+        ],
+        "verified": false
+      },
+      "EU-GDPR-5-1-e": {
+        "id": "EU-GDPR-5-1-e",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 5(1)(e)",
+        "title": "Storage limitation",
+        "summary": "Personal data must be kept in identifiable form no longer than necessary for the purposes for which it is processed.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "retention"
+        ],
+        "verified": false
+      },
+      "EU-GDPR-13-2-a": {
+        "id": "EU-GDPR-13-2-a",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 13(2)(a)",
+        "title": "Retention period must be stated",
+        "summary": "The controller must state the period for which personal data will be stored or, if that is not possible, the criteria used to determine that period.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "retention",
+          "transparency"
+        ],
+        "verified": false
+      },
+      "EU-AIACT-50-1": {
+        "id": "EU-AIACT-50-1",
+        "jurisdiction": "EU",
+        "area": "ai_transparency",
+        "instrument": "Regulation (EU) 2024/1689 (AI Act)",
+        "ref": "Art. 50(1)",
+        "title": "People must be told they are interacting with an AI system",
+        "summary": "Providers must ensure AI systems intended to interact directly with people are designed so that people are informed they are interacting with an AI system, unless this is obvious from the context.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+        "tags": [
+          "ai",
+          "transparency",
+          "chatbot"
+        ],
+        "verified": false
+      },
+      "EU-UCPD-6": {
+        "id": "EU-UCPD-6",
+        "jurisdiction": "EU",
+        "area": "consumer",
+        "instrument": "Directive 2005/29/EC (Unfair Commercial Practices Directive)",
+        "ref": "Art. 6",
+        "title": "Misleading actions",
+        "summary": "A practice is misleading if it contains false information, or is likely to deceive the average consumer, and causes a transactional decision the consumer would not otherwise have taken.",
+        "official_url": "https://eur-lex.europa.eu/eli/dir/2005/29/oj",
+        "tags": [
+          "misleading",
+          "sharing",
+          "fairness"
+        ],
+        "verified": false
+      },
+      "EU-UCPD-7": {
+        "id": "EU-UCPD-7",
+        "jurisdiction": "EU",
+        "area": "consumer",
+        "instrument": "Directive 2005/29/EC (Unfair Commercial Practices Directive)",
+        "ref": "Art. 7",
+        "title": "Misleading omissions",
+        "summary": "A practice is misleading if it omits or hides material information that the average consumer needs to take an informed transactional decision.",
+        "official_url": "https://eur-lex.europa.eu/eli/dir/2005/29/oj",
+        "tags": [
+          "misleading",
+          "information",
+          "erasure",
+          "omission"
+        ],
+        "verified": false
+      },
+      "EU-UCPD-5": {
+        "id": "EU-UCPD-5",
+        "jurisdiction": "EU",
+        "area": "consumer",
+        "instrument": "Directive 2005/29/EC (Unfair Commercial Practices Directive)",
+        "ref": "Art. 5",
+        "title": "Prohibition of unfair commercial practices",
+        "summary": "Unfair commercial practices are prohibited: practices contrary to professional diligence that materially distort the economic behaviour of the average consumer.",
+        "official_url": "https://eur-lex.europa.eu/eli/dir/2005/29/oj",
+        "tags": [
+          "fairness",
+          "dark_patterns",
+          "consent",
+          "tracking"
+        ],
+        "verified": false
+      },
+      "KZ-PD-7": {
+        "id": "KZ-PD-7",
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "instrument": "Law of the Republic of Kazakhstan No. 94-V 'On Personal Data and their Protection' (21 May 2013)",
+        "ref": "Art. 7",
+        "title": "Conditions for collection and processing",
+        "summary": "Collection and processing of personal data is carried out with the consent of the subject, except in cases set by law. Transfer to third parties and cross-border transfer are subject to consent.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z1300000094",
+        "tags": [
+          "consent",
+          "lawfulness",
+          "sharing",
+          "recipients",
+          "processors",
+          "cookies",
+          "tracking"
+        ],
+        "verified": false
+      },
+      "KZ-PD-8": {
+        "id": "KZ-PD-8",
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "instrument": "Law of the Republic of Kazakhstan No. 94-V 'On Personal Data and their Protection' (21 May 2013)",
+        "ref": "Art. 8(4)",
+        "title": "Required content of consent",
+        "summary": "Consent must state, among other things, its validity period, whether data may be transferred to third parties, whether cross-border transfer takes place, and the list of data collected.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z1300000094",
+        "tags": [
+          "consent",
+          "recipients",
+          "processors",
+          "transfers",
+          "data_categories",
+          "retention",
+          "transparency",
+          "sharing"
+        ],
+        "verified": false
+      },
+      "KZ-PD-12-2": {
+        "id": "KZ-PD-12-2",
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "instrument": "Law of the Republic of Kazakhstan No. 94-V 'On Personal Data and their Protection' (21 May 2013)",
+        "ref": "Art. 12(2)",
+        "title": "Storage in Kazakhstan and retention period",
+        "summary": "Personal data must be stored in a database or digital facility located in the territory of Kazakhstan. The retention period is set by the date the purposes of collection and processing are achieved.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z1300000094",
+        "tags": [
+          "localisation",
+          "transfers",
+          "retention"
+        ],
+        "verified": false
+      },
+      "KZ-PD-16": {
+        "id": "KZ-PD-16",
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "instrument": "Law of the Republic of Kazakhstan No. 94-V 'On Personal Data and their Protection' (21 May 2013)",
+        "ref": "Art. 16",
+        "title": "Cross-border transfer",
+        "summary": "Cross-border transfer is allowed only to states that ensure protection of personal data, or otherwise on limited grounds such as the subject's consent to the cross-border transfer.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z1300000094",
+        "tags": [
+          "transfers"
+        ],
+        "verified": false
+      },
+      "KZ-PD-25": {
+        "id": "KZ-PD-25",
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "instrument": "Law of the Republic of Kazakhstan No. 94-V 'On Personal Data and their Protection' (21 May 2013)",
+        "ref": "Art. 25",
+        "title": "Duties of the owner and operator",
+        "summary": "The owner or operator must take legal, organisational and technical measures to protect personal data, be able to evidence consent, give the subject access to their data, and destroy data in the cases set by law.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z1300000094",
+        "tags": [
+          "security",
+          "logs",
+          "erasure",
+          "deletion",
+          "consent"
+        ],
+        "verified": false
+      },
+      "KZ-PD-24": {
+        "id": "KZ-PD-24",
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "instrument": "Law of the Republic of Kazakhstan No. 94-V 'On Personal Data and their Protection' (21 May 2013)",
+        "ref": "Art. 24",
+        "title": "Rights of the subject",
+        "summary": "The subject has rights including to know what personal data the owner or operator holds, to require changes, blocking and destruction of data in cases set by law, and to withdraw consent.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z1300000094",
+        "tags": [
+          "erasure",
+          "deletion",
+          "rights"
+        ],
+        "verified": false
+      },
+      "KZ-AI-16": {
+        "id": "KZ-AI-16",
+        "jurisdiction": "KZ",
+        "area": "ai_transparency",
+        "instrument": "Law of the Republic of Kazakhstan No. 230-VIII 'On Artificial Intelligence' (17 November 2025, in force 18 January 2026)",
+        "ref": "Art. 16(1)",
+        "title": "User rights when interacting with AI systems",
+        "summary": "Users have the right to read the user agreement of the AI system, to protection of their personal data processed by it, to explanations of results affecting their rights, and to refuse to interact with an AI system where interaction is not mandatory by law.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z2500000230",
+        "tags": [
+          "ai",
+          "transparency",
+          "rights",
+          "chatbot"
+        ],
+        "verified": false
+      },
+      "KZ-AI-21-1": {
+        "id": "KZ-AI-21-1",
+        "jurisdiction": "KZ",
+        "area": "ai_transparency",
+        "instrument": "Law of the Republic of Kazakhstan No. 230-VIII 'On Artificial Intelligence' (17 November 2025, in force 18 January 2026)",
+        "ref": "Art. 21(1)",
+        "title": "Users must be informed that AI is used",
+        "summary": "Users must be informed that goods, works and services are produced or provided using artificial intelligence systems.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z2500000230",
+        "tags": [
+          "ai",
+          "transparency",
+          "chatbot"
+        ],
+        "verified": false
+      },
+      "KZ-CP-10": {
+        "id": "KZ-CP-10",
+        "jurisdiction": "KZ",
+        "area": "consumer",
+        "instrument": "Law of the Republic of Kazakhstan No. 274-IV 'On Protection of Consumer Rights' (4 May 2010)",
+        "ref": "Art. 10",
+        "title": "Consumer right to information",
+        "summary": "The consumer has the right to receive full, reliable and timely information about goods, works and services and about the seller or provider.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z100000274_",
+        "tags": [
+          "information",
+          "misleading",
+          "sharing",
+          "fairness",
+          "erasure",
+          "omission",
+          "consent",
+          "tracking"
+        ],
+        "verified": false
+      },
+      "KZ-CP-25": {
+        "id": "KZ-CP-25",
+        "jurisdiction": "KZ",
+        "area": "consumer",
+        "instrument": "Law of the Republic of Kazakhstan No. 274-IV 'On Protection of Consumer Rights' (4 May 2010)",
+        "ref": "Art. 25",
+        "title": "Seller's duty to provide information",
+        "summary": "The seller or provider must give the consumer the mandatory information about the goods, works or services, including their main consumer properties.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z100000274_",
+        "tags": [
+          "information",
+          "misleading",
+          "omission"
+        ],
+        "verified": false
+      }
+    },
+    "stats": {
+      "files_scanned": 8,
+      "bearer": false,
+      "requests_pre_consent": 4,
+      "vendors_found": 7,
+      "claims_method": "heuristic",
+      "verdict_method": "deterministic",
+      "duration_s": 41.3
+    },
+    "disclaimer": "Groundtruth is a first-pass engineering check. It reports possible inconsistencies between observed product behaviour and the published privacy policy. It is not legal advice."
+  },
+  "error": null
+}
