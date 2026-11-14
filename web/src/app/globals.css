@@ -5,6 +5,10 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-status-red: var(--status-red);
+  --color-status-amber: var(--status-amber);
+  --color-status-green: var(--status-green);
+  --color-status-grey: var(--status-grey);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -73,6 +77,10 @@
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
+  --status-red: oklch(0.55 0.2 25);
+  --status-amber: oklch(0.62 0.15 70);
+  --status-green: oklch(0.55 0.14 155);
+  --status-grey: oklch(0.55 0.01 260);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -84,11 +92,15 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --status-red: oklch(0.72 0.17 22);
+  --status-amber: oklch(0.82 0.14 80);
+  --status-green: oklch(0.77 0.14 155);
+  --status-grey: oklch(0.66 0.01 260);
+  --background: oklch(0.155 0.006 260);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+  --card: oklch(0.195 0.007 260);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: oklch(0.185 0.007 260);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
@@ -126,5 +138,6 @@
   }
   html {
     @apply font-sans;
+    color-scheme: dark;
   }
 }

@@ -1,55 +1,65 @@
-import type { components } from "./api-types";
+import type { AuditCreated, AuditRequest, AuditStatus, ProgressEvent } from "@/lib/types";
 
-type S = components["schemas"];
-export type AuditReport = S["AuditReport"];
-export type AuditStatus = S["AuditStatus"];
-export type AuditRequest = S["AuditRequest"];
-export type CellVerdict = S["CellVerdict"];
-export type Finding = S["Finding"];
-export type Evidence = S["Evidence"];
-export type Observation = S["Observation"];
-export type Provision = S["Provision"];
-export type Fix = S["Fix"];
-export type ProgressEvent = S["ProgressEvent"];
-export type Status = CellVerdict["status"];
-export type Jurisdiction = CellVerdict["jurisdiction"];
-export type Area = CellVerdict["area"];
+export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/$/, "");
+// The cached audit of demo/fixture-app. The web app bundles it, so this report opens without the API.
+export const DEMO_ID = "demo-fixture";
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-
-export const JURISDICTIONS: { id: Jurisdiction; label: string }[] = [
-  { id: "UK", label: "United Kingdom" },
-  { id: "EU", label: "European Union" },
-  { id: "KZ", label: "Kazakhstan" },
-];
-export const AREAS: { id: Area; label: string }[] = [
-  { id: "personal_data", label: "Personal data" },
-  { id: "ai_transparency", label: "AI transparency" },
-  { id: "consumer", label: "Consumer protection" },
-  { id: "financial", label: "Financial" },
-];
-
-async function json<T>(res: Response): Promise<T> {
-  if (!res.ok) {
-    const body = await res.json().catch(() => null);
-    const detail = typeof body?.detail === "string" ? body.detail : `Request failed (${res.status})`;
-    throw new Error(detail);
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly kind: "network" | "http",
+  ) {
+    super(message);
   }
-  return res.json();
 }
 
-export async function createAudit(req: AuditRequest): Promise<{ id: string }> {
-  const res = await fetch(`${API_URL}/audits`, {
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, init);
+  } catch {
+    throw new ApiError(`Cannot reach the audit service at ${API_URL}.`, "network");
+  }
+  if (!res.ok) {
+    let detail = "";
+    try {
+      const body = await res.json();
+      detail = typeof body?.detail === "string" ? body.detail : "";
+    } catch {}
+    throw new ApiError(detail || `The audit service answered with status ${res.status}.`, "http");
+  }
+  return res.json() as Promise<T>;
+}
+
+export function createAudit(body: AuditRequest): Promise<AuditCreated> {
+  return request<AuditCreated>("/audits", {
     method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(req),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
-  return json(res);
 }
 
-export async function getAudit(id: string): Promise<AuditStatus> {
-  return json(await fetch(`${API_URL}/audits/${encodeURIComponent(id)}`));
+export function getAudit(id: string): Promise<AuditStatus> {
+  return request<AuditStatus>(`/audits/${encodeURIComponent(id)}`);
 }
 
-export const eventsUrl = (id: string) => `${API_URL}/audits/${encodeURIComponent(id)}/events`;
-export const markdownUrl = (id: string) => `${API_URL}/audits/${encodeURIComponent(id)}/report.md`;
+export function markdownUrl(id: string): string {
+  return `${API_URL}/audits/${encodeURIComponent(id)}/report.md`;
+}
+
+// GET /audits/{id}/events sends `progress` events and closes the stream with `end`.
+export function subscribeToEvents(
+  id: string,
+  onEvent: (event: ProgressEvent) => void,
+  onEnd: () => void,
+): () => void {
+  const source = new EventSource(`${API_URL}/audits/${encodeURIComponent(id)}/events`);
+  source.addEventListener("progress", (message) => onEvent(JSON.parse(message.data) as ProgressEvent));
+  source.addEventListener("end", () => {
+    source.close();
+    onEnd();
+  });
+  // A reconnect would replay every event; polling in useAudit picks up the result instead.
+  source.onerror = () => source.close();
+  return () => source.close();
+}

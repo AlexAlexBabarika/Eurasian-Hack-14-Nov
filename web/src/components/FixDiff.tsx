@@ -1,45 +1,34 @@
-"use client";
+import { FileText, Wrench } from "lucide-react";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import type { Fix } from "@/lib/api";
-
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      size="sm"
-      onClick={async () => {
-        await navigator.clipboard.writeText(text);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1500);
-      }}
-    >
-      {copied ? "Copied" : "Copy"}
-    </Button>
-  );
-}
+import { CopyButton } from "@/components/CopyButton";
+import type { Fix } from "@/lib/types";
 
 export function FixDiff({ fix }: { fix: Fix }) {
+  if (!fix.policy_clause && !fix.code_change) return null;
   return (
-    <div className="space-y-3 rounded-md border p-3">
+    <div className="overflow-hidden rounded-lg border">
       {fix.policy_clause && (
-        <div>
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Policy clause</p>
-            <CopyButton text={fix.policy_clause} />
+        <div className="border-l-2 border-status-green bg-status-green/[0.06] p-3">
+          <div className="mb-1.5 flex items-center justify-between gap-2">
+            <p className="flex items-center gap-1.5 text-xs font-medium text-status-green">
+              <FileText aria-hidden className="size-3.5" />
+              Add to your policy
+            </p>
+            <CopyButton text={fix.policy_clause} label="Copy clause" />
           </div>
-          <p className="mt-2 border-l-2 border-emerald-500/60 bg-emerald-500/5 py-2 pl-3 pr-2 text-sm">
-            {fix.policy_clause}
-          </p>
+          <p className="text-sm leading-relaxed text-foreground">{fix.policy_clause}</p>
         </div>
       )}
       {fix.code_change && (
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Code change</p>
-          <p className="mt-2 whitespace-pre-wrap text-sm text-foreground/90">{fix.code_change}</p>
+        <div className={fix.policy_clause ? "border-t bg-card/60 p-3" : "bg-card/60 p-3"}>
+          <div className="mb-1.5 flex items-center justify-between gap-2">
+            <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <Wrench aria-hidden className="size-3.5" />
+              Change in code
+            </p>
+            <CopyButton text={fix.code_change} />
+          </div>
+          <p className="text-sm leading-relaxed text-foreground/90">{fix.code_change}</p>
         </div>
       )}
     </div>

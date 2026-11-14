@@ -1,120 +1,102 @@
-"use client";
-
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { JURISDICTIONS, createAudit, type Jurisdiction } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import { ArrowRight, Braces, Scale, ScanSearch } from "lucide-react";
 
-const DEMO = {
-  repo_url: "https://github.com/AlexAlexBabarika/Eurasian-Hack-14-Nov/tree/main/demo/fixture-app",
-  site_url: "http://localhost:4100/public/index.html",
-  policy_url: "http://localhost:4100/privacy.html",
-};
-const FIELDS = [
-  { name: "repo_url", label: "GitHub repository", placeholder: "https://github.com/acme/app" },
-  { name: "site_url", label: "Live site", placeholder: "https://acme.com" },
-  { name: "policy_url", label: "Privacy policy", placeholder: "https://acme.com/privacy" },
-] as const;
+import { AuditForm } from "@/components/AuditForm";
+import { SiteHeader } from "@/components/SiteHeader";
+import { StatusIcon } from "@/components/StatusBadge";
+import { DEMO_ID } from "@/lib/api";
+
+const HOW = [
+  {
+    icon: Braces,
+    title: "Reads what the product does",
+    text: "Dependencies, source code and the requests your site makes before anyone clicks Accept.",
+  },
+  {
+    icon: ScanSearch,
+    title: "Compares it with your policy",
+    text: "Each mismatch is shown next to the exact sentence of the policy and the exact line of code.",
+  },
+  {
+    icon: Scale,
+    title: "Maps it to the law",
+    text: "Every result cites a specific provision in UK, EU or Kazakhstan law, with a link to the official text.",
+  },
+];
 
 export default function Home() {
-  const router = useRouter();
-  const [form, setForm] = useState({ repo_url: "", site_url: "", policy_url: "" });
-  const [jurisdictions, setJurisdictions] = useState<Jurisdiction[]>(["UK", "EU", "KZ"]);
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setPending(true);
-    try {
-      const { id } = await createAudit({ ...form, jurisdictions });
-      router.push(`/audit/${id}`);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      setError(message === "Failed to fetch" ? "Cannot reach the API. Is it running on port 8000?" : message);
-      setPending(false);
-    }
-  }
-
-  const toggle = (j: Jurisdiction) =>
-    setJurisdictions((cur) => (cur.includes(j) ? cur.filter((x) => x !== j) : [...cur, j]));
-
   return (
-    <div className="mx-auto max-w-2xl">
-      <h1 className="text-3xl font-semibold tracking-tight text-balance">
-        Does your privacy policy match what your code does?
-      </h1>
-      <p className="mt-3 text-muted-foreground">
-        Groundtruth scans your repository and live site, compares the evidence with your policy, and maps each
-        possible inconsistency to official law in the UK, EU and Kazakhstan.
-      </p>
+    <div className="flex min-h-screen flex-col">
+      <SiteHeader>
+        <Link
+          href={`/audit/${DEMO_ID}`}
+          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+        >
+          See an example report
+          <ArrowRight aria-hidden className="size-3.5" />
+        </Link>
+      </SiteHeader>
 
-      <form onSubmit={submit} className="mt-10 space-y-5">
-        {FIELDS.map((f) => (
-          <div key={f.name} className="space-y-2">
-            <Label htmlFor={f.name}>{f.label}</Label>
-            <Input
-              id={f.name}
-              type="url"
-              required
-              placeholder={f.placeholder}
-              value={form[f.name]}
-              onChange={(e) => setForm({ ...form, [f.name]: e.target.value })}
-              className="font-mono text-sm"
-            />
-          </div>
-        ))}
-
-        <fieldset className="space-y-2">
-          <legend className="text-sm font-medium">Jurisdictions</legend>
-          <div className="flex gap-2">
-            {JURISDICTIONS.map((j) => (
-              <button
-                key={j.id}
-                type="button"
-                aria-pressed={jurisdictions.includes(j.id)}
-                onClick={() => toggle(j.id)}
-                className={cn(
-                  "rounded-md border px-3 py-1.5 text-sm transition-colors",
-                  jurisdictions.includes(j.id)
-                    ? "border-foreground/40 bg-secondary text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {j.label}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-
-        {error && (
-          <p role="alert" className="rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
-            {error}
+      <main className="mx-auto grid w-full max-w-6xl flex-1 content-start gap-x-16 gap-y-8 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,520px)] lg:py-16">
+        <section className="space-y-4 lg:pt-4">
+          <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">Privacy policy vs. code</p>
+          <h1 className="text-3xl leading-tight font-semibold tracking-tight text-balance text-foreground sm:text-4xl">
+            Does your privacy policy match what your product actually does?
+          </h1>
+          <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
+            Paste three links. Groundtruth compares the code and the live site with the policy and shows every possible
+            inconsistency with evidence, the provision it relates to, and text you can paste to fix it.
           </p>
-        )}
+        </section>
 
-        <div className="flex flex-wrap items-center gap-3 pt-2">
-          <Button type="submit" disabled={pending || jurisdictions.length === 0}>
-            {pending ? "Starting audit" : "Run audit"}
-          </Button>
-          <Button type="button" variant="outline" onClick={() => setForm(DEMO)}>
-            Use demo fixture
-          </Button>
-          <Link href="/audit/demo-fixture" className="text-sm text-muted-foreground underline-offset-4 hover:underline">
-            View a sample report
-          </Link>
-        </div>
-      </form>
+        <section aria-label="Start an audit" className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <AuditForm />
+        </section>
 
-      <p className="mt-10 text-xs text-muted-foreground">
-        Public repositories and public pages only. Results are possible inconsistencies for you and your lawyer to
-        review, not legal advice.
-      </p>
+        <section aria-label="How it works" className="space-y-8 lg:col-start-1">
+          <ol className="space-y-5">
+            {HOW.map((item, i) => (
+              <li key={item.title} className="flex gap-3.5">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border bg-card text-muted-foreground">
+                  <item.icon aria-hidden className="size-4" />
+                </span>
+                <div className="space-y-0.5">
+                  <p className="text-sm font-medium text-foreground">
+                    <span className="mr-1.5 text-muted-foreground">{i + 1}.</span>
+                    {item.title}
+                  </p>
+                  <p className="text-sm text-muted-foreground">{item.text}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <div className="rounded-xl border border-dashed p-4">
+            <p className="mb-2.5 text-xs text-muted-foreground">You get one verdict per country and area of law:</p>
+            <ul className="grid gap-x-6 gap-y-1.5 text-sm text-foreground/90 sm:grid-cols-2">
+              <li className="flex items-center gap-2">
+                <StatusIcon status="red" /> Possible inconsistency
+              </li>
+              <li className="flex items-center gap-2">
+                <StatusIcon status="amber" /> Needs review
+              </li>
+              <li className="flex items-center gap-2">
+                <StatusIcon status="green" /> No issues found
+              </li>
+              <li className="flex items-center gap-2">
+                <StatusIcon status="grey" /> Not assessed
+              </li>
+            </ul>
+          </div>
+        </section>
+      </main>
+
+      <footer className="border-t">
+        <p className="mx-auto w-full max-w-6xl px-4 py-4 text-xs text-muted-foreground sm:px-6">
+          A first-pass engineering check, not legal advice. Results are worded as possible inconsistencies for a lawyer to
+          review.
+        </p>
+      </footer>
     </div>
   );
 }

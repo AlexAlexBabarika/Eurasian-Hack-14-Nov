@@ -1,48 +1,112 @@
-import type { ProgressEvent } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import { Check, Circle, LoaderCircle, Minus, X } from "lucide-react";
+import { cn } from "cn";
 
-const STEPS: { id: ProgressEvent["step"]; label: string }[] = [
-  { id: "clone", label: "Fetch repository" },
-  { id: "manifests", label: "SDK and dependency scan" },
-  { id: "bearer", label: "Bearer data-flow scan" },
-  { id: "site_scan", label: "Site scan before consent" },
-  { id: "policy_fetch", label: "Fetch privacy policy" },
-  { id: "claims", label: "Extract policy claims" },
-  { id: "diff", label: "Compare behaviour with claims" },
-  { id: "law", label: "Retrieve legal provisions" },
-  { id: "verdict", label: "Write verdicts" },
-];
+import { STEP_LABEL } from "@/lib/labels";
+import type { ProgressEvent, Step } from "@/lib/types";
+import { STEPS } from "@/lib/types";
 
-const DOT: Record<string, string> = {
-  pending: "border-border bg-transparent",
-  running: "border-sky-400 bg-sky-400/30 animate-pulse",
-  done: "border-emerald-400 bg-emerald-400",
-  error: "border-red-400 bg-red-400",
-  skipped: "border-muted-foreground bg-muted-foreground/40",
+type StepState = ProgressEvent["status"] | "pending";
+
+export function latestByStep(events: ProgressEvent[]): Partial<Record<Step, ProgressEvent>> {
+  const latest: Partial<Record<Step, ProgressEvent>> = {};
+  for (const event of events) latest[event.step] = event;
+  return latest;
+}
+
+function StepIcon({ state }: { state: StepState }) {
+  const base = "flex size-6 shrink-0 items-center justify-center rounded-full border";
+  if (state === "done")
+    return (
+      <span className={cn(base, "border-status-green/40 bg-status-green/10 text-status-green")}>
+        <Check aria-hidden className="size-3.5" />
+      </span>
+    );
+  if (state === "running")
+    return (
+      <span className={cn(base, "border-foreground/40 text-foreground")}>
+        <LoaderCircle aria-hidden className="size-3.5 animate-spin" />
+      </span>
+    );
+  if (state === "error")
+    return (
+      <span className={cn(base, "border-status-red/40 bg-status-red/10 text-status-red")}>
+        <X aria-hidden className="size-3.5" />
+      </span>
+    );
+  if (state === "skipped")
+    return (
+      <span className={cn(base, "text-muted-foreground")}>
+        <Minus aria-hidden className="size-3.5" />
+      </span>
+    );
+  return (
+    <span className={cn(base, "border-dashed text-muted-foreground/40")}>
+      <Circle aria-hidden className="size-2 fill-current" />
+    </span>
+  );
+}
+
+const STATE_TEXT: Record<StepState, string> = {
+  pending: "Waiting",
+  running: "In progress",
+  done: "Done",
+  error: "Failed, continuing without it",
+  skipped: "Skipped",
 };
 
 export function ProgressTimeline({ events }: { events: ProgressEvent[] }) {
-  const latest = new Map(events.map((e) => [e.step, e]));
+  const latest = latestByStep(events);
+  const finished = STEPS.filter((step) => {
+    const status = latest[step]?.status;
+    return status === "done" || status === "skipped" || status === "error";
+  }).length;
+  const percent = Math.round((finished / STEPS.length) * 100);
+
   return (
-    <ol className="space-y-0" aria-live="polite">
-      {STEPS.map((step, i) => {
-        const event = latest.get(step.id);
-        const status = event?.status ?? "pending";
-        return (
-          <li key={step.id} className="relative flex gap-4 pb-5 last:pb-0">
-            {i < STEPS.length - 1 && <span className="absolute left-[5px] top-4 h-full w-px bg-border" />}
-            <span className={cn("relative mt-1 size-[11px] shrink-0 rounded-full border", DOT[status])} />
-            <div className="min-w-0">
-              <p className={cn("text-sm font-medium", status === "pending" && "text-muted-foreground")}>
-                {step.label}
-                {status === "error" && <span className="ml-2 text-xs text-red-300">failed, continuing</span>}
-                {status === "skipped" && <span className="ml-2 text-xs text-muted-foreground">skipped</span>}
-              </p>
-              {event && <p className="mt-0.5 break-words text-xs text-muted-foreground">{event.message}</p>}
-            </div>
-          </li>
-        );
-      })}
-    </ol>
+    <div className="space-y-5">
+      <div className="space-y-2">
+        <div className="flex items-baseline justify-between text-xs text-muted-foreground">
+          <span>
+            Step {Math.min(finished + 1, STEPS.length)} of {STEPS.length}
+          </span>
+          <span>{percent}%</span>
+        </div>
+        <div
+          role="progressbar"
+          aria-label="Audit progress"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={percent}
+          className="h-1 overflow-hidden rounded-full bg-muted"
+        >
+          <div className="h-full rounded-full bg-foreground transition-[width] duration-500" style={{ width: `${percent}%` }} />
+        </div>
+      </div>
+
+      <ol aria-live="polite" className="relative">
+        {STEPS.map((step, i) => {
+          const event = latest[step];
+          const state: StepState = event?.status ?? "pending";
+          return (
+            <li key={step} className="relative flex gap-3 pb-4 last:pb-0">
+              {i < STEPS.length - 1 && <span aria-hidden className="absolute top-6 bottom-0 left-3 w-px bg-border" />}
+              <StepIcon state={state} />
+              <div className="min-w-0 pt-0.5">
+                <p className={cn("text-sm", state === "pending" ? "text-muted-foreground" : "font-medium text-foreground")}>
+                  {STEP_LABEL[step]}
+                  <span className="sr-only">: {STATE_TEXT[state]}</span>
+                </p>
+                {event && (
+                  <p className={cn("text-xs", state === "error" ? "text-status-red" : "text-muted-foreground")}>
+                    {event.message}
+                    {state === "error" && " The audit continues without this step."}
+                  </p>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
   );
 }
