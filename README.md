@@ -37,11 +37,13 @@ Inside the container `localhost` is the container itself. To audit something ser
 
 ### MCP server
 
-`mcp/server.py` exposes the audit as one tool, `audit_product(repo_url, site_url, policy_url)`, over stdio and returns the Markdown report. Needs `mcp` 2.x (installed by `make setup`).
+`mcp/server.py` exposes the audit as one tool, `audit_product(repo_url, site_url, policy_url, jurisdictions)`, over stdio and returns the Markdown report. `jurisdictions` is optional: a list of `UK`, `EU`, `KZ` that limits the matrix and verdicts; leave it out for all three. Needs `mcp` 2.x (installed by `make setup`).
 
 ```sh
 uv run --project api python mcp/server.py
 ```
+
+To use it from Claude Code, Cursor or Claude Desktop, see [mcp/README.md](mcp/README.md). The repo ships `.mcp.json` and `.cursor/mcp.json`, so the first two need no configuration.
 
 With `DEMO_MODE=cached` (in `.env` or the server's environment), inputs that match a saved audit in `api/data/audits/` return that report at once, without cloning or scanning. Other inputs still run a live audit.
 
