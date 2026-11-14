@@ -7,6 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "api"))
 
 from mcp.server.mcpserver import MCPServer  # noqa: E402
+from mcp.server.mcpserver.exceptions import ToolError  # noqa: E402
 
 from app.models import AuditRequest  # noqa: E402
 from app.pipeline import run_audit  # noqa: E402
@@ -24,7 +25,7 @@ async def audit_product(repo_url: str, site_url: str, policy_url: str) -> str:
     """
     for name, value in (("repo_url", repo_url), ("site_url", site_url), ("policy_url", policy_url)):
         if not value.startswith(("http://", "https://")):
-            raise ValueError(f"{name} must be an http(s) URL")
+            raise ToolError(f"{name} must be an http(s) URL")
     req = AuditRequest(repo_url=repo_url, site_url=site_url, policy_url=policy_url)
     report = await run_audit(uuid.uuid4().hex[:12], req, lambda event: None)
     return render(report)

@@ -41,7 +41,7 @@ Positioning: "Website GDPR scanners read your policy. Enterprise code scanners c
 | Law retrieval | **Curated YAML corpus + tag filter + BM25 (`rank-bm25`)**, no vector DB | ~40 provisions, deterministic, zero infra, citations can be whitelisted |
 | Streaming | **sse-starlette** | progress events to the UI |
 | Storage | in-memory dict + JSON files in `./data/audits/` | no DB needed; also used for the cached demo |
-| MCP (stretch) | **`mcp` Python SDK (FastMCP)** | exposes `audit_product` to Claude/Cursor |
+| MCP (stretch) | **`mcp` Python SDK 2.x (MCPServer)** | exposes `audit_product` to Claude/Cursor |
 | Types FE↔BE | FastAPI OpenAPI → **`openapi-typescript`** → `web/src/lib/api-types.ts` | one source of truth (Pydantic) |
 | Run/demo | `docker compose` (api image includes Chromium + git + bearer) + local `pnpm dev` | demo runs locally; Vercel deploy of `web/` is optional |
 
@@ -106,7 +106,7 @@ groundtruth/
 │   └── src/lib/api.ts, api-types.ts (generated)
 │
 ├── mcp/
-│   └── server.py               # FastMCP: audit_product(repo_url, site_url, policy_url) (C, stretch)
+│   └── server.py               # MCPServer: audit_product(repo_url, site_url, policy_url) (C, stretch)
 │
 └── demo/
     ├── fixture-app/            # deliberately non-compliant mini product (A+C, H0.5–1.5)
