@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "groundtruth": {
+    "proveryai": {
       "command": "uv",
       "args": ["run", "--project", "${CLAUDE_PROJECT_DIR:-.}/api", "python", "${CLAUDE_PROJECT_DIR:-.}/mcp/server.py"]
     }

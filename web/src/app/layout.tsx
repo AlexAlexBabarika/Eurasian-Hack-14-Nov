@@ -24,7 +24,7 @@ const instrumentSerif = Instrument_Serif({
 export const viewport: Viewport = { themeColor: "#0b0d12", colorScheme: "dark" };
 
 export const metadata: Metadata = {
-  title: "Groundtruth: privacy policy vs. code",
+  title: "Proveryai: privacy policy vs. code",
   description:
     "Checks whether a product's privacy policy matches what its code and live site actually do, across UK, EU and Kazakhstan law.",
 };

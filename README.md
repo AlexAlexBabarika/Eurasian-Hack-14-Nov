@@ -1,4 +1,4 @@
-# Groundtruth
+# Proveryai
 
 Privacy policy vs. code auditor. Give it a GitHub repo, a live site URL and a privacy policy URL; it finds what the product actually collects and sends, compares that with what the policy claims, and maps each possible inconsistency to official law in the UK, EU and Kazakhstan.
 
@@ -49,7 +49,7 @@ uv run --project api python mcp/server.py
 
 To use it from Claude Code, Cursor or Claude Desktop, see [mcp/README.md](mcp/README.md). The repo ships `.mcp.json` and `.cursor/mcp.json`, so the first two need no configuration.
 
-Example prompt: "Audit https://github.com/acme/app and https://acme.example against https://acme.example/privacy with the groundtruth tool, then list the findings that need a code change."
+Example prompt: "Audit https://github.com/acme/app and https://acme.example against https://acme.example/privacy with the proveryai tool, then list the findings that need a code change."
 
 With `DEMO_MODE=cached` (in `.env` or the server's environment), inputs that match a saved audit in `api/data/audits/` return that report at once, without cloning or scanning. Other inputs still run a live audit.
 

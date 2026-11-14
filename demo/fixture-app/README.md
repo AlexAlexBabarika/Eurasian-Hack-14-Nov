@@ -1,6 +1,6 @@
 # Notely (demo fixture)
 
-A deliberately non-compliant mini product used as the Groundtruth demo target. Nothing here is installed or run as an app; the code is only scanned, and the two HTML pages are served statically.
+A deliberately non-compliant mini product used as the Proveryai demo target. Nothing here is installed or run as an app; the code is only scanned, and the two HTML pages are served statically.
 
 Planted issues:
 - `src/lib/analytics.ts` sends email + name to Mixpanel and PostHog.

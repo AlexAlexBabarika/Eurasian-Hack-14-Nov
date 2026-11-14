@@ -14,7 +14,7 @@ SERVER = Path(__file__).resolve().parents[2] / "mcp" / "server.py"
 
 
 def _load():
-    spec = importlib.util.spec_from_file_location("groundtruth_mcp_server", SERVER)
+    spec = importlib.util.spec_from_file_location("proveryai_mcp_server", SERVER)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -142,7 +142,7 @@ def test_unknown_jurisdiction_is_rejected(monkeypatch) -> None:
 )
 def test_shipped_client_config_starts_this_server(config: str, root_placeholder: str) -> None:
     root = SERVER.parents[1]
-    entry = json.loads((root / config).read_text())["mcpServers"]["groundtruth"]
+    entry = json.loads((root / config).read_text())["mcpServers"]["proveryai"]
     args = [a.replace(root_placeholder, str(root)) for a in entry["args"]]
     assert entry["command"] == "uv"
     assert args == ["run", "--project", str(root / "api"), "python", str(SERVER)]
@@ -174,7 +174,7 @@ def test_live_audit_reports_each_pipeline_event_as_progress(monkeypatch) -> None
     monkeypatch.setattr(module, "run_audit", fake_run_audit)
     monkeypatch.setenv("DEMO_MODE", "live")
     text, seen = _call_with_progress(module, DEMO)
-    assert text.startswith("# Groundtruth audit")
+    assert text.startswith("# Proveryai audit")
     assert seen == [
         (1, 19, "Fetching repository"),
         (2, 19, "Could not fetch repository: boom"),
@@ -187,5 +187,5 @@ def test_saved_report_is_returned_without_progress(monkeypatch) -> None:
     _no_live_audit(module, monkeypatch)
     monkeypatch.setenv("DEMO_MODE", "cached")
     text, seen = _call_with_progress(module, DEMO)
-    assert text.startswith("# Groundtruth audit")
+    assert text.startswith("# Proveryai audit")
     assert seen == []

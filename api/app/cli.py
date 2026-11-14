@@ -20,7 +20,7 @@ EXIT_INCOMPLETE = 2
 
 
 def _args(argv: list[str] | None) -> argparse.Namespace:
-    p = argparse.ArgumentParser(prog="groundtruth", description=__doc__.splitlines()[0])
+    p = argparse.ArgumentParser(prog="proveryai", description=__doc__.splitlines()[0])
     p.add_argument("--policy", required=True, help="privacy policy: URL or local HTML/text file")
     p.add_argument("--repo", help="repository: local directory or public GitHub URL")
     p.add_argument("--site", help="live site URL (optional; loads it in a headless browser)")

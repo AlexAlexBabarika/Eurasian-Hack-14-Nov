@@ -75,7 +75,7 @@ export default function Home() {
               className="animate-rise max-w-xl text-base leading-relaxed text-foreground/80 sm:text-lg"
               style={{ "--i": 2 } as React.CSSProperties}
             >
-              Paste two or three links. Groundtruth compares the code and the live site with the policy and shows every possible
+              Paste two or three links. Proveryai compares the code and the live site with the policy and shows every possible
               inconsistency with evidence, the provision it relates to, and text you can paste to fix it.
             </p>
           </section>

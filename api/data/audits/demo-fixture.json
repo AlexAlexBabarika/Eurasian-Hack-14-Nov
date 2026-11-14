@@ -2158,7 +2158,7 @@
       "verdict_method": "deterministic",
       "duration_s": 41.3
     },
-    "disclaimer": "Groundtruth is a first-pass engineering check. It reports possible inconsistencies between observed product behaviour and the published privacy policy. It is not legal advice."
+    "disclaimer": "Proveryai is a first-pass engineering check. It reports possible inconsistencies between observed product behaviour and the published privacy policy. It is not legal advice."
   },
   "error": null
 }

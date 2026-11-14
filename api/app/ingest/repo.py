@@ -45,7 +45,7 @@ async def fetch(repo_url: str) -> Path:
     if not m:
         raise ValueError("repo_url must be a public https://github.com/<owner>/<repo> URL")
     owner, repo, ref, subdir = m.groups()
-    dest = Path(tempfile.mkdtemp(prefix="groundtruth-"))
+    dest = Path(tempfile.mkdtemp(prefix="proveryai-"))
     token = os.getenv("GITHUB_TOKEN")
     auth = f"x-access-token:{token}@" if token else ""
     cmd = ["git", "clone", "--depth", "1", "--single-branch"]

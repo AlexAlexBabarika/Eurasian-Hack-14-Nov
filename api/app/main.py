@@ -15,7 +15,7 @@ from app.pipeline import run_audit
 from app.report.markdown import render
 from app.store import AUDITS, AuditState
 
-app = FastAPI(title="Groundtruth API", version="0.1.0")
+app = FastAPI(title="Proveryai API", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("WEB_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(","),

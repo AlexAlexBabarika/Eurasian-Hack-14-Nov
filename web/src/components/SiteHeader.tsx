@@ -17,7 +17,7 @@ export function Wordmark() {
           <path d="M11.5 9.5l3 3M14.5 9.5l-3 3" className="text-status-red" stroke="currentColor" />
         </svg>
       </span>
-      Groundtruth
+      Proveryai
     </Link>
   );
 }

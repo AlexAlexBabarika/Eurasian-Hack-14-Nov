@@ -82,7 +82,7 @@ def test_cli_exit_codes_and_markdown(tmp_path, capsys):
     base = ["--repo", str(sample.FIXTURE), "--policy", POLICY, "--no-llm"]
     out = tmp_path / "report.md"
     assert cli.main([*base, "--fail-on", "red", "--markdown", str(out)]) == cli.EXIT_FAILED_GATE
-    assert out.read_text().startswith("# Groundtruth audit report")
+    assert out.read_text().startswith("# Proveryai audit report")
     assert "RED" in capsys.readouterr().out
     assert cli.main([*base, "--fail-on", "never"]) == 0
     fixed = ["--repo", str(sample.FIXTURE), "--policy", str(sample.FIXTURE / sample.FIXED_POLICY), "--no-llm"]

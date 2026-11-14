@@ -1,4 +1,4 @@
-name: Groundtruth privacy audit
+name: Proveryai privacy audit
 description: Compare a privacy policy with the code (and optionally the live site) and fail the job on possible inconsistencies.
 
 inputs:
@@ -46,7 +46,7 @@ runs:
             *) printf '%s' "$GITHUB_WORKSPACE/$1" ;;
           esac
         }
-        report="$RUNNER_TEMP/groundtruth-report.md"
+        report="$RUNNER_TEMP/proveryai-report.md"
         rm -f "$report"
         args=(--policy "$(resolve "$GT_POLICY")" --fail-on "$GT_FAIL_ON" --jurisdictions "$GT_JURISDICTIONS" --markdown "$report")
         if [ -n "$GT_REPO" ]; then args+=(--repo "$(resolve "$GT_REPO")"); fi
