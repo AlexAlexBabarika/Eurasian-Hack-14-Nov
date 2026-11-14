@@ -7,8 +7,8 @@ import { StartTourButton } from "@/components/tour/TourDock";
 import { TOUR_STEPS } from "@/lib/tour";
 
 export const metadata: Metadata = {
-  title: "Guided tour | Groundtruth",
-  description: "A nine-step walk through Groundtruth for judges: every feature, with the recorded demo audit.",
+  title: "Guided tour | ProveryAI",
+  description: "A nine-step walk through ProveryAI for judges: every feature, with the recorded demo audit.",
 };
 
 const OUTSIDE = [

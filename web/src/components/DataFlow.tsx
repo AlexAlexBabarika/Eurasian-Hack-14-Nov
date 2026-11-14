@@ -111,6 +111,7 @@ export function DataFlow({ report }: { report: AuditReport }) {
     onMouseEnter: () => setActive(next),
     onMouseLeave: () => setActive(null),
   });
+  const hasPolicy = Boolean(report.inputs.policy_url);
   const crossBorder = flow.countries.some((country) => country.crossBorder.length > 0);
 
   return (
@@ -118,7 +119,7 @@ export function DataFlow({ report }: { report: AuditReport }) {
       <p className="text-sm text-muted-foreground">
         {plural(flow.vendors.length, "vendor")} in {plural(flow.countries.length, "country", "countries")}{" "}
         {flow.vendors.length === 1 ? "receives" : "receive"} {plural(flow.categories.length, "kind")} of data.
-        {crossBorder && !report.claims.international_transfers && " The policy does not mention international transfers."}
+        {hasPolicy && crossBorder && !report.claims.international_transfers && " The policy does not mention international transfers."}
       </p>
 
       <ul className="space-y-2 md:hidden">
@@ -131,8 +132,9 @@ export function DataFlow({ report }: { report: AuditReport }) {
                 <VendorBadges isAi={vendor.isAi} preConsent={vendor.preConsent} />
               </div>
               <p className="text-xs text-muted-foreground">
-                {vendor.purpose || "Purpose unknown"} ·{" "}
-                {vendor.named ? "Named in policy" : <span className="text-status-amber">Not named in policy</span>}
+                {vendor.purpose || "Purpose unknown"}
+                {hasPolicy && " · "}
+                {hasPolicy && (vendor.named ? "Named in policy" : <span className="text-status-amber">Not named in policy</span>)}
               </p>
               <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
                 <dt className="text-muted-foreground">Receives</dt>
@@ -192,8 +194,8 @@ export function DataFlow({ report }: { report: AuditReport }) {
                 </div>
                 <p className="flex items-center gap-1 truncate text-xs text-muted-foreground">
                   <span className="truncate">{vendor.purpose || "Purpose unknown"}</span>
-                  <span aria-hidden>·</span>
-                  {vendor.named ? (
+                  {hasPolicy && <span aria-hidden>·</span>}
+                  {!hasPolicy ? null : vendor.named ? (
                     <span className="inline-flex shrink-0 items-center gap-0.5">
                       <Check aria-hidden className="size-3" />
                       Named in policy

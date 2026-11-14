@@ -3,8 +3,8 @@ description: Compare a privacy policy with the code (and optionally the live sit
 
 inputs:
   policy:
-    description: Privacy policy, as a URL or a path relative to the workspace.
-    required: true
+    description: Privacy policy, as a URL or a path relative to the workspace. Optional; without it only the checks that need no policy run.
+    default: ""
   repo:
     description: Code to scan, as a path relative to the workspace or a public GitHub URL.
     default: "."
@@ -57,7 +57,8 @@ runs:
         }
         report="$RUNNER_TEMP/groundtruth-report.md"
         rm -f "$report"
-        args=(--policy "$(resolve "$GT_POLICY")" --fail-on "$GT_FAIL_ON" --jurisdictions "$GT_JURISDICTIONS" --markdown "$report")
+        args=(--fail-on "$GT_FAIL_ON" --jurisdictions "$GT_JURISDICTIONS" --markdown "$report")
+        if [ -n "$GT_POLICY" ]; then args+=(--policy "$(resolve "$GT_POLICY")"); fi
         if [ -n "$GT_REPO" ]; then args+=(--repo "$(resolve "$GT_REPO")"); fi
         if [ -n "$GT_SITE" ]; then args+=(--site "$GT_SITE"); fi
         cd "$GITHUB_ACTION_PATH/api"

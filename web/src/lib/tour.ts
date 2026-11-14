@@ -63,7 +63,7 @@ export const TOUR_STEPS: TourStep[] = [
     href: "/",
     action: 'Look at the "Start an audit" form. Do not submit it yet.',
     look: [
-      "An audit takes a GitHub repository, a live site and a privacy policy. The repository or the site can be left out.",
+      "An audit takes a GitHub repository, a live site and a privacy policy. The repository and the policy are optional.",
       "Scroll down to the recorded audits. They open without the audit service running.",
     ],
   },

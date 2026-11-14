@@ -70,7 +70,7 @@ def summaries(prefix: str = "demo-") -> list[AuditSummary]:
             counts[cell.status] += 1
         out.append(AuditSummary(
             id=path.stem, repo_url=report.inputs.get("repo_url"), site_url=report.inputs.get("site_url"),
-            policy_url=report.inputs.get("policy_url") or "", findings=len(report.findings),
+            policy_url=report.inputs.get("policy_url"), findings=len(report.findings),
             vendors=len([o for o in report.observations if o.vendor]), status_counts=counts,
         ))  # fmt: skip
     return out

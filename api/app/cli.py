@@ -2,7 +2,7 @@
 
     uv run --project api python -m app.cli --repo . --policy docs/privacy.html --fail-on red
 
---repo and --policy accept local paths or URLs. --site is optional; without it no browser is started.
+--repo and --policy accept local paths or URLs; --policy is optional. --site is optional; without it no browser is started.
 """
 
 import argparse
@@ -21,7 +21,8 @@ EXIT_INCOMPLETE = 2
 
 def _args(argv: list[str] | None) -> argparse.Namespace:
     p = argparse.ArgumentParser(prog="groundtruth", description=__doc__.splitlines()[0])
-    p.add_argument("--policy", required=True, help="privacy policy: URL or local HTML/text file")
+    p.add_argument("--policy", help="privacy policy: URL or local HTML/text file (optional; without it only the "
+                   "checks that need no policy run)")  # fmt: skip
     p.add_argument("--repo", help="repository: local directory or public GitHub URL")
     p.add_argument("--site", help="live site URL (optional; loads it in a headless browser)")
     p.add_argument("--jurisdictions", default=",".join(JURISDICTIONS), help="comma-separated, default: %(default)s")
@@ -29,6 +30,8 @@ def _args(argv: list[str] | None) -> argparse.Namespace:
                    help="exit 1 if any cell is at least this bad (default: %(default)s)")  # fmt: skip
     p.add_argument("--markdown", type=Path, help="write the full Markdown report to this file")
     p.add_argument("--json", type=Path, help="write the AuditReport JSON to this file")
+    p.add_argument("--effort", choices=["fast", "strong"], default="fast",
+                   help="LLM to use: MODEL_FAST or MODEL_STRONG (default: %(default)s)")  # fmt: skip
     p.add_argument("--no-llm", action="store_true", help="deterministic run even if LLM_API_KEY is set")
     args = p.parse_args(argv)
     if not args.repo and not args.site:
@@ -71,7 +74,8 @@ def main(argv: list[str] | None = None) -> int:
         if event.status != "running":
             print(f"{event.step:13s} {event.status:8s} {event.message}", file=sys.stderr)
 
-    req = AuditRequest(repo_url=args.repo, site_url=args.site, policy_url=args.policy, jurisdictions=args.jurisdictions)
+    req = AuditRequest(repo_url=args.repo, site_url=args.site, policy_url=args.policy, jurisdictions=args.jurisdictions,
+                       effort=args.effort)  # fmt: skip
     report = asyncio.run(run_audit("cli", req, emit, use_llm=not args.no_llm))
     if args.markdown:
         args.markdown.write_text(render(report))

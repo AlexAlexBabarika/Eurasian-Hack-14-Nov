@@ -42,7 +42,7 @@ export function ReportInputs({ inputs }: { inputs: AuditReport["inputs"] }) {
     <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
       <InputLink icon={GitBranch} label="Repository" url={inputs.repo_url} empty="No repository given" />
       <InputLink icon={Globe} label="Live site" url={inputs.site_url} empty="No live site given" />
-      <InputLink icon={FileText} label="Privacy policy" url={inputs.policy_url} empty="No policy address given" />
+      <InputLink icon={FileText} label="Privacy policy" url={inputs.policy_url} empty="No privacy policy given" />
     </div>
   );
 }

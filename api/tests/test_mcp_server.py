@@ -37,7 +37,7 @@ def test_bad_url_reaches_the_client_with_its_message() -> None:
 def test_repo_and_site_are_optional_but_not_both_missing() -> None:
     server = _load().server
     tool = asyncio.run(server.list_tools())[0]
-    assert tool.input_schema["required"] == ["policy_url"]
+    assert not tool.input_schema.get("required")
     with pytest.raises(ToolError, match="give a repo_url, a site_url, or both"):
         asyncio.run(server.call_tool("audit_product", {"policy_url": "http://x"}))
     with pytest.raises(ToolError, match=r"site_url must be an http\(s\) URL"):
@@ -101,7 +101,7 @@ def _matrix_rows(text: str) -> list[str]:
 
 def test_jurisdictions_is_an_optional_list_of_the_three_codes() -> None:
     schema = asyncio.run(_load().server.list_tools())[0].input_schema
-    assert "jurisdictions" not in schema["required"]
+    assert "jurisdictions" not in schema.get("required", [])
     assert '"enum": ["UK", "EU", "KZ"]' in json.dumps(schema)
 
 

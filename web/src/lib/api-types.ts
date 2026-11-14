@@ -131,6 +131,8 @@ export interface components {
         /**
          * AuditRequest
          * @description repo_url or site_url may be omitted (not both): the audit then covers only what it can observe.
+         *
+         *     Without policy_url only the checks that need no policy text run. effort picks the LLM: MODEL_FAST or MODEL_STRONG.
          */
         AuditRequest: {
             /** Repo Url */
@@ -138,9 +140,15 @@ export interface components {
             /** Site Url */
             site_url?: string | null;
             /** Policy Url */
-            policy_url: string;
+            policy_url?: string | null;
             /** Jurisdictions */
             jurisdictions?: ("UK" | "EU" | "KZ")[] | null;
+            /**
+             * Effort
+             * @default fast
+             * @enum {string}
+             */
+            effort: "fast" | "strong";
         };
         /** AuditStatus */
         AuditStatus: {
@@ -165,7 +173,7 @@ export interface components {
             /** Site Url */
             site_url: string | null;
             /** Policy Url */
-            policy_url: string;
+            policy_url: string | null;
             /** Findings */
             findings: number;
             /** Vendors */

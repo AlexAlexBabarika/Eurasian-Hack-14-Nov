@@ -239,7 +239,7 @@ def _prompt(cell: CellVerdict, findings: list[Finding], observations: list[Obser
 
 async def build_matrix(findings: list[Finding], observations: list[Observation], jurisdictions: list[Jurisdiction],
                        use_llm: bool = True, gaps: list[str] | None = None,
-                       on_cell: Callable[[int, int], None] | None = None,
+                       on_cell: Callable[[int, int], None] | None = None, model: str | None = None,
                        ) -> Matrix:  # fmt: skip
     """With an LLM, `on_cell(finished, total)` is called each time a cell is finished."""
     cells = [deterministic_cell(j, a, findings, observations, gaps) for j in jurisdictions for a in AREAS]
@@ -254,7 +254,7 @@ async def build_matrix(findings: list[Finding], observations: list[Observation],
         try:
             # Status and citations are decided in code; the model only writes prose, so it needs no reasoning pass.
             prose = await llm.structured(SYSTEM, _prompt(cell, findings, observations), CellProse,
-                                         max_tokens=MAX_TOKENS, reasoning=False)  # fmt: skip
+                                         max_tokens=MAX_TOKENS, reasoning=False, model=model)  # fmt: skip
             out = post_validate(cell, prose, cell.provision_ids)
         except Exception:  # noqa: BLE001 - deterministic cell is always a valid answer
             out = cell

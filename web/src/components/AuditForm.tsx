@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ApiError, createAudit, DEMO_ID } from "@/lib/api";
 import { JURISDICTION_LABEL } from "@/lib/labels";
-import type { Jurisdiction } from "@/lib/types";
+import type { Effort, Jurisdiction } from "@/lib/types";
 import { JURISDICTIONS } from "@/lib/types";
 
 type FieldName = "repo_url" | "site_url" | "policy_url";
@@ -36,13 +36,19 @@ const FIELDS: Field[] = [
   {
     name: "policy_url",
     label: "Privacy policy",
-    hint: "The public page your users see.",
+    hint: "The public page your users see. Without it only the checks that need no policy run: trackers and consent on the site, personal data in logs.",
+    optional: true,
     placeholder: "https://acme.com/privacy",
     icon: FileText,
   },
 ];
 
 type Values = Record<FieldName, string>;
+
+const EFFORTS: { value: Effort; label: string; hint: string }[] = [
+  { value: "fast", label: "Fast", hint: "The quicker model. About a minute." },
+  { value: "strong", label: "Strong", hint: "The stronger model reads the policy and writes the verdicts. Slower." },
+];
 
 const DEMO_VALUES: Values = {
   repo_url: "https://github.com/AlexAlexBabarika/Eurasian-Hack-14-Nov/tree/main/demo/fixture-app",
@@ -79,6 +85,7 @@ export function AuditForm() {
   const [values, setValues] = useState<Values>({ repo_url: "", site_url: "", policy_url: "" });
   const [touched, setTouched] = useState<Partial<Record<FieldName, boolean>>>({});
   const [jurisdictions, setJurisdictions] = useState<Jurisdiction[]>(JURISDICTIONS);
+  const [effort, setEffort] = useState<Effort>("fast");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<ApiError | Error | null>(null);
 
@@ -111,8 +118,9 @@ export function AuditForm() {
       const { id } = await createAudit({
         repo_url: values.repo_url.trim() || null,
         site_url: values.site_url.trim(),
-        policy_url: values.policy_url.trim(),
+        policy_url: values.policy_url.trim() || null,
         jurisdictions,
+        effort,
       });
       router.push(`/audit/${encodeURIComponent(id)}`);
     } catch (error) {
@@ -222,6 +230,36 @@ export function AuditForm() {
           </div>
           {jurisdictions.length === 0 && <p className="text-xs text-destructive">Select at least one jurisdiction.</p>}
         </fieldset>
+
+        <fieldset className="space-y-2 pt-1">
+          <legend className="text-sm font-medium text-foreground">Effort</legend>
+          <div className="grid grid-cols-2 gap-2">
+            {EFFORTS.map((option) => {
+              const checked = effort === option.value;
+              return (
+                <label
+                  key={option.value}
+                  className={cn(
+                    "cursor-pointer rounded-lg border px-3 py-2.5 transition-colors has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
+                    checked ? "border-primary bg-accent/40" : "hover:bg-accent/30",
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name={`${formId}-effort`}
+                    className="sr-only"
+                    checked={checked}
+                    onChange={() => setEffort(option.value)}
+                  />
+                  <span className={cn("block text-sm font-medium", checked ? "text-foreground" : "text-muted-foreground")}>
+                    {option.label}
+                  </span>
+                  <span className="block text-xs text-muted-foreground">{option.hint}</span>
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
       </div>
 
       {submitError && (
@@ -256,7 +294,9 @@ export function AuditForm() {
           {submitting ? "Starting…" : isDemo ? "Run demo audit" : "Run audit"}
           {!submitting && <ArrowRight aria-hidden className="transition-transform group-hover/run:translate-x-1" />}
         </Button>
-        <p className="text-center text-xs text-muted-foreground">Takes about a minute.</p>
+        <p className="text-center text-xs text-muted-foreground">
+          {effort === "strong" ? "Takes longer than a fast run." : "Takes about a minute."}
+        </p>
       </div>
     </form>
   );
