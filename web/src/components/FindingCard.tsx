@@ -6,12 +6,12 @@ import { cn } from "cn";
 
 import { EvidenceBlock } from "@/components/EvidenceBlock";
 import { JurisdictionChips } from "@/components/JurisdictionChips";
-import { SeverityBadge, StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { AREA_LABEL, ruleCode, ruleLabel } from "@/lib/labels";
+import { AREA_LABEL, ruleCode, ruleLabel, SEVERITY_LABEL, STATUS_LABEL } from "@/lib/labels";
 import { SEVERITY_STATUS } from "@/lib/status";
 import type { CellVerdict, Finding, Status } from "@/lib/types";
 
+// The first piece of product evidence is shown with its code, the second as a one-line reference, the rest on demand.
 const VISIBLE_EVIDENCE = 2;
 
 // `status` is the finding's status in one jurisdiction; it replaces the jurisdiction-neutral severity.
@@ -37,87 +37,90 @@ export function FindingCard({
   const hidden = product.length - VISIBLE_EVIDENCE;
   const evidence = expanded ? product : product.slice(0, VISIBLE_EVIDENCE);
 
-  return (
-    <article
-      className={cn(
-        "@container rounded-2xl p-5",
-        (status ?? SEVERITY_STATUS[finding.severity]) === "red"
-          ? "tone-red tone-wash tone-edge"
-          : "border bg-card",
-      )}
-    >
-      <header className="space-y-2">
-        <div className="flex flex-wrap items-center gap-2">
-          {status ? <StatusBadge status={status} className="px-1.5 py-0.5 text-[11px]" /> : <SeverityBadge severity={finding.severity} />}
-          <span className="text-xs text-muted-foreground">
-            {ruleLabel(finding.rule)}
-            <span className="ml-1.5 font-mono text-muted-foreground/70">{ruleCode(finding.rule)}</span>
-          </span>
-          {showAreas && (
-            <span className="ml-auto flex flex-wrap gap-1">
-              {finding.areas.map((area) => (
-                <span key={area} className="rounded border px-1.5 py-0.5 text-[11px] text-muted-foreground">
-                  {AREA_LABEL[area].name}
-                </span>
-              ))}
-            </span>
-          )}
-        </div>
-        <h3 className="text-lg leading-snug font-semibold tracking-tight text-foreground">{finding.title}</h3>
-        {matrix && <JurisdictionChips findingId={finding.id} matrix={matrix} />}
-      </header>
+  const tone = status ?? SEVERITY_STATUS[finding.severity];
 
-      <div
-        className={cn(
-          "mt-4 grid gap-4",
-          hasPolicy && product.length > 0 && "@2xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]",
-        )}
-      >
-        {hasPolicy && (
-          <section className="space-y-2">
-            <h4 className="font-serif text-lg leading-none text-paper">The policy says</h4>
-            {finding.policy_quote && (
-              <blockquote className="paper rounded-lg px-4 py-3 font-serif text-[17px] leading-7 shadow-lg shadow-black/30">
-                <span className="marker">&ldquo;{finding.policy_quote}&rdquo;</span>
-              </blockquote>
+  return (
+    // Severity sits in a plain gutter beside the finding, so the panel itself stays neutral.
+    <article className="@container overflow-hidden rounded-xl border bg-card">
+      <div className="grid @2xl:grid-cols-[112px_minmax(0,1fr)]">
+        <div className="flex items-baseline gap-2 px-5 pt-4 @2xl:flex-col @2xl:gap-1 @2xl:border-r @2xl:px-4 @2xl:py-5">
+          <p
+            className={cn(
+              "text-xs leading-snug font-semibold",
+              tone === "red" ? "text-status-red" : tone === "amber" ? "text-status-amber" : "text-muted-foreground",
             )}
-            {policyNotes.map((item, i) =>
-              item.quote ? (
-                <EvidenceBlock key={i} evidence={item} />
-              ) : (
-                <p
-                  key={i}
-                  className="rounded-md border border-dashed px-3 py-2 text-sm leading-relaxed text-muted-foreground"
-                >
-                  {item.summary}
-                </p>
-              ),
-            )}
-          </section>
-        )}
-        {product.length > 0 && (
-          <section className="min-w-0">
-            <h4 className="mb-2 font-mono text-sm leading-none font-medium text-foreground">The product does</h4>
-            <div className="space-y-3">
-              {evidence.map((item, i) => (
-                <EvidenceBlock key={i} evidence={item} />
-              ))}
+          >
+            {status ? STATUS_LABEL[status].name : SEVERITY_LABEL[finding.severity]}
+            {!status && <span className="sr-only"> severity</span>}
+          </p>
+          <p className="text-xs text-muted-foreground tabular-nums">
+            <span className="sr-only">Rule </span>
+            {ruleCode(finding.rule)}
+          </p>
+        </div>
+        <div className="min-w-0 p-5 pt-2 @2xl:pt-5">
+          <header className="space-y-1.5">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              <span>{ruleLabel(finding.rule)}</span>
+              {showAreas && <span>{finding.areas.map((area) => AREA_LABEL[area].name).join(", ")}</span>}
             </div>
-            {hidden > 0 && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="mt-2 -ml-2 text-muted-foreground"
-                aria-expanded={expanded}
-                onClick={() => setExpanded((value) => !value)}
-              >
-                <ChevronDown aria-hidden className={cn("transition-transform", expanded && "rotate-180")} />
-                {expanded ? "Show less" : `Show ${hidden} more piece${hidden === 1 ? "" : "s"} of evidence`}
-              </Button>
+            <h3 className="text-lg leading-snug font-semibold tracking-tight text-pretty text-foreground">{finding.title}</h3>
+            {matrix && <JurisdictionChips findingId={finding.id} matrix={matrix} />}
+          </header>
+
+          <div
+            className={cn(
+              "mt-4 grid gap-4",
+              hasPolicy && product.length > 0 && "@2xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]",
             )}
-          </section>
-        )}
+          >
+            {hasPolicy && (
+              <section className="space-y-2">
+                <h4 className="text-xs font-medium text-muted-foreground">The policy says</h4>
+                {finding.policy_quote && (
+                  <blockquote className="paper rounded-md px-4 py-3 font-serif text-[17px] leading-7">
+                    <span className="marker">&ldquo;{finding.policy_quote}&rdquo;</span>
+                  </blockquote>
+                )}
+                {policyNotes.map((item, i) =>
+                  item.quote ? (
+                    <EvidenceBlock key={i} evidence={item} />
+                  ) : (
+                    <p
+                      key={i}
+                      className="rounded-md border border-dashed px-3 py-2 text-sm leading-relaxed text-muted-foreground"
+                    >
+                      {item.summary}
+                    </p>
+                  ),
+                )}
+              </section>
+            )}
+            {product.length > 0 && (
+              <section className="min-w-0">
+                <h4 className="mb-2 text-xs font-medium text-muted-foreground">The product does</h4>
+                <div className="space-y-3">
+                  {evidence.map((item, i) => (
+                    <EvidenceBlock key={i} evidence={item} compact={!expanded && i > 0} />
+                  ))}
+                </div>
+                {hidden > 0 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="mt-2 -ml-2 text-muted-foreground"
+                    aria-expanded={expanded}
+                    onClick={() => setExpanded((value) => !value)}
+                  >
+                    <ChevronDown aria-hidden className={cn("transition-transform", expanded && "rotate-180")} />
+                    {expanded ? "Show less" : `Show ${hidden} more piece${hidden === 1 ? "" : "s"} of evidence`}
+                  </Button>
+                )}
+              </section>
+            )}
+          </div>
+        </div>
       </div>
     </article>
   );

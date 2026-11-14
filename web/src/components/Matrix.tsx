@@ -3,11 +3,10 @@
 import { ChevronRight } from "lucide-react";
 import { cn } from "cn";
 
-import SpotlightCard from "@/components/reactbits/SpotlightCard";
 import { StatusIcon } from "@/components/StatusBadge";
 import { AREA_LABEL, JURISDICTION_LABEL, STATUS_LABEL } from "@/lib/labels";
 import { previousStatus } from "@/lib/compare";
-import { cellSurface, LOUD_STATUS, SPOTLIGHT_COLOR, STATUS_STYLE } from "@/lib/status";
+import { LOUD_STATUS, STATUS_STYLE } from "@/lib/status";
 import type { Area, CellVerdict, Jurisdiction, Status } from "@/lib/types";
 import { AREAS, JURISDICTIONS } from "@/lib/types";
 
@@ -27,6 +26,23 @@ function footerText(cell: CellVerdict): string {
   return "See details";
 }
 
+const CELL_TONE: Record<Status, string> = {
+  red: "border-status-red/45 bg-[color-mix(in_oklch,var(--status-red)_7%,var(--card))] hover:border-status-red/75",
+  amber: "border-status-amber/35 bg-card hover:border-status-amber/65",
+  green: "border-border bg-card hover:border-white/25",
+  grey: "border-dashed border-white/12 hover:border-white/25",
+};
+
+function StatusMark({ status, className }: { status: Status; className?: string }) {
+  if (LOUD_STATUS[status]) return <StatusIcon status={status} className={className} />;
+  return (
+    <span
+      aria-hidden
+      className={cn("mx-[3px] size-2 shrink-0 rounded-full", status === "grey" ? "border border-status-grey/70" : STATUS_STYLE[status].dot)}
+    />
+  );
+}
+
 function Cell({
   cell,
   was,
@@ -44,72 +60,59 @@ function Cell({
   const loud = LOUD_STATUS[cell.status];
   const grey = cell.status === "grey";
   return (
-    // The wrapper carries the entrance, the hover lift and, for red cells, the travelling arc.
-    <div
+    <button
+      type="button"
       style={{ "--i": index } as React.CSSProperties}
+      onClick={() => onSelect({ jurisdiction: cell.jurisdiction, area: cell.area })}
+      aria-label={`${jurisdiction}, ${area}: ${STATUS_LABEL[cell.status].name}${
+        was ? `, previously ${STATUS_LABEL[was].name}` : ""
+      }. ${cell.headline}. Open details.`}
       className={cn(
-        "animate-power-on rounded-xl transition-transform duration-200 hover:-translate-y-0.5",
-        style.tone,
-        cell.status === "red" && "arc-border",
-        grey && "border border-dashed border-white/12",
+        "animate-cell-in group flex h-full w-full flex-col gap-2 rounded-[10px] border p-3.5 text-left outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background lg:min-h-[132px]",
+        CELL_TONE[cell.status],
       )}
     >
-      <SpotlightCard
-        spotlightColor={loud ? SPOTLIGHT_COLOR[cell.status] : SPOTLIGHT_COLOR.grey}
-        intensity={loud ? 0.26 : 0.12}
-        spotlightSize={260}
-        borderGlow={loud ? 1 : 0.4}
-        style={cellSurface(cell.status)}
-        className="h-full"
+      <span className="text-xs text-muted-foreground lg:hidden">{area}</span>
+      <span className={cn("flex items-center gap-1.5 text-[13px]", loud ? cn("font-semibold", style.text) : "font-medium text-muted-foreground")}>
+        <StatusMark status={cell.status} className="size-3.5" />
+        {STATUS_LABEL[cell.status].name}
+      </span>
+      {was && (
+        <span className="-mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+          <span aria-hidden className={cn("size-1.5 shrink-0 rounded-full", STATUS_STYLE[was].dot)} />
+          Was: {STATUS_LABEL[was].name}
+        </span>
+      )}
+      <span
+        className={cn(
+          "text-sm leading-snug text-pretty break-words",
+          loud ? "text-foreground/90" : "text-muted-foreground",
+          grey && "max-lg:hidden",
+        )}
       >
-        <button
-          type="button"
-          onClick={() => onSelect({ jurisdiction: cell.jurisdiction, area: cell.area })}
-          aria-label={`${jurisdiction}, ${area}: ${STATUS_LABEL[cell.status].name}${
-            was ? `, previously ${STATUS_LABEL[was].name}` : ""
-          }. ${cell.headline}. Open details.`}
-          className="group flex h-full min-h-[124px] w-full flex-col gap-2 rounded-xl p-4 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/70 focus-visible:ring-inset"
-        >
-          <span className="text-xs font-medium text-muted-foreground lg:hidden">{area}</span>
-          {loud ? (
-            <span className={cn("flex items-center gap-1.5 text-sm font-semibold", style.text)}>
-              <StatusIcon status={cell.status} />
-              {STATUS_LABEL[cell.status].name}
-            </span>
-          ) : (
-            <span className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span
-                aria-hidden
-                className={cn("size-2 shrink-0 rounded-full", grey ? "border border-status-grey/70" : style.dot)}
-              />
-              {STATUS_LABEL[cell.status].name}
-            </span>
-          )}
-          {was && (
-            <span className="-mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span aria-hidden className={cn("size-1.5 shrink-0 rounded-full", STATUS_STYLE[was].dot)} />
-              Was: {STATUS_LABEL[was].name}
-            </span>
-          )}
-          <span
-            className={cn(
-              "text-sm leading-snug text-pretty break-words",
-              loud ? "text-foreground/90" : grey ? "text-muted-foreground" : "text-foreground/70",
-            )}
-          >
-            {cell.headline}
-          </span>
-          <span className="mt-auto flex items-center justify-between gap-2 pt-1 text-xs text-muted-foreground">
-            <span>{footerText(cell)}</span>
-            <ChevronRight
-              aria-hidden
-              className={cn("size-4 opacity-50 transition group-hover:translate-x-1 group-hover:opacity-100", loud && style.text)}
-            />
-          </span>
-        </button>
-      </SpotlightCard>
-    </div>
+        {cell.headline}
+      </span>
+      <span className="mt-auto flex items-center justify-between gap-2 pt-1 text-xs text-muted-foreground">
+        <span>{footerText(cell)}</span>
+        <ChevronRight
+          aria-hidden
+          className="size-3.5 shrink-0 opacity-45 transition group-hover:translate-x-0.5 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
+        />
+      </span>
+    </button>
   );
+}
+
+// "8 possible inconsistencies, 1 needs review, 3 not assessed."
+export function matrixSummary(cells: CellVerdict[]): string {
+  const count = (status: Status) => cells.filter((cell) => cell.status === status).length;
+  const parts = [
+    count("red") > 0 && `${count("red")} possible ${count("red") === 1 ? "inconsistency" : "inconsistencies"}`,
+    count("amber") > 0 && `${count("amber")} ${count("amber") === 1 ? "needs" : "need"} review`,
+    count("green") > 0 && `${count("green")} with no issues found`,
+    count("grey") > 0 && `${count("grey")} not assessed`,
+  ].filter(Boolean);
+  return parts.length > 0 ? `${parts.join(", ")}.` : "";
 }
 
 export function Matrix({
@@ -126,22 +129,27 @@ export function Matrix({
   const find = (jurisdiction: Jurisdiction, area: Area) =>
     cells.find((cell) => cell.jurisdiction === jurisdiction && cell.area === area);
   const rows = jurisdictions.filter((jurisdiction) => cells.some((cell) => cell.jurisdiction === jurisdiction));
-  const grid = "lg:grid lg:grid-cols-[132px_repeat(4,minmax(0,1fr))] lg:gap-3";
+  // A column where no country was assessed (financial licensing) gets less room than the ones with content.
+  const tracks = AREAS.map((area) =>
+    rows.every((jurisdiction) => (find(jurisdiction, area)?.status ?? "grey") === "grey") ? "minmax(0,0.6fr)" : "minmax(0,1fr)",
+  ).join(" ");
+  const grid = "lg:grid lg:grid-cols-(--matrix-cols) lg:gap-2.5";
+  const cols = { "--matrix-cols": `128px ${tracks}` } as React.CSSProperties;
 
   return (
     <div className="space-y-3">
-      <div className={cn("hidden", grid)} aria-hidden>
+      <div className={cn("hidden", grid)} style={cols} aria-hidden>
         <span />
         {AREAS.map((area) => (
-          <div key={area} className="px-1">
-            <p className="text-[15px] font-semibold tracking-tight text-foreground">{AREA_LABEL[area].name}</p>
+          <div key={area} className="px-3.5">
+            <p className="text-sm font-semibold text-foreground">{AREA_LABEL[area].name}</p>
             <p className="text-xs text-muted-foreground">{AREA_LABEL[area].hint}</p>
           </div>
         ))}
       </div>
 
       {rows.map((jurisdiction, row) => (
-        <section key={jurisdiction} aria-label={JURISDICTION_LABEL[jurisdiction].name} className={cn("space-y-2 lg:space-y-0", grid)}>
+        <section key={jurisdiction} aria-label={JURISDICTION_LABEL[jurisdiction].name} className={cn("space-y-2 lg:space-y-0", grid)} style={cols}>
           <div className="flex items-baseline gap-3 pt-3 lg:flex-col lg:gap-1 lg:pt-3">
             <p aria-hidden translate="no" className="font-serif text-4xl leading-none text-paper lg:text-5xl">
               {jurisdiction}
@@ -157,30 +165,24 @@ export function Matrix({
               return cell ? (
                 <Cell key={area} cell={cell} was={previousStatus(previous, cell)} index={row * AREAS.length + column} onSelect={onSelect} />
               ) : (
-                <div key={area} className="hidden min-h-[124px] rounded-xl border border-dashed lg:block" />
+                <div key={area} className="hidden min-h-[132px] rounded-[10px] border border-dashed lg:block" />
               );
             })}
           </div>
         </section>
       ))}
 
-      <ul className="flex flex-wrap gap-x-5 gap-y-1 pt-2 text-xs text-muted-foreground">
+      <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-1.5 border-t pt-4 text-xs text-muted-foreground">
         {LEGEND.map((status) => (
-          <li key={status} className="flex items-start gap-1.5">
-            <span aria-hidden className="flex h-4 shrink-0 items-center">
-              {LOUD_STATUS[status] ? (
-                <StatusIcon status={status} className="size-3.5" />
-              ) : (
-                <span
-                  className={cn(
-                    "size-2 rounded-full",
-                    status === "grey" ? "border border-status-grey/70" : STATUS_STYLE[status].dot,
-                  )}
-                />
-              )}
+          <li key={status} className="flex items-center gap-1.5">
+            <span aria-hidden className={cn("flex shrink-0 items-center", STATUS_STYLE[status].text)}>
+              <StatusMark status={status} className="size-3.5" />
             </span>
             <span>
-              <span className="text-foreground/80">{STATUS_LABEL[status].name}:</span> {STATUS_LABEL[status].description}
+              <span className={cn("font-semibold", LOUD_STATUS[status] ? STATUS_STYLE[status].text : "text-foreground/80")}>
+                {STATUS_LABEL[status].name}
+              </span>{" "}
+              {STATUS_LABEL[status].description}
             </span>
           </li>
         ))}

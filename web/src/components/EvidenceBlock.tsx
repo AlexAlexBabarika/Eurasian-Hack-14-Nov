@@ -27,7 +27,8 @@ export function InlineText({ text }: { text: string }): ReactNode {
   );
 }
 
-export function EvidenceBlock({ evidence }: { evidence: Evidence }) {
+// `compact` keeps the summary and location and leaves the code or quote for the expanded view.
+export function EvidenceBlock({ evidence, compact = false }: { evidence: Evidence; compact?: boolean }) {
   const Icon = ICON[evidence.kind];
   const location = evidence.file ? `${evidence.file}${evidence.line ? `:${evidence.line}` : ""}` : null;
 
@@ -48,12 +49,12 @@ export function EvidenceBlock({ evidence }: { evidence: Evidence }) {
           </p>
         </div>
       </div>
-      {evidence.snippet && (
+      {!compact && evidence.snippet && (
         <div className="pl-[26px]">
           <CodeSnippet code={evidence.snippet} file={evidence.file} line={evidence.line} />
         </div>
       )}
-      {evidence.quote && (
+      {!compact && evidence.quote && (
         <blockquote className="ml-[26px] border-l-2 border-paper/50 pl-3 font-serif text-[17px] leading-6 text-paper">
           &ldquo;{evidence.quote}&rdquo;
         </blockquote>

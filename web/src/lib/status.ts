@@ -89,21 +89,3 @@ export function spotlightSurface(status: Status | undefined, padding: number | s
 
 // Red and amber cells ask for attention; green and grey cells stay neutral so the problems stand out.
 export const LOUD_STATUS: Record<Status, boolean> = { red: true, amber: true, green: false, grey: false };
-
-// Surface of a matrix cell: only red gets a fill, red and amber get a coloured edge, the rest use the neutral card.
-export function cellSurface(status: Status): CSSProperties {
-  const surface: Record<Status, [string, string]> = {
-    red: ["color-mix(in srgb, var(--status-red) 11%, var(--card))", "color-mix(in srgb, var(--status-red) 50%, transparent)"],
-    amber: ["var(--card)", "color-mix(in srgb, var(--status-amber) 45%, transparent)"],
-    green: ["var(--card)", "var(--border)"],
-    grey: ["transparent", "transparent"],
-  };
-  const [fill, edge] = surface[status];
-  return {
-    padding: 0,
-    borderRadius: 12,
-    "--spotlight-card-surface": fill,
-    "--spotlight-card-border": edge,
-    "--spotlight-card-shadow": "none",
-  } as CSSProperties;
-}
