@@ -3,6 +3,7 @@
 import re
 from pathlib import Path
 
+from app.detect import call_sites
 from app.detect.catalog import Vendor, package_index
 from app.ingest.repo import RepoFile
 from app.models import Evidence, Observation
@@ -21,14 +22,6 @@ _IMPORT = re.compile(
     r"""(?:from\s+['"]([^'"]+)['"]|require\(\s*['"]([^'"]+)['"]\s*\)|import\s+['"]([^'"]+)['"]"""
     r"""|^\s*(?:from|import)\s+([\w.]+))"""
 )
-_PII = {
-    "email": re.compile(r"\be[-_]?mail\b|\$email", re.I),
-    "name": re.compile(r"\b(?:full_?name|first_?name|last_?name|user\.name)\b|\$name|\bname:\s*\w+\.name", re.I),
-    "phone": re.compile(r"\bphone(?:_?number)?\b", re.I),
-    "location": re.compile(r"\b(?:geolocation|latitude|longitude)\b", re.I),
-}
-_USER_CONTENT = re.compile(r"\b(?:messages|prompt|content|input)\b\s*[:=,}]", re.I)
-
 
 MAX_CODE_LINE = 1000
 _STRING = re.compile(r"""(?P<f>\b[fF])?(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)""")
@@ -129,44 +122,41 @@ def detect(files: list[RepoFile]) -> list[Observation]:
                 ))  # fmt: skip
 
     for f in files:
-        if Path(f.path).suffix not in SOURCE_EXT:
+        suffix = Path(f.path).suffix
+        if suffix not in SOURCE_EXT:
             continue
         lines = f.text.splitlines()
-        vendors: dict[str, tuple[Vendor, int]] = {}
+        vendors: dict[str, tuple[Vendor, int, set[str]]] = {}
         for i, line in enumerate(lines):
             for m in _IMPORT.finditer(line):
                 vendor = _import_vendor(next(g for g in m.groups() if g))
                 # Bare `import x` is Python syntax; in JS `import Stripe from "./icons/stripe"` names a local binding.
                 # Even in Python it only counts if the vendor is already known from a manifest.
                 bare = m.group(4) is not None
-                if vendor and (not bare or (Path(f.path).suffix == ".py" and vendor.name in by_vendor)):
-                    vendors.setdefault(vendor.name, (vendor, i))
-        for vendor, i in vendors.values():
+                if vendor and (not bare or (suffix == ".py" and vendor.name in by_vendor)):
+                    kind = "py" if bare else "es" if m.group(1) else "require" if m.group(2) else ""
+                    names = vendors.setdefault(vendor.name, (vendor, i, set()))[2]
+                    names |= call_sites.import_bindings(lines, i, kind) if kind else set()
+        if not vendors:
+            continue
+        code = call_sites.clean(lines, code_lines(lines))  # words inside prompts and messages are not data being sent
+        for vendor, i, names in vendors.values():
             o = obs(vendor)
             o.evidence.append(Evidence(
                 kind="code", summary=f"{vendor.name} SDK imported", file=f.path, line=i + 1,
                 snippet=_snippet(lines, i, 1),
             ))  # fmt: skip
-            # Heuristic: PII identifiers in a file that talks to a vendor are treated as sent to that vendor.
-            seen: set[str] = set()
-            code = code_lines(lines)  # words inside prompts and messages are not data being sent
-            for j, raw in enumerate(lines):
-                if raw.lstrip().startswith(("import", "//", "#", "*", "/*")):
-                    continue
-                line = code[j]
-                for cat, rx in _PII.items():
-                    if cat not in seen and rx.search(line):
-                        seen.add(cat)
-                        add_category(o, cat)
-                        o.evidence.append(Evidence(
-                            kind="code", summary=f"{cat} handled in a file that calls {vendor.name}",
-                            file=f.path, line=j + 1, snippet=_snippet(lines, j),
-                        ))  # fmt: skip
-                if vendor.is_ai and "user_content" not in seen and _USER_CONTENT.search(line):
-                    seen.add("user_content")
-                    add_category(o, "user_content")
-                    o.evidence.append(Evidence(
-                        kind="code", summary=f"User-provided content passed to {vendor.name}",
-                        file=f.path, line=j + 1, snippet=_snippet(lines, j),
-                    ))  # fmt: skip
+            # A category counts as sent to the vendor when it is passed in the arguments of a call to its SDK.
+            # Languages whose bindings are not resolved keep the older file-level heuristic.
+            resolved = suffix in call_sites.RESOLVED_EXT
+            hits = call_sites.sent(code, names, vendor.is_ai) if resolved else call_sites.file_level(code, vendor.is_ai)
+            for hit in hits:
+                what = "User-provided content" if hit.category == "user_content" else hit.category
+                how = f"passed to {vendor.name}" if resolved else f"handled in a file that calls {vendor.name}"
+                via = f" (via `{hit.via}`)" if hit.via else ""
+                add_category(o, hit.category)
+                o.evidence.append(Evidence(
+                    kind="code", summary=f"{what} {how}{via}", file=f.path, line=hit.line + 1,
+                    snippet=_snippet(lines, hit.line),
+                ))  # fmt: skip
     return list(by_vendor.values())
