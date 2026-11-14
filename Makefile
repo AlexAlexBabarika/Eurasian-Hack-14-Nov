@@ -1,4 +1,4 @@
-.PHONY: setup dev api web types test sample demo fixture
+.PHONY: setup dev api web types test sample demo fixture cache
 
 setup:
 	cd api && uv sync && uv run playwright install chromium
@@ -29,3 +29,7 @@ demo:
 
 fixture:
 	cd demo/fixture-app && python3 -m http.server 4100
+
+# Save a live audit for DEMO_MODE=cached: make cache name=acme repo=https://github.com/... site=https://... policy=https://...
+cache:
+	cd api && uv run python -m app.demo_cache $(name) $(repo) $(site) $(policy)

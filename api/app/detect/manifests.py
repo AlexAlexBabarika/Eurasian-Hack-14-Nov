@@ -30,11 +30,14 @@ _PII = {
 _USER_CONTENT = re.compile(r"\b(?:messages|prompt|content|input)\b\s*[:=,}]", re.I)
 
 
+MAX_CODE_LINE = 1000
 _STRING = re.compile(r"""(?P<f>\b[fF])?(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)""")
 
 
 def code_only(line: str) -> str:
     """The line without the text of string literals; interpolated expressions (`${x}`, f"{x}") are kept."""
+    if len(line) > MAX_CODE_LINE:
+        return ""  # minified or generated; also keeps the regex below from going quadratic on unbalanced quotes
 
     def repl(m: re.Match) -> str:
         s = m.group(0)
@@ -52,6 +55,9 @@ def code_lines(lines: list[str]) -> list[str]:
     out: list[str] = []
     open_delim: str | None = None  # "`", '"""' or "'''" while inside a multi-line string
     for line in lines:
+        if len(line) > MAX_CODE_LINE:
+            out.append("")
+            continue
         if open_delim:
             before, closed, rest = line.partition(open_delim)
             interpolated = " ".join(re.findall(r"\$\{([^{}]*)\}", before)) if open_delim == "`" else ""
@@ -130,8 +136,10 @@ def detect(files: list[RepoFile]) -> list[Observation]:
         for i, line in enumerate(lines):
             for m in _IMPORT.finditer(line):
                 vendor = _import_vendor(next(g for g in m.groups() if g))
-                # Python/Go style bare imports only count if the vendor is already known from a manifest.
-                if vendor and (m.group(4) is None or vendor.name in by_vendor):
+                # Bare `import x` is Python syntax; in JS `import Stripe from "./icons/stripe"` names a local binding.
+                # Even in Python it only counts if the vendor is already known from a manifest.
+                bare = m.group(4) is not None
+                if vendor and (not bare or (Path(f.path).suffix == ".py" and vendor.name in by_vendor)):
                     vendors.setdefault(vendor.name, (vendor, i))
         for vendor, i in vendors.values():
             o = obs(vendor)

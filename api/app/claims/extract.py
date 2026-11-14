@@ -54,7 +54,8 @@ def heuristic(policy_text: str) -> PolicyClaims:
     no_share = re.compile(r"(?:never|do(?:es)? not|don't|will not|won't) (?:sell(?:,| or| nor) )?(?:rent or )?shar", re.I)
     qualified = re.compile(
         r"\bfor (?:[\w-]+,? ){0,4}(?:marketing|commercial|advertising|promotional)|\bexcept\b|\bunless\b|other than"
-        r"|\bwithout your (?:consent|permission)|\bonly (?:with|when|where|as)\b", re.I,
+        r"|\bwithout your (?:consent|permission)|\bonly (?:with|when|where|as)\b"
+        r"|\bs[eo]ll?d?(?:,| or| nor) (?:rent(?:ed)? or )?shar", re.I,  # "sell or share" is the CCPA term, not "no processors"
     )  # fmt: skip
     sells_rx = re.compile(r"\bwe (?:may )?sell\b|share .{0,60}advertis", re.I)
     blanket = next((s for s in sents if no_share.search(s) and not qualified.search(s)), None)

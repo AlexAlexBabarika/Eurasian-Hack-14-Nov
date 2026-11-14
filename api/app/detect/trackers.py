@@ -9,7 +9,8 @@ from app.models import Evidence, Observation
 
 def _vendor_for_url(url: str) -> Vendor | None:
     parsed = urlparse(url)
-    host, full = parsed.netloc.lower(), (parsed.netloc + parsed.path).lower()
+    host = parsed.netloc.lower()
+    full = (parsed.netloc + parsed.path + ("?" + parsed.query if parsed.query else "")).lower()
     for v in load_catalog():
         for d in v.domains:
             if ("/" in d and d in full) or host == d or host.endswith("." + d):
