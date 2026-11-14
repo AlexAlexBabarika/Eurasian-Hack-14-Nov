@@ -74,7 +74,7 @@ export const TOUR_STEPS: TourStep[] = [
     action: 'Watch the steps tick, or press "Skip to the report".',
     look: [
       "This replays a recorded audit of Notely, a small demo product we wrote with planted problems.",
-      "Each step is a real stage: read the code, load the site without clicking anything, read the policy, compare, map to law.",
+      "Each step is a real stage: read the code, load the site before and after the cookie choice, read the policy, compare, map to law.",
     ],
   },
   {

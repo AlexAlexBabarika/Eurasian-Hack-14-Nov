@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field, HttpUrl, model_validator
+from pydantic import BaseModel, Field, HttpUrl, field_validator, model_validator
 
 Jurisdiction = Literal["UK", "EU", "KZ"]
 Area = Literal["personal_data", "ai_transparency", "consumer", "financial"]
@@ -121,6 +121,11 @@ class AuditRequest(BaseModel):
     policy_url: str | None = None
     jurisdictions: list[Jurisdiction] | None = None
     effort: Effort = "fast"
+
+    @field_validator("repo_url", "site_url", "policy_url", mode="before")
+    @classmethod
+    def _blank_is_none(cls, value: object) -> object:
+        return (value.strip() or None) if isinstance(value, str) else value
 
     @model_validator(mode="after")
     def _something_to_observe(self) -> "AuditRequest":
