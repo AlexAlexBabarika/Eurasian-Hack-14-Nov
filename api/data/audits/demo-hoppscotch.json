@@ -40,13 +40,13 @@
     {
       "step": "site_scan",
       "status": "running",
-      "message": "Loading the site in a clean browser, clicking nothing",
+      "message": "Loading the site in clean browsers: clicking nothing, rejecting, accepting",
       "count": null
     },
     {
       "step": "site_scan",
       "status": "done",
-      "message": "53 requests before consent; trackers: Google Analytics",
+      "message": "53 requests before consent; trackers: Google Analytics; reject: no banner found; accept: no banner found",
       "count": 1
     },
     {
@@ -98,6 +98,78 @@
       "count": null
     },
     {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 1 of 12 cells",
+      "count": 1
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 2 of 12 cells",
+      "count": 2
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 3 of 12 cells",
+      "count": 3
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 4 of 12 cells",
+      "count": 4
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 5 of 12 cells",
+      "count": 5
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 6 of 12 cells",
+      "count": 6
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 7 of 12 cells",
+      "count": 7
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 8 of 12 cells",
+      "count": 8
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 9 of 12 cells",
+      "count": 9
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 10 of 12 cells",
+      "count": 10
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 11 of 12 cells",
+      "count": 11
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 12 of 12 cells",
+      "count": 12
+    },
+    {
       "step": "law",
       "status": "done",
       "message": "15 provisions cited",
@@ -112,7 +184,7 @@
     {
       "step": "done",
       "status": "done",
-      "message": "Audit finished in 23.5s",
+      "message": "Audit finished in 19.1s",
       "count": null
     }
   ],
@@ -122,7 +194,8 @@
       "repo_url": "https://github.com/hoppscotch/hoppscotch",
       "site_url": "https://hoppscotch.com",
       "policy_url": "https://docs.hoppscotch.io/support/privacy",
-      "jurisdictions": null
+      "jurisdictions": null,
+      "effort": "fast"
     },
     "observations": [
       {
@@ -197,10 +270,10 @@
       ],
       "named_processors": [
         "Stripe",
+        "OpenAI",
         "Crisp",
         "PostHog",
-        "Google Analytics",
-        "OpenAI"
+        "Google Analytics"
       ],
       "sharing_statement": "sells_or_shares",
       "mentions_ai": true,
@@ -214,7 +287,7 @@
       "cookie_consent_described": false,
       "quotes": {
         "data_categories": "Contact data, such as your first and last name, salutation, email address, billing and mailing addresses, professional title and company name, and phone number.",
-        "named_processors": "For example, we use Google Analytics and PostHog for this purpose.",
+        "named_processors": "We partner with OpenAI, the creators of GPT-4o mini, to offer you enhanced API development and testing capabilities.",
         "sharing_statement": "We may also share information about our users with these companies to facilitate interest-based advertising to those or similar users on other online platforms.",
         "mentions_ai": "We partner with OpenAI, the creators of GPT-4o mini, to offer you enhanced API development and testing capabilities.",
         "international_transfers": "Your personal information may be transferred to the United States or other locations where privacy laws may not be as protective as those in your state, province, or country.",
@@ -275,8 +348,8 @@
         "jurisdiction": "UK",
         "area": "personal_data",
         "status": "amber",
-        "headline": "Google Analytics fires before any consent interaction; DUAA analytics exception may apply only with clear notice and an easy way to object.",
-        "reasoning": "Network evidence shows Google Analytics being loaded from googletagmanager.com (gtag.js, id G-LQ01D3PKKN) with usage, device_id and ip data before any consent interaction on the site, which is a possible inconsistency with PECR reg. 6(1) [UK-PECR-6]. Under PECR Sch. A1 para. 5 as inserted by the Data (Use and Access) Act 2025 [UK-PECR-SCHA1-5], consent would not be required only if the storage/access is solely to collect statistical information about how the site is used with a view to improving it, and users are given clear information and a simple means to object; advertising and cross-site tracking fall outside that exception, so those conditions would have to hold on the live site. Separately, the privacy policy states no retention period or criteria for the data it collects, a possible inconsistency with UK GDPR Art. 5(1)(e) and Art. 13(2)(a) [UK-GDPR-5-1-e, UK-GDPR-13-2-a]. Both points are amber because the analytics exception may cover the pre-consent load if notice and objection are in place, and the retention gap is a disclosure gap rather than evidence of indefinite storage.",
+        "headline": "Google Analytics fires before consent, and the policy states no retention period",
+        "reasoning": "Google Analytics (US) receives usage data, device ID and IP address, and network evidence shows its request firing before any consent interaction on the site, which engages the terminal-equipment rules (PECR reg. 6(1)). In the UK, the analytics exception in PECR Schedule A1 para. 5 may apply only if the information is used solely for statistical purposes to improve the service, is not shared beyond that, and users get clear information plus a simple, free way to object — conditions the evidence here does not show to be met, so the position is more permissive than in the EU but still uncertain. Separately, the privacy policy does not state how long personal data is kept or the criteria used, which is a possible inconsistency with Art. 13(2)(a) and, given the data points above, with the storage-limitation principle in Art. 5(1)(e).",
         "finding_ids": [
           "F1",
           "F2"
@@ -284,22 +357,20 @@
         "provision_ids": [
           "UK-PECR-6",
           "UK-PECR-SCHA1-5",
-          "UK-GDPR-5-1-e",
-          "UK-GDPR-13-2-a"
+          "UK-GDPR-13-2-a",
+          "UK-GDPR-5-1-e"
         ],
         "fixes": [
           {
-            "policy_clause": "We use Google Analytics (Google LLC, United States) to collect statistical information about how our website and documentation are used, including usage data, device identifiers and IP addresses. We load Google Analytics for this statistical purpose and you have a simple way to object to it at [objection link or mechanism]; when you object we [stop loading analytics / disable it on your device]. We do not use Google Analytics for advertising or cross-site tracking. This information is shared with Google, which processes it on our behalf.",
-            "code_change": "In the analytics bootstrap that injects https://www.googletagmanager.com/gtag/js?id=G-LQ01D3PKKN&l=dataLayer, replace the unconditional script load: only inject it after either (a) the user has consented, or (b) the analytics notice with a working opt-out has been shown and the user has not opted out. Persist the opt-out choice and skip the injection when it is set."
+            "policy_clause": "We use Google Analytics to understand how our website and service are used, so that we can improve them. Google Analytics may receive usage data, a device ID and your IP address. Where we rely on the analytics exception, we use this information only for statistical purposes and do not share it with anyone else except to help us make those improvements. You can object to this at any time, free of charge, using the [objection mechanism / link], and we will stop.",
+            "code_change": "In the site consent banner / tag loader, hold the Google Analytics gtag.js load (https://www.googletagmanager.com/gtag/js?id=G-LQ01D3PKKN) until either consent is given or the analytics exception is relied on and the user has not objected; expose a simple, free objection control that stops the tag from loading."
           },
           {
-            "policy_clause": "We keep personal data only for as long as is necessary for the purposes described in this policy. In particular, analytics data collected through Google Analytics (usage data, device identifiers and IP addresses) is kept for [retention period]; after that we [delete it / aggregate it so it no longer identifies you], and we review our retention periods at least [review frequency].",
+            "policy_clause": "We keep personal data only for as long as necessary for the purposes described in this policy. The retention periods we apply are: [category of personal data] — [retention period]; [category of personal data] — [retention period]. Where we cannot set a fixed period, we decide how long to keep data using these criteria: [criteria].",
             "code_change": null
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F1": "amber",
           "F2": "amber"
@@ -310,7 +381,7 @@
         "area": "ai_transparency",
         "status": "green",
         "headline": "No possible inconsistencies detected for AI transparency",
-        "reasoning": "None of the checks we ran (R1-R9) produced a finding for this cell. This reflects only what was visible in the repository, the public site and the policy text.",
+        "reasoning": "None of the checks we ran (R1-R10) produced a finding for this cell. This reflects only what was visible in the repository, the public site and the policy text.",
         "finding_ids": [],
         "provision_ids": [],
         "fixes": [],
@@ -321,8 +392,8 @@
         "jurisdiction": "UK",
         "area": "consumer",
         "status": "amber",
-        "headline": "Google Analytics (G-LQ01D3PKKN) fires before any consent interaction, a possible inconsistency with DMCC s. 225.",
-        "reasoning": "Network evidence shows the Google Analytics tag (gtag/js?id=G-LQ01D3PKKN) loading on the site before any consent interaction, collecting usage data, device identifiers and IP addresses — a possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1, s. 225, which prohibits misleading omissions and practices that fall short of professional diligence, since visitors are not told at that moment that measurement is already running. In the UK, analytics used solely for statistical purposes to improve the service may not need consent where users get clear information and a simple way to object, so the outcome here depends on whether the Google Analytics data is used only for that purpose and whether that information and objection route are actually in place. If any of this data also feeds advertising, personalisation or profiling, those conditions would not hold. The same evidence is treated more strictly in the EU.",
+        "headline": "Google Analytics fires before any consent interaction on the site",
+        "reasoning": "Network evidence shows the site requests Google Analytics (US) — which receives usage data, device ID and IP address — before any consent interaction. Under s. 225, a possible inconsistency with consumer protection would arise if visitors are not clearly informed about this analytics and given a simple way to object, since the Data (Use and Access) Act 2025 may allow analytics used solely for statistical purposes to run without consent only where that information and objection route exist. The same evidence is treated more strictly in the EU, so UK-specific conditions must hold for the analytics to be unproblematic here.",
         "finding_ids": [
           "F1"
         ],
@@ -331,17 +402,11 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We use Google Analytics (tag G-LQ01D3PKKN) to collect usage data, device identifiers and IP addresses so we can understand how our site is used and improve it. Our Google Analytics script may load before you interact with our consent banner. Where we use this data only for statistical purposes to improve our service, we rely on the UK's exception for such analytics instead of consent, and you can object at any time by [objection method, e.g. a footer link or an email address]. If we use this data for any other purpose, such as advertising or profiling, we ask for your consent before the script loads.",
-            "code_change": "In the site's analytics bootstrap, gate the Google Analytics script (googletagmanager.com/gtag/js?id=G-LQ01D3PKKN) so it only loads after the consent state is set, or after the analytics notice with the objection route has been shown; leave the tag ID and the request unchanged."
-          },
-          {
-            "policy_clause": "You can object to our Google Analytics measurement at any time by [method]. We record your choice and, from your next visit, we stop collecting usage data, device identifiers and IP addresses through Google Analytics.",
-            "code_change": "Add an 'object to analytics' control on [settings page/footer] that stores a persistent flag, and have the analytics bootstrap check that flag before loading gtag/js (G-LQ01D3PKKN)."
+            "policy_clause": "We use Google Analytics, provided by Google LLC in the United States, to understand how our site is used. It receives usage data, a device ID and your IP address, and it may run before you interact with any consent banner. We use it only for statistical purposes to improve our service. You can object to this analytics at any time by [method of objection], and [retention period] applies.",
+            "code_change": "In the site's consent/analytics bootstrap, do not load https://www.googletagmanager.com/gtag/js?id=G-LQ01D3PKKN until after the consent/objection interaction, or block it until the user has been shown the analytics notice and given the objection route; the initial gtag request must not fire on page load."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F1": "amber"
         }
@@ -362,8 +427,8 @@
         "jurisdiction": "EU",
         "area": "personal_data",
         "status": "red",
-        "headline": "Google Analytics (gtag.js) loads on page view before any consent interaction, sending usage, device ID and IP data.",
-        "reasoning": "Network evidence shows the gtag.js request to googletagmanager.com (measurement ID G-LQ01D3PKKN) firing before any consent interaction, sending usage data, a device identifier and IP address to Google Analytics in the US. Under EU-EPRIVACY-5-3, reading or storing information on a user's device needs prior consent unless strictly necessary to deliver a service the user asked for, and that provision contains no analytics exemption, so a possible inconsistency arises; EU-GDPR-7 and EU-GDPR-6(1) are also engaged because consent that has not yet been collected cannot be demonstrated and no other legal basis is documented for this tracking. Separately, the privacy policy does not state how long data is kept, a possible inconsistency with EU-GDPR-13-2-a and EU-GDPR-5-1-e, which require a retention period or the criteria used to set one, and storage limited to what is necessary. A legitimate-interests or strictly-necessary argument would only change the analysis if it could be shown that no information is stored or read on the device before consent and that the processing is genuinely necessary for a service the user requested, which the current pre-consent firing does not support.",
+        "headline": "Google Analytics fires before any consent interaction, before consent is collected",
+        "reasoning": "Network evidence shows a request to Google Analytics (googletagmanager.com) loading before any consent interaction on the site, and it receives usage data, device ID and IP address. Where such storage or access is not strictly necessary to provide a service the user requested, this points to a possible inconsistency with Directive 2002/58/EC Art. 5(3), and the absence of a prior consent basis points to a possible inconsistency with Regulation Art. 6(1) and Art. 7 on demonstrating consent. The privacy policy says nothing about how long personal data is kept, which points to a possible inconsistency with the information duty in Regulation Art. 13(2)(a) and the storage limitation principle in Art. 5(1)(e).",
         "finding_ids": [
           "F1",
           "F2"
@@ -377,17 +442,15 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We use Google Analytics to understand how our website and documentation are used. When you allow analytics, Google Analytics may set cookies and receive your IP address, a device identifier, and information about the pages you visit and how you interact with them. We do not load Google Analytics or set these cookies until you accept analytics in our consent banner, and you can change or withdraw your choice at any time through the cookie settings link in our footer.",
-            "code_change": "Gate the Google Analytics loader on stored consent: do not inject the https://www.googletagmanager.com/gtag/js?id=G-LQ01D3PKKN script (or call gtag('config', ...)) until the visitor has accepted analytics in the consent banner; load it only after the consent state is read, and remove it if consent is withdrawn."
+            "policy_clause": "We use Google Analytics to understand how our site and product are used. Google Analytics may set cookies and receive your usage data, device ID and IP address. We only load Google Analytics after you have given consent through our cookie banner, and you can withdraw that consent at any time through the same banner.",
+            "code_change": "In the site's analytics bootstrap (the gtag/js loader for G-LQ01D3PKKN), do not inject the Google Analytics script on page load. Load it only after the consent state is set to granted by the consent manager, and keep the default consent state as denied."
           },
           {
-            "policy_clause": "We keep Google Analytics data, including your IP address, device identifier and usage data, for [retention period]. Where we cannot give a fixed period for a specific category, we decide how long to keep it based on [criteria, e.g. the reporting period we need for product and documentation improvements and our contractual limits with the provider], and then delete or anonymise it.",
+            "policy_clause": "We keep personal data only for as long as necessary for the purposes described in this policy. Specifically: [data category] is kept for [retention period]; where a fixed period is not possible, we decide retention based on [criteria used to determine the period].",
             "code_change": null
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F1": "red",
           "F2": "amber"
@@ -398,7 +461,7 @@
         "area": "ai_transparency",
         "status": "green",
         "headline": "No possible inconsistencies detected for AI transparency",
-        "reasoning": "None of the checks we ran (R1-R9) produced a finding for this cell. This reflects only what was visible in the repository, the public site and the policy text.",
+        "reasoning": "None of the checks we ran (R1-R10) produced a finding for this cell. This reflects only what was visible in the repository, the public site and the policy text.",
         "finding_ids": [],
         "provision_ids": [],
         "fixes": [],
@@ -409,8 +472,8 @@
         "jurisdiction": "EU",
         "area": "consumer",
         "status": "red",
-        "headline": "Google Analytics (gtag.js, G-LQ01D3PKKN) fires before any consent interaction, collecting usage, device ID and IP data.",
-        "reasoning": "Network evidence shows a request to https://www.googletagmanager.com/gtag/js?id=G-LQ01D3PKKN that fires before the user has made any consent interaction, and the finding records that this analytics tag covers usage data, device identifiers and IP addresses. In the EU, analytics trackers are generally treated as non-essential and so should be loaded only after a consent choice is made, so firing this tag first feeds through to a possible inconsistency with EU-UCPD-5 Art. 5 on practices contrary to professional diligence that may materially distort the average consumer's economic behaviour. If the tag were only initialised after an affirmative consent choice (or on a documented exemption applying to this specific, non-profiling measurement), the concern would fall away; the evidence indicates it is not gated in that way. This is not legal advice.",
+        "headline": "Google Analytics fires before any consent interaction on the site",
+        "reasoning": "Network evidence shows a request to Google Analytics (US) — sending usage data, device ID and IP address — loading from googletagmanager.com before the visitor has interacted with any consent notice. Because analytics trackers run before any consent interaction, the practice may fall short of the professional diligence expected of a trader toward the average consumer, which is the possible inconsistency with Art. 5. Whether Art. 5 is engaged depends on whether the practice materially distorts, or is likely to materially distort, the average consumer's economic behaviour; a pre-consent analytics load that shapes the information the consumer sees could meet that condition. This is a compliance observation, not legal advice.",
         "finding_ids": [
           "F1"
         ],
@@ -419,17 +482,15 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We use Google Analytics, a US-based analytics provider, on our site. When you accept analytics cookies, Google Analytics sets cookies and collects usage data, device identifiers and your IP address so we can understand how our site is used. We load Google Analytics only after you have made a consent choice, and you can withdraw that consent at any time through [cookie settings link].",
-            "code_change": null
+            "policy_clause": "We load Google Analytics, a product analytics service provided by Google (US), only after you have given consent. Until then, Google Analytics does not receive your usage data, device ID or IP address. When you consent, Google Analytics processes this data on our behalf to help us understand how our site is used; you can withdraw your consent at any time in our cookie settings.",
+            "code_change": "In the tag loading logic that injects https://www.googletagmanager.com/gtag/js (the Google Analytics/gtag snippet), gate the script injection behind the consent state: do not insert the gtag script until the visitor has actively accepted analytics cookies, and remove/disable the tag when consent is withdrawn."
           },
           {
-            "policy_clause": null,
-            "code_change": "In the consent manager, do not inject or initialise the Google Analytics tag (https://www.googletagmanager.com/gtag/js?id=G-LQ01D3PKKN, including the dataLayer/gtag config call) until the user grants analytics consent, and tear the tag down when consent is withdrawn. Add a regression test asserting no request to googletagmanager.com occurs before a consent choice."
+            "policy_clause": "You can accept or refuse analytics cookies, including Google Analytics, before any analytics script is loaded, and refusing has the same effect as never giving consent. We show the choice before any such script runs and record your decision.",
+            "code_change": "Add a consent gate/await check before any analytics initialization so the gtag request is blocked on first page load; add a test that asserts no request to googletagmanager.com occurs before the consent event fires."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F1": "red"
         }
@@ -450,8 +511,8 @@
         "jurisdiction": "KZ",
         "area": "personal_data",
         "status": "amber",
-        "headline": "Google Analytics fires on Hoppscotch before any consent interaction; the policy states no retention period.",
-        "reasoning": "Google Analytics (US) fires on the site before any consent interaction, sending usage, device_id and IP data to a US vendor; under KZ-PD-7 collection and third-party or cross-border transfer are carried out with the subject's consent unless a case is set by law, and KZ-PD-8(4) requires that consent to state the list of data collected, its validity period, whether data may go to third parties and whether cross-border transfer takes place — so a possible inconsistency with KZ-PD-7 and KZ-PD-8(4) turns on whether a lawful exception applies or a valid consent covering Google Analytics and its US transfer is in fact obtained elsewhere. Kazakhstan has no cookie-specific rule, so this is governed by the general consent condition in KZ-PD-7 rather than a cookie provision. The policy at docs.hoppscotch.io/support/privacy does not state how long personal data is kept, so the consent content in KZ-PD-8(4) and the retention rule in KZ-PD-12-2 (period set by the date the purposes of collection and processing are achieved, with storage in a database located in Kazakhstan) are not reflected in the policy text; the silence alone shows only that the policy does not say this. This is a possible inconsistency, not a finding of breach, and is not legal advice.",
+        "headline": "Google Analytics fires before any consent interaction and no retention period is stated",
+        "reasoning": "Network evidence shows Google Analytics (US) loading on the site before any consent interaction, receiving usage data, device ID and IP address; under Art. 7 collection generally requires the subject's consent, so this is a possible inconsistency unless a legal exception applies. Because consent is only as good as what it covers, the missing retention period also touches Art. 8(4), which requires consent to state its validity period and whether data is transferred to third parties or across borders. The policy does not state how long personal data is kept or the criteria used, which is a possible inconsistency with Art. 12(2), under which the retention period follows from when the collection purposes are achieved and data must be held in Kazakhstan.",
         "finding_ids": [
           "F1",
           "F2"
@@ -463,21 +524,15 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We use Google Analytics to measure how our website and documentation are used. Google Analytics may collect your usage data, your device identifier and your IP address, and may transfer this data to the United States on our behalf. We load Google Analytics only after you have given consent, and we do not run it before then. Our consent request lists the data collected, states that data may be transferred to third parties and that cross-border transfer to the United States takes place, and states that your consent is valid for [consent validity period]. You can withdraw your consent at any time, and we will stop loading Google Analytics when you do.",
-            "code_change": null
+            "policy_clause": "We use Google Analytics to understand how our site and product are used. It may receive usage data, device ID and IP address. Where required, we ask for your consent before these tools are loaded, and you can withdraw it at any time. Because Google Analytics is operated from the United States, this involves a cross-border transfer; we ask for your consent to that transfer separately. We keep personal data only until the purposes for which it was collected are achieved, and in any case no longer than [retention period], after which it is deleted or anonymised. Personal data collected in Kazakhstan is stored in databases located in Kazakhstan.",
+            "code_change": "Load Google Analytics (gtag.js / G-LQ01D3PKKN) only after the visitor's consent has been recorded, e.g. gate the script injection in the layout that currently requests https://www.googletagmanager.com/gtag/js on page load."
           },
           {
-            "policy_clause": "We keep personal data, including analytics data collected through Google Analytics, only for as long as needed to achieve the purposes for which it was collected. Our retention period for analytics data is [retention period], after which we delete or anonymise it. Our personal data is stored in a database located in the territory of Kazakhstan, except where [cross-border storage arrangement] applies.",
+            "policy_clause": "When we ask for your consent we tell you what it covers: the list of data we collect, how long the consent is valid, whether your data may be shared with third parties, and whether it is transferred outside Kazakhstan.",
             "code_change": null
-          },
-          {
-            "policy_clause": null,
-            "code_change": "In the site's analytics include, the script tag loading https://www.googletagmanager.com/gtag/js?id=G-LQ01D3PKKN&l=dataLayer must not be rendered on initial page load. Remove the eager <script> tag and inject the gtag.js loader only after the consent banner records analytics consent (and remove cookies set by that tag when consent is withdrawn or refused)."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F1": "amber",
           "F2": "amber"
@@ -488,7 +543,7 @@
         "area": "ai_transparency",
         "status": "green",
         "headline": "No possible inconsistencies detected for AI transparency",
-        "reasoning": "None of the checks we ran (R1-R9) produced a finding for this cell. This reflects only what was visible in the repository, the public site and the policy text.",
+        "reasoning": "None of the checks we ran (R1-R10) produced a finding for this cell. This reflects only what was visible in the repository, the public site and the policy text.",
         "finding_ids": [],
         "provision_ids": [],
         "fixes": [],
@@ -499,8 +554,8 @@
         "jurisdiction": "KZ",
         "area": "consumer",
         "status": "amber",
-        "headline": "Google Analytics (gtag.js) fires on the site before any consent interaction, collecting usage, device_id and IP data.",
-        "reasoning": "Network evidence shows a request to Google Analytics (www.googletagmanager.com/gtag/js?id=G-LQ01D3PKKN&l=dataLayer) firing before any consent interaction on the site, carrying usage, device_id and IP data. Kazakhstan has no cookie-specific rule, so the general consent requirements for collection apply, and this early firing is a possible inconsistency with Art. 10 of the Consumer Rights Law, which gives consumers the right to full, reliable and timely information about the service and provider. Because the law is framed as an information right rather than a cookie rule, the key condition is whether the visitor is told about Google Analytics and its data categories in a timely way before or at the point of collection; if that notice is absent, the inconsistency with Art. 10 is stronger. The finding does not tell us what the policy says about analytics, so the silence itself should not be read as proof that no notice is given anywhere.",
+        "headline": "Google Analytics fires before consent, sending usage data, device ID and IP address",
+        "reasoning": "Network evidence shows a request to Google Analytics (gtag) on the site before any consent interaction, transmitting usage data, device ID and IP address. Because collection starts before the consumer is given any notice or choice, this is a possible inconsistency with Art. 10 (Consumer right to information), which gives consumers the right to full, reliable and timely information. Kazakhstan has no cookie-specific rule, so the general consent and information requirements apply; the condition that would resolve the issue is that the analytics tag is loaded only after the consumer has been informed and has acted.",
         "finding_ids": [
           "F1"
         ],
@@ -509,17 +564,15 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We use Google Analytics on our website to understand how visitors use our service. Google Analytics may collect your usage data, a device identifier and your IP address. We load Google Analytics only after you have been shown information about this analytics tool and have had the chance to consent; if you do not consent, we do not load it. We keep analytics data for [retention period].",
-            "code_change": "In the page template that loads https://www.googletagmanager.com/gtag/js?id=G-LQ01D3PKKN, remove the gtag.js script from the initial HTML and load it only after the consent banner records an affirmative analytics choice; gate the `gtag('config', ...)` call on that stored consent value."
+            "policy_clause": "We use Google Analytics to understand how our website and app are used. Google Analytics receives usage data, your device ID and your IP address. We load Google Analytics only after you have been shown information about this and have given your consent; if you do not consent, Google Analytics does not run.",
+            "code_change": "Gate the Google Analytics tag in the site/app bootstrap: do not inject or fire https://www.googletagmanager.com/gtag/js until the consent flag is set (e.g. move the gtag snippet behind the consent state or use Consent Mode default 'denied' before any consent interaction)."
           },
           {
-            "policy_clause": "You can withdraw or change your analytics consent at any time using [consent settings link], and we will stop loading Google Analytics for your browser from that point.",
-            "code_change": "Add a consent-state check before the gtag.js loader so that withdrawing consent removes or blocks the Google Analytics tag on subsequent page loads."
+            "policy_clause": "You can withdraw your consent to Google Analytics at any time, and we will stop loading it and delete the analytics data linked to your device ID and IP address [within the retention period].",
+            "code_change": "Add a consent-withdrawal handler that removes the gtag script, clears the _ga/_gid cookies and calls gtag('consent', 'update', {analytics_storage: 'denied'})."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F1": "amber"
         }
@@ -546,13 +599,13 @@
         "ref": "reg. 6(1), as substituted by Data (Use and Access) Act 2025 s. 112",
         "title": "Storing or accessing information on a user's device",
         "summary": "A person must not store information, or gain access to information stored, in a user's terminal equipment unless an exception in Schedule A1 applies (for example consent, or strict necessity).",
-        "official_url": "https://www.legislation.gov.uk/ukpga/2025/18/section/112",
+        "official_url": "https://www.legislation.gov.uk/uksi/2003/2426/regulation/6",
         "tags": [
           "cookies",
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-PECR-SCHA1-5": {
         "id": "UK-PECR-SCHA1-5",
@@ -561,8 +614,8 @@
         "instrument": "PECR Schedule A1, inserted by Data (Use and Access) Act 2025 Sch. 12",
         "ref": "Sch. A1 para. 5",
         "title": "Statistical-purposes exception for analytics cookies",
-        "summary": "Consent is not required where storage or access is solely to collect statistical information about how a service or website is used, with a view to improving it, provided the user is given clear information and a simple means to object. Advertising and cross-site tracking are outside the exception.",
-        "official_url": "https://www.legislation.gov.uk/ukpga/2025/18/schedule/12",
+        "summary": "Consent is not required where the sole purpose of the storage or access is to collect information for statistical purposes about how the service or website is used, with a view to improving it, provided the information is not shared with anyone else except to help make those improvements, the user is given clear and comprehensive information about the purpose, and the user is given a simple, free means of objecting and does not object.",
+        "official_url": "https://www.legislation.gov.uk/uksi/2003/2426/schedule/A1",
         "tags": [
           "cookies",
           "consent",
@@ -570,21 +623,7 @@
           "statistical",
           "analytics"
         ],
-        "verified": false
-      },
-      "UK-GDPR-5-1-e": {
-        "id": "UK-GDPR-5-1-e",
-        "jurisdiction": "UK",
-        "area": "personal_data",
-        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
-        "ref": "Art. 5(1)(e)",
-        "title": "Storage limitation",
-        "summary": "Personal data must be kept in identifiable form no longer than necessary for the purposes for which it is processed.",
-        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/5",
-        "tags": [
-          "retention"
-        ],
-        "verified": false
+        "verified": true
       },
       "UK-GDPR-13-2-a": {
         "id": "UK-GDPR-13-2-a",
@@ -599,7 +638,21 @@
           "retention",
           "transparency"
         ],
-        "verified": false
+        "verified": true
+      },
+      "UK-GDPR-5-1-e": {
+        "id": "UK-GDPR-5-1-e",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 5(1)(e)",
+        "title": "Storage limitation",
+        "summary": "Personal data must be kept in identifiable form no longer than necessary for the purposes for which it is processed.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/5",
+        "tags": [
+          "retention"
+        ],
+        "verified": true
       },
       "UK-DMCC-225": {
         "id": "UK-DMCC-225",
@@ -616,17 +669,17 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-EPRIVACY-5-3": {
         "id": "EU-EPRIVACY-5-3",
         "jurisdiction": "EU",
         "area": "personal_data",
-        "instrument": "Directive 2002/58/EC (ePrivacy Directive)",
+        "instrument": "Directive 2002/58/EC (ePrivacy Directive), as amended by Directive 2009/136/EC",
         "ref": "Art. 5(3)",
         "title": "Consent for cookies and similar technologies",
-        "summary": "Storing information, or accessing information stored, on a user's device is only allowed with the user's consent after clear information, unless strictly necessary to provide a service the user requested. There is no exemption for analytics.",
-        "official_url": "https://eur-lex.europa.eu/eli/dir/2002/58/oj",
+        "summary": "Storing information, or accessing information stored, on a user's device is only allowed with the user's consent after clear information, unless strictly necessary to provide a service the user requested.",
+        "official_url": "https://eur-lex.europa.eu/eli/dir/2002/58/2009-12-19",
         "tags": [
           "cookies",
           "consent",
@@ -647,7 +700,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-6": {
         "id": "EU-GDPR-6",
@@ -663,7 +716,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-5-1-e": {
         "id": "EU-GDPR-5-1-e",
@@ -677,7 +730,7 @@
         "tags": [
           "retention"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-13-2-a": {
         "id": "EU-GDPR-13-2-a",
@@ -692,7 +745,7 @@
           "retention",
           "transparency"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-UCPD-5": {
         "id": "EU-UCPD-5",
@@ -701,7 +754,7 @@
         "instrument": "Directive 2005/29/EC (Unfair Commercial Practices Directive)",
         "ref": "Art. 5",
         "title": "Prohibition of unfair commercial practices",
-        "summary": "Unfair commercial practices are prohibited: practices contrary to professional diligence that materially distort the economic behaviour of the average consumer.",
+        "summary": "Unfair commercial practices are prohibited: practices contrary to professional diligence that materially distort, or are likely to materially distort, the economic behaviour of the average consumer.",
         "official_url": "https://eur-lex.europa.eu/eli/dir/2005/29/oj",
         "tags": [
           "fairness",
@@ -709,7 +762,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-PD-7": {
         "id": "KZ-PD-7",
@@ -729,7 +782,7 @@
           "cookies",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-PD-8": {
         "id": "KZ-PD-8",
@@ -750,7 +803,7 @@
           "transparency",
           "sharing"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-PD-12-2": {
         "id": "KZ-PD-12-2",
@@ -766,7 +819,7 @@
           "transfers",
           "retention"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-CP-10": {
         "id": "KZ-CP-10",
@@ -787,7 +840,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       }
     },
     "stats": {
@@ -795,10 +848,16 @@
       "files_scanned": 2321,
       "bearer": false,
       "requests_pre_consent": 53,
+      "site_passes": {
+        "reject": "no banner found",
+        "accept": "no banner found"
+      },
       "vendors_found": 2,
+      "effort": "fast",
       "claims_method": "llm",
       "verdict_method": "llm",
-      "duration_s": 23.5
+      "verdict_fallbacks": 0,
+      "duration_s": 19.1
     },
     "disclaimer": "ProveryAI is a first-pass engineering check. It reports possible inconsistencies between observed product behaviour and the published privacy policy. It is not legal advice."
   },
