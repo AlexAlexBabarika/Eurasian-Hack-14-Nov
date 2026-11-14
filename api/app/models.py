@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, model_validator
 
 Jurisdiction = Literal["UK", "EU", "KZ"]
 Area = Literal["personal_data", "ai_transparency", "consumer", "financial"]
@@ -108,10 +108,30 @@ class AuditReport(BaseModel):
 
 
 class AuditRequest(BaseModel):
-    repo_url: str
-    site_url: str
+    """repo_url or site_url may be omitted (not both): the audit then covers only what it can observe."""
+
+    repo_url: str | None = None
+    site_url: str | None = None
     policy_url: str
     jurisdictions: list[Jurisdiction] | None = None
+
+    @model_validator(mode="after")
+    def _something_to_observe(self) -> "AuditRequest":
+        if not self.repo_url and not self.site_url:
+            raise ValueError("give a repo_url, a site_url, or both")
+        return self
+
+
+class AuditSummary(BaseModel):
+    """One saved demo audit, for the examples list on the landing page."""
+
+    id: str
+    repo_url: str | None
+    site_url: str | None
+    policy_url: str
+    findings: int
+    vendors: int
+    status_counts: dict[Status, int]
 
 
 class AuditCreated(BaseModel):

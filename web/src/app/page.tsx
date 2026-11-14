@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { AuditForm } from "@/components/AuditForm";
+import { ExampleAudits } from "@/components/ExampleAudits";
 import { HeroExhibit } from "@/components/HeroExhibit";
 import { ScrambleText } from "@/components/ScrambleText";
 import LetterGlitch from "@/components/reactbits/LetterGlitch";
@@ -74,7 +75,7 @@ export default function Home() {
               className="animate-rise max-w-xl text-base leading-relaxed text-foreground/80 sm:text-lg"
               style={{ "--i": 2 } as React.CSSProperties}
             >
-              Paste three links. Groundtruth compares the code and the live site with the policy and shows every possible
+              Paste two or three links. Groundtruth compares the code and the live site with the policy and shows every possible
               inconsistency with evidence, the provision it relates to, and text you can paste to fix it.
             </p>
           </section>
@@ -121,6 +122,10 @@ export default function Home() {
             </ul>
           </div>
         </section>
+
+        <div className="mx-auto w-full max-w-7xl px-4 pb-12 sm:px-6">
+          <ExampleAudits />
+        </div>
       </main>
 
       <footer className="border-t border-white/[0.07]">

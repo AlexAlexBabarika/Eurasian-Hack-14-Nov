@@ -69,7 +69,7 @@ def _dedupe(items: list[Provision]) -> list[Provision]:
 
 def deterministic_cell(j: Jurisdiction, area: Area, findings: list[Finding], observations: list[Observation],
                        gaps: list[str] | None = None) -> CellVerdict:  # fmt: skip
-    """`gaps` lists inputs that could not be read (repository, policy); a cell with gaps is never green."""
+    """`gaps` says which inputs are missing or unreadable (repository, policy); a cell with gaps is never green."""
     if area == "financial":
         return CellVerdict(
             jurisdiction=j, area=area, status="grey", headline="Needs questionnaire",
@@ -83,9 +83,9 @@ def deterministic_cell(j: Jurisdiction, area: Area, findings: list[Finding], obs
     if not rows and gaps:
         return CellVerdict(
             jurisdiction=j, area=area, status="grey", finding_ids=[], provision_ids=[], fixes=[],
-            headline=f"Not assessed: {' and '.join(gaps)} could not be read",
-            reasoning="No findings, but the scan was incomplete, so this is not a clean result. Fix the input and "
-            "run the audit again.",
+            headline=f"Not assessed: {' and '.join(gaps)}",
+            reasoning="No findings, but the scan was incomplete, so this is not a clean result. Complete the inputs "
+            "and run the audit again.",
         )  # fmt: skip
     if not rows:
         return CellVerdict(

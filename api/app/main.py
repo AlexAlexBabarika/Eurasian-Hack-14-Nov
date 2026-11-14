@@ -10,7 +10,7 @@ from fastapi.responses import PlainTextResponse
 from sse_starlette.sse import EventSourceResponse
 
 from app import store
-from app.models import AuditCreated, AuditRequest, AuditStatus, ProgressEvent
+from app.models import AuditCreated, AuditRequest, AuditStatus, AuditSummary, ProgressEvent
 from app.pipeline import run_audit
 from app.report.markdown import render
 from app.store import AUDITS, AuditState
@@ -50,7 +50,7 @@ async def _replay(audit_id: str, cached: AuditState) -> None:
 async def create_audit(req: AuditRequest) -> AuditCreated:
     if os.getenv("ALLOW_LOCAL_INPUTS") != "1":
         for name in ("repo_url", "site_url", "policy_url"):
-            if not getattr(req, name).startswith(("http://", "https://")):
+            if (value := getattr(req, name)) is not None and not value.startswith(("http://", "https://")):
                 raise HTTPException(422, f"{name} must be an http(s) URL")
     audit_id = uuid.uuid4().hex[:12]
     AUDITS[audit_id] = AuditState()
@@ -59,6 +59,12 @@ async def create_audit(req: AuditRequest) -> AuditCreated:
     _tasks.add(task)
     task.add_done_callback(_tasks.discard)
     return AuditCreated(id=audit_id)
+
+
+@app.get("/audits", response_model=list[AuditSummary])
+async def list_example_audits() -> list[AuditSummary]:
+    """Saved demo audits (api/data/audits/demo-*.json)."""
+    return store.summaries()
 
 
 def _state(audit_id: str) -> AuditState:

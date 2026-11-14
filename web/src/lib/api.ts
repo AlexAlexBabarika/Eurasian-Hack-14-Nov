@@ -1,8 +1,15 @@
-import type { AuditCreated, AuditRequest, AuditStatus, ProgressEvent } from "@/lib/types";
+import type { AuditCreated, AuditRequest, AuditStatus, AuditSummary, ProgressEvent } from "@/lib/types";
 
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/$/, "");
 // The cached audit of demo/fixture-app. The web app bundles it, so this report opens without the API.
 export const DEMO_ID = "demo-fixture";
+// The same product audited again after the policy was corrected. Also bundled.
+export const DEMO_FIXED_ID = "demo-fixture-fixed";
+export const BUNDLED_AUDIT_IDS: readonly string[] = [DEMO_ID, DEMO_FIXED_ID];
+
+export function isBundledAudit(id: string): boolean {
+  return BUNDLED_AUDIT_IDS.includes(id);
+}
 
 export class ApiError extends Error {
   constructor(
@@ -37,6 +44,10 @@ export function createAudit(body: AuditRequest): Promise<AuditCreated> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+}
+
+export function listExampleAudits(): Promise<AuditSummary[]> {
+  return request<AuditSummary[]>("/audits");
 }
 
 export function getAudit(id: string): Promise<AuditStatus> {

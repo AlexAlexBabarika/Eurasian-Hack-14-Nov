@@ -1,0 +1,1028 @@
+{
+  "status": "done",
+  "events": [
+    {
+      "step": "clone",
+      "status": "running",
+      "message": "Fetching repository",
+      "count": null
+    },
+    {
+      "step": "clone",
+      "status": "done",
+      "message": "9 files ready to scan",
+      "count": 9
+    },
+    {
+      "step": "manifests",
+      "status": "running",
+      "message": "Matching dependencies and imports against the SDK catalog",
+      "count": null
+    },
+    {
+      "step": "manifests",
+      "status": "done",
+      "message": "Vendors in code: Sentry, Mixpanel, OpenAI, PostHog, Stripe",
+      "count": 5
+    },
+    {
+      "step": "bearer",
+      "status": "running",
+      "message": "Running Bearer data-flow scan",
+      "count": null
+    },
+    {
+      "step": "bearer",
+      "status": "skipped",
+      "message": "Bearer CLI not installed; using manifest detector only",
+      "count": null
+    },
+    {
+      "step": "site_scan",
+      "status": "running",
+      "message": "Loading the site in a clean browser, clicking nothing",
+      "count": null
+    },
+    {
+      "step": "site_scan",
+      "status": "done",
+      "message": "4 requests before consent; trackers: Google Analytics, PostHog",
+      "count": 2
+    },
+    {
+      "step": "policy_fetch",
+      "status": "running",
+      "message": "Fetching the privacy policy",
+      "count": null
+    },
+    {
+      "step": "policy_fetch",
+      "status": "done",
+      "message": "Policy text extracted (2,697 characters)",
+      "count": 2697
+    },
+    {
+      "step": "claims",
+      "status": "running",
+      "message": "Extracting what the policy claims",
+      "count": null
+    },
+    {
+      "step": "claims",
+      "status": "done",
+      "message": "Claims extracted (heuristic); sharing statement: processors_only",
+      "count": null
+    },
+    {
+      "step": "diff",
+      "status": "running",
+      "message": "Comparing observed behaviour with policy claims",
+      "count": null
+    },
+    {
+      "step": "diff",
+      "status": "done",
+      "message": "2 possible inconsistencies",
+      "count": 2
+    },
+    {
+      "step": "law",
+      "status": "running",
+      "message": "Retrieving provisions from the curated corpus",
+      "count": null
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts per jurisdiction",
+      "count": null
+    },
+    {
+      "step": "law",
+      "status": "done",
+      "message": "12 provisions cited",
+      "count": 12
+    },
+    {
+      "step": "verdict",
+      "status": "done",
+      "message": "12 matrix cells (deterministic)",
+      "count": 12
+    },
+    {
+      "step": "done",
+      "status": "done",
+      "message": "Audit finished in 0.0s",
+      "count": null
+    }
+  ],
+  "report": {
+    "id": "demo-fixture-fixed",
+    "inputs": {
+      "repo_url": "https://github.com/AlexAlexBabarika/Eurasian-Hack-14-Nov/tree/main/demo/fixture-app",
+      "site_url": "http://localhost:4100/public/index.html",
+      "policy_url": "http://localhost:4100/privacy-fixed.html",
+      "jurisdictions": null
+    },
+    "observations": [
+      {
+        "id": "obs-1",
+        "vendor": "Sentry",
+        "vendor_country": "US",
+        "data_categories": [
+          "device_id",
+          "ip",
+          "usage",
+          "email"
+        ],
+        "purpose_guess": "error_monitoring",
+        "is_ai": false,
+        "pre_consent": false,
+        "evidence": [
+          {
+            "kind": "manifest",
+            "summary": "@sentry/nextjs declared as a dependency",
+            "file": "package.json",
+            "line": 11,
+            "snippet": "\"@sentry/nextjs\": \"^8.40.0\",",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Sentry SDK imported",
+            "file": "src/lib/sentry.ts",
+            "line": 1,
+            "snippet": "import * as Sentry from \"@sentry/nextjs\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "email handled in a file that calls Sentry",
+            "file": "src/lib/sentry.ts",
+            "line": 9,
+            "snippet": "});\n\nexport function setSentryUser(user: { id: string; email: string }) {\n  Sentry.setUser({ id: user.id, email: user.email });\n}",
+            "url": null,
+            "quote": null
+          }
+        ]
+      },
+      {
+        "id": "obs-2",
+        "vendor": "Mixpanel",
+        "vendor_country": "US",
+        "data_categories": [
+          "usage",
+          "device_id",
+          "ip",
+          "email",
+          "name"
+        ],
+        "purpose_guess": "analytics",
+        "is_ai": false,
+        "pre_consent": false,
+        "evidence": [
+          {
+            "kind": "manifest",
+            "summary": "mixpanel-browser declared as a dependency",
+            "file": "package.json",
+            "line": 12,
+            "snippet": "\"mixpanel-browser\": \"^2.56.0\",",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Mixpanel SDK imported",
+            "file": "src/lib/analytics.ts",
+            "line": 1,
+            "snippet": "import mixpanel from \"mixpanel-browser\";\nimport posthog from \"posthog-js\";",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "email handled in a file that calls Mixpanel",
+            "file": "src/lib/analytics.ts",
+            "line": 7,
+            "snippet": "posthog.init(\"phc_demo_key\", { api_host: \"https://eu.i.posthog.com\" });\n\nexport type User = { id: string; email: string; name: string };\n\nexport function identifyUser(user: User) {",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "name handled in a file that calls Mixpanel",
+            "file": "src/lib/analytics.ts",
+            "line": 13,
+            "snippet": "  mixpanel.people.set({\n    $email: user.email,\n    $name: user.name,\n  });\n  posthog.identify(user.id, { email: user.email, name: user.name });",
+            "url": null,
+            "quote": null
+          }
+        ]
+      },
+      {
+        "id": "obs-3",
+        "vendor": "OpenAI",
+        "vendor_country": "US",
+        "data_categories": [
+          "email",
+          "user_content"
+        ],
+        "purpose_guess": "ai_processing",
+        "is_ai": true,
+        "pre_consent": false,
+        "evidence": [
+          {
+            "kind": "manifest",
+            "summary": "openai declared as a dependency",
+            "file": "package.json",
+            "line": 14,
+            "snippet": "\"openai\": \"^4.73.0\",",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "OpenAI SDK imported",
+            "file": "src/app/api/chat/route.ts",
+            "line": 1,
+            "snippet": "import OpenAI from \"openai\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "email handled in a file that calls OpenAI",
+            "file": "src/app/api/chat/route.ts",
+            "line": 8,
+            "snippet": "  const { user, message } = await req.json();\n\n  console.log(\"chat request from\", user.email, message);\n\n  const completion = await openai.chat.completions.create({",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "User-provided content passed to OpenAI",
+            "file": "src/app/api/chat/route.ts",
+            "line": 12,
+            "snippet": "  const completion = await openai.chat.completions.create({\n    model: \"gpt-4o-mini\",\n    messages: [\n      { role: \"system\", content: \"You are Notely, a helpful note-taking assistant.\" },\n      { role: \"user\", content: message },",
+            "url": null,
+            "quote": null
+          }
+        ]
+      },
+      {
+        "id": "obs-4",
+        "vendor": "PostHog",
+        "vendor_country": "US",
+        "data_categories": [
+          "usage",
+          "device_id",
+          "ip",
+          "email",
+          "name"
+        ],
+        "purpose_guess": "analytics",
+        "is_ai": false,
+        "pre_consent": true,
+        "evidence": [
+          {
+            "kind": "manifest",
+            "summary": "posthog-js declared as a dependency",
+            "file": "package.json",
+            "line": 15,
+            "snippet": "\"posthog-js\": \"^1.188.0\",",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "PostHog SDK imported",
+            "file": "src/lib/analytics.ts",
+            "line": 2,
+            "snippet": "import mixpanel from \"mixpanel-browser\";\nimport posthog from \"posthog-js\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "email handled in a file that calls PostHog",
+            "file": "src/lib/analytics.ts",
+            "line": 7,
+            "snippet": "posthog.init(\"phc_demo_key\", { api_host: \"https://eu.i.posthog.com\" });\n\nexport type User = { id: string; email: string; name: string };\n\nexport function identifyUser(user: User) {",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "name handled in a file that calls PostHog",
+            "file": "src/lib/analytics.ts",
+            "line": 13,
+            "snippet": "  mixpanel.people.set({\n    $email: user.email,\n    $name: user.name,\n  });\n  posthog.identify(user.id, { email: user.email, name: user.name });",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "network",
+            "summary": "Request to PostHog before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://eu.i.posthog.com/e/?ip=1&_=1700000000000",
+            "quote": null
+          },
+          {
+            "kind": "cookie",
+            "summary": "Cookie `ph_phc_demo_key_posthog` (PostHog) set before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "http://localhost:4100/public/index.html",
+            "quote": null
+          }
+        ]
+      },
+      {
+        "id": "obs-5",
+        "vendor": "Stripe",
+        "vendor_country": "US",
+        "data_categories": [
+          "payment",
+          "email",
+          "name"
+        ],
+        "purpose_guess": "payments",
+        "is_ai": false,
+        "pre_consent": false,
+        "evidence": [
+          {
+            "kind": "manifest",
+            "summary": "stripe declared as a dependency",
+            "file": "package.json",
+            "line": 18,
+            "snippet": "\"stripe\": \"^17.4.0\"",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "src/lib/billing.ts",
+            "line": 1,
+            "snippet": "import Stripe from \"stripe\";\n",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "email handled in a file that calls Stripe",
+            "file": "src/lib/billing.ts",
+            "line": 5,
+            "snippet": "const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? \"\");\n\nexport async function createCustomer(user: { email: string; name: string }) {\n  return stripe.customers.create({ email: user.email, name: user.name });\n}",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "name handled in a file that calls Stripe",
+            "file": "src/lib/billing.ts",
+            "line": 6,
+            "snippet": "\nexport async function createCustomer(user: { email: string; name: string }) {\n  return stripe.customers.create({ email: user.email, name: user.name });\n}",
+            "url": null,
+            "quote": null
+          }
+        ]
+      },
+      {
+        "id": "obs-6",
+        "vendor": "Google Analytics",
+        "vendor_country": "US",
+        "data_categories": [
+          "usage",
+          "device_id",
+          "ip"
+        ],
+        "purpose_guess": "analytics",
+        "is_ai": false,
+        "pre_consent": true,
+        "evidence": [
+          {
+            "kind": "network",
+            "summary": "Request to Google Analytics before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://www.googletagmanager.com/gtag/js?id=G-DEMO000000",
+            "quote": null
+          },
+          {
+            "kind": "network",
+            "summary": "Request to Google Analytics before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-DEMO000000&en=page_view",
+            "quote": null
+          },
+          {
+            "kind": "cookie",
+            "summary": "Cookie `_ga` (Google Analytics) set before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "http://localhost:4100/public/index.html",
+            "quote": null
+          }
+        ]
+      }
+    ],
+    "claims": {
+      "data_categories": [
+        "email",
+        "name",
+        "usage",
+        "device_id",
+        "ip",
+        "user_content",
+        "payment"
+      ],
+      "named_processors": [
+        "Google Analytics",
+        "Google",
+        "Google Tag Manager",
+        "Mixpanel",
+        "PostHog",
+        "Sentry",
+        "Stripe",
+        "OpenAI"
+      ],
+      "sharing_statement": "processors_only",
+      "mentions_ai": true,
+      "international_transfers": true,
+      "retention_stated": true,
+      "rights_listed": [
+        "access",
+        "erasure"
+      ],
+      "deletion_method": "You can delete your account and personal data at any time from Settings, Account, or by emailing privacy@notely.example.",
+      "cookie_consent_described": true,
+      "quotes": {
+        "data_categories": "We collect and process the following categories of personal data: your email address, your name and password when you create an account; the content you submit to the service, including your notes and chat messages; payment and billing details when you subscribe; and usage information, device identifiers and your IP address when you use our website.",
+        "data_name": "We collect and process the following categories of personal data: your email address, your name and password when you create an account; the content you submit to the service, including your notes and chat messages; payment and billing details when you subscribe; and usage information, device identifiers and your IP address when you use our website.",
+        "data_usage": "We collect and process the following categories of personal data: your email address, your name and password when you create an account; the content you submit to the service, including your notes and chat messages; payment and billing details when you subscribe; and usage information, device identifiers and your IP address when you use our website.",
+        "data_device_id": "We collect and process the following categories of personal data: your email address, your name and password when you create an account; the content you submit to the service, including your notes and chat messages; payment and billing details when you subscribe; and usage information, device identifiers and your IP address when you use our website.",
+        "data_ip": "We collect and process the following categories of personal data: your email address, your name and password when you create an account; the content you submit to the service, including your notes and chat messages; payment and billing details when you subscribe; and usage information, device identifiers and your IP address when you use our website.",
+        "data_user_content": "We collect and process the following categories of personal data: your email address, your name and password when you create an account; the content you submit to the service, including your notes and chat messages; payment and billing details when you subscribe; and usage information, device identifiers and your IP address when you use our website.",
+        "data_payment": "We collect and process the following categories of personal data: your email address, your name and password when you create an account; the content you submit to the service, including your notes and chat messages; payment and billing details when you subscribe; and usage information, device identifiers and your IP address when you use our website.",
+        "sharing_statement": "Service providers",
+        "right_access": "You have the right to request access to the information we hold about you, to have it corrected, and the right to erasure.",
+        "right_erasure": "You have the right to request access to the information we hold about you, to have it corrected, and the right to erasure.",
+        "deletion_method": "You can delete your account and personal data at any time from Settings, Account, or by emailing privacy@notely.example.",
+        "mentions_ai": "We share personal data with service providers who process it on our behalf and only on our instructions: Mixpanel and PostHog (product analytics; email, name, usage, device identifiers, IP address), Google Analytics and Google Tag Manager (website analytics; usage, device identifiers, IP address), Sentry (error monitoring; email, usage, device identifiers, IP address), Stripe (payments; email, payment details) and OpenAI (AI features; the content you submit).",
+        "international_transfers": "International transfers",
+        "retention_stated": "We retain your account data for as long as your account is active and delete it within 30 days after you close it.",
+        "cookie_consent_described": "We use Google Analytics and PostHog cookies to measure how our website is used; we only set them after you give consent, and you can withdraw consent at any time in cookie settings."
+      }
+    },
+    "findings": [
+      {
+        "id": "F1",
+        "rule": "R5_TRACKING_BEFORE_CONSENT",
+        "title": "PostHog and Google Analytics fire before any consent interaction on the site",
+        "severity": "high",
+        "areas": [
+          "personal_data",
+          "consumer"
+        ],
+        "observation_ids": [
+          "obs-4",
+          "obs-6"
+        ],
+        "evidence": [
+          {
+            "kind": "network",
+            "summary": "Request to PostHog before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://eu.i.posthog.com/e/?ip=1&_=1700000000000",
+            "quote": null
+          },
+          {
+            "kind": "network",
+            "summary": "Request to Google Analytics before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://www.googletagmanager.com/gtag/js?id=G-DEMO000000",
+            "quote": null
+          },
+          {
+            "kind": "cookie",
+            "summary": "Cookie `ph_phc_demo_key_posthog` (PostHog) set before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "http://localhost:4100/public/index.html",
+            "quote": null
+          },
+          {
+            "kind": "network",
+            "summary": "Request to Google Analytics before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-DEMO000000&en=page_view",
+            "quote": null
+          },
+          {
+            "kind": "cookie",
+            "summary": "Cookie `_ga` (Google Analytics) set before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "http://localhost:4100/public/index.html",
+            "quote": null
+          }
+        ],
+        "policy_quote": "We use Google Analytics and PostHog cookies to measure how our website is used; we only set them after you give consent, and you can withdraw consent at any time in cookie settings."
+      },
+      {
+        "id": "F2",
+        "rule": "R8_PII_IN_LOGS",
+        "title": "Personal data is written to application logs",
+        "severity": "medium",
+        "areas": [
+          "personal_data"
+        ],
+        "observation_ids": [],
+        "evidence": [
+          {
+            "kind": "code",
+            "summary": "`email` written to application logs",
+            "file": "src/app/api/chat/route.ts",
+            "line": 8,
+            "snippet": "  const { user, message } = await req.json();\n\n  console.log(\"chat request from\", user.email, message);\n\n  const completion = await openai.chat.completions.create({",
+            "url": null,
+            "quote": null
+          }
+        ],
+        "policy_quote": null
+      }
+    ],
+    "matrix": [
+      {
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "status": "amber",
+        "headline": "PostHog and Google Analytics fire before any consent interaction on the site",
+        "reasoning": "PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with PECR Schedule A1, inserted by Data Sch. A1 para. 5; Privacy and Electronic Communications reg. 6(1), as substituted by Data (Use and Access) Act 2025 s. 112. UK: since the Data (Use and Access) Act 2025, analytics used solely for statistical purposes to improve the service may not need consent, if users get clear information and a simple way to object. The same evidence is treated more strictly in the EU. Personal data is written to application logs. Possible inconsistency with UK GDPR Art. 5(1)(f).",
+        "finding_ids": [
+          "F1",
+          "F2"
+        ],
+        "provision_ids": [
+          "UK-PECR-SCHA1-5",
+          "UK-PECR-6",
+          "UK-GDPR-5-1-f"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. You can object to these cookies at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+          },
+          {
+            "policy_clause": null,
+            "code_change": "Remove personal data from the log statement at src/app/api/chat/route.ts:8; log an internal user id instead."
+          }
+        ],
+        "unverified_notes": [],
+        "finding_statuses": {
+          "F1": "amber",
+          "F2": "amber"
+        }
+      },
+      {
+        "jurisdiction": "UK",
+        "area": "ai_transparency",
+        "status": "green",
+        "headline": "No possible inconsistencies detected for AI transparency",
+        "reasoning": "None of the checks we ran (R1-R9) produced a finding for this cell. This reflects only what was visible in the repository, the public site and the policy text.",
+        "finding_ids": [],
+        "provision_ids": [],
+        "fixes": [],
+        "unverified_notes": [],
+        "finding_statuses": {}
+      },
+      {
+        "jurisdiction": "UK",
+        "area": "consumer",
+        "status": "amber",
+        "headline": "PostHog and Google Analytics fire before any consent interaction on the site",
+        "reasoning": "PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 225. UK: since the Data (Use and Access) Act 2025, analytics used solely for statistical purposes to improve the service may not need consent, if users get clear information and a simple way to object. The same evidence is treated more strictly in the EU.",
+        "finding_ids": [
+          "F1"
+        ],
+        "provision_ids": [
+          "UK-DMCC-225"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. You can object to these cookies at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+          }
+        ],
+        "unverified_notes": [],
+        "finding_statuses": {
+          "F1": "amber"
+        }
+      },
+      {
+        "jurisdiction": "UK",
+        "area": "financial",
+        "status": "grey",
+        "headline": "Needs questionnaire",
+        "reasoning": "Financial licensing cannot be assessed from code and policy alone. Out of scope for this scan.",
+        "finding_ids": [],
+        "provision_ids": [],
+        "fixes": [],
+        "unverified_notes": [],
+        "finding_statuses": {}
+      },
+      {
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "status": "red",
+        "headline": "PostHog and Google Analytics fire before any consent interaction on the site",
+        "reasoning": "PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Directive 2002/58/EC Art. 5(3); Regulation Art. 7; Regulation Art. 6(1). EU: consent is required before non-essential cookies or trackers, including analytics. Personal data is written to application logs. Possible inconsistency with Regulation Art. 5(1)(f).",
+        "finding_ids": [
+          "F1",
+          "F2"
+        ],
+        "provision_ids": [
+          "EU-EPRIVACY-5-3",
+          "EU-GDPR-7",
+          "EU-GDPR-6",
+          "EU-GDPR-5-1-f"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+          },
+          {
+            "policy_clause": null,
+            "code_change": "Remove personal data from the log statement at src/app/api/chat/route.ts:8; log an internal user id instead."
+          }
+        ],
+        "unverified_notes": [],
+        "finding_statuses": {
+          "F1": "red",
+          "F2": "amber"
+        }
+      },
+      {
+        "jurisdiction": "EU",
+        "area": "ai_transparency",
+        "status": "green",
+        "headline": "No possible inconsistencies detected for AI transparency",
+        "reasoning": "None of the checks we ran (R1-R9) produced a finding for this cell. This reflects only what was visible in the repository, the public site and the policy text.",
+        "finding_ids": [],
+        "provision_ids": [],
+        "fixes": [],
+        "unverified_notes": [],
+        "finding_statuses": {}
+      },
+      {
+        "jurisdiction": "EU",
+        "area": "consumer",
+        "status": "red",
+        "headline": "PostHog and Google Analytics fire before any consent interaction on the site",
+        "reasoning": "PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Directive 2005/29/EC Art. 5. EU: consent is required before non-essential cookies or trackers, including analytics.",
+        "finding_ids": [
+          "F1"
+        ],
+        "provision_ids": [
+          "EU-UCPD-5"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+          }
+        ],
+        "unverified_notes": [],
+        "finding_statuses": {
+          "F1": "red"
+        }
+      },
+      {
+        "jurisdiction": "EU",
+        "area": "financial",
+        "status": "grey",
+        "headline": "Needs questionnaire",
+        "reasoning": "Financial licensing cannot be assessed from code and policy alone. Out of scope for this scan.",
+        "finding_ids": [],
+        "provision_ids": [],
+        "fixes": [],
+        "unverified_notes": [],
+        "finding_statuses": {}
+      },
+      {
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "status": "amber",
+        "headline": "PostHog and Google Analytics fire before any consent interaction on the site",
+        "reasoning": "PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Art. 7 (Conditions for collection and processing). Kazakhstan has no cookie-specific rule; general consent requirements for collection apply. Personal data is written to application logs. Possible inconsistency with Art. 25 (Duties of the owner and operator).",
+        "finding_ids": [
+          "F1",
+          "F2"
+        ],
+        "provision_ids": [
+          "KZ-PD-7",
+          "KZ-PD-25"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+          },
+          {
+            "policy_clause": null,
+            "code_change": "Remove personal data from the log statement at src/app/api/chat/route.ts:8; log an internal user id instead."
+          }
+        ],
+        "unverified_notes": [],
+        "finding_statuses": {
+          "F1": "amber",
+          "F2": "amber"
+        }
+      },
+      {
+        "jurisdiction": "KZ",
+        "area": "ai_transparency",
+        "status": "green",
+        "headline": "No possible inconsistencies detected for AI transparency",
+        "reasoning": "None of the checks we ran (R1-R9) produced a finding for this cell. This reflects only what was visible in the repository, the public site and the policy text.",
+        "finding_ids": [],
+        "provision_ids": [],
+        "fixes": [],
+        "unverified_notes": [],
+        "finding_statuses": {}
+      },
+      {
+        "jurisdiction": "KZ",
+        "area": "consumer",
+        "status": "amber",
+        "headline": "PostHog and Google Analytics fire before any consent interaction on the site",
+        "reasoning": "PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Art. 10 (Consumer right to information). Kazakhstan has no cookie-specific rule; general consent requirements for collection apply.",
+        "finding_ids": [
+          "F1"
+        ],
+        "provision_ids": [
+          "KZ-CP-10"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+          }
+        ],
+        "unverified_notes": [],
+        "finding_statuses": {
+          "F1": "amber"
+        }
+      },
+      {
+        "jurisdiction": "KZ",
+        "area": "financial",
+        "status": "grey",
+        "headline": "Needs questionnaire",
+        "reasoning": "Financial licensing cannot be assessed from code and policy alone. Out of scope for this scan.",
+        "finding_ids": [],
+        "provision_ids": [],
+        "fixes": [],
+        "unverified_notes": [],
+        "finding_statuses": {}
+      }
+    ],
+    "provisions": {
+      "UK-PECR-SCHA1-5": {
+        "id": "UK-PECR-SCHA1-5",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "PECR Schedule A1, inserted by Data (Use and Access) Act 2025 Sch. 12",
+        "ref": "Sch. A1 para. 5",
+        "title": "Statistical-purposes exception for analytics cookies",
+        "summary": "Consent is not required where the sole purpose of the storage or access is to collect information for statistical purposes about how the service or website is used, with a view to improving it, provided the information is not shared with anyone else except to help make those improvements, the user is given clear and comprehensive information about the purpose, and the user is given a simple, free means of objecting and does not object.",
+        "official_url": "https://www.legislation.gov.uk/ukpga/2025/18/schedule/12",
+        "tags": [
+          "cookies",
+          "consent",
+          "tracking",
+          "statistical",
+          "analytics"
+        ],
+        "verified": true
+      },
+      "UK-PECR-6": {
+        "id": "UK-PECR-6",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "Privacy and Electronic Communications (EC Directive) Regulations 2003 (PECR)",
+        "ref": "reg. 6(1), as substituted by Data (Use and Access) Act 2025 s. 112",
+        "title": "Storing or accessing information on a user's device",
+        "summary": "A person must not store information, or gain access to information stored, in a user's terminal equipment unless an exception in Schedule A1 applies (for example consent, or strict necessity).",
+        "official_url": "https://www.legislation.gov.uk/ukpga/2025/18/section/112",
+        "tags": [
+          "cookies",
+          "consent",
+          "tracking"
+        ],
+        "verified": true
+      },
+      "UK-GDPR-5-1-f": {
+        "id": "UK-GDPR-5-1-f",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 5(1)(f)",
+        "title": "Integrity and confidentiality",
+        "summary": "Personal data must be processed with appropriate security, including protection against unauthorised access.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/5",
+        "tags": [
+          "security",
+          "logs"
+        ],
+        "verified": true
+      },
+      "UK-DMCC-225": {
+        "id": "UK-DMCC-225",
+        "jurisdiction": "UK",
+        "area": "consumer",
+        "instrument": "Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1",
+        "ref": "s. 225",
+        "title": "Prohibition of unfair commercial practices",
+        "summary": "Unfair commercial practices are prohibited, including misleading actions, misleading omissions and practices that contravene professional diligence.",
+        "official_url": "https://www.legislation.gov.uk/ukpga/2024/13/section/225",
+        "tags": [
+          "fairness",
+          "dark_patterns",
+          "consent",
+          "tracking"
+        ],
+        "verified": true
+      },
+      "EU-EPRIVACY-5-3": {
+        "id": "EU-EPRIVACY-5-3",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Directive 2002/58/EC (ePrivacy Directive), as amended by Directive 2009/136/EC",
+        "ref": "Art. 5(3)",
+        "title": "Consent for cookies and similar technologies",
+        "summary": "Storing information, or accessing information stored, on a user's device is only allowed with the user's consent after clear information, unless strictly necessary to provide a service the user requested. There is no exemption for analytics.",
+        "official_url": "https://eur-lex.europa.eu/eli/dir/2002/58/2009-12-19",
+        "tags": [
+          "cookies",
+          "consent",
+          "tracking"
+        ],
+        "verified": false
+      },
+      "EU-GDPR-7": {
+        "id": "EU-GDPR-7",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 7",
+        "title": "Conditions for consent",
+        "summary": "Where processing relies on consent, the controller must be able to demonstrate that the person consented, and consent must be as easy to withdraw as to give.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "consent",
+          "tracking"
+        ],
+        "verified": true
+      },
+      "EU-GDPR-6": {
+        "id": "EU-GDPR-6",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 6(1)",
+        "title": "Lawful basis for processing",
+        "summary": "Processing is lawful only if at least one legal basis applies, such as consent, contract, legal obligation or legitimate interests.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "lawfulness",
+          "consent",
+          "tracking"
+        ],
+        "verified": true
+      },
+      "EU-GDPR-5-1-f": {
+        "id": "EU-GDPR-5-1-f",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 5(1)(f)",
+        "title": "Integrity and confidentiality",
+        "summary": "Personal data must be processed with appropriate security, including protection against unauthorised access. Personal data written to application logs widens who can access it.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "security",
+          "logs"
+        ],
+        "verified": true
+      },
+      "EU-UCPD-5": {
+        "id": "EU-UCPD-5",
+        "jurisdiction": "EU",
+        "area": "consumer",
+        "instrument": "Directive 2005/29/EC (Unfair Commercial Practices Directive)",
+        "ref": "Art. 5",
+        "title": "Prohibition of unfair commercial practices",
+        "summary": "Unfair commercial practices are prohibited: practices contrary to professional diligence that materially distort, or are likely to materially distort, the economic behaviour of the average consumer.",
+        "official_url": "https://eur-lex.europa.eu/eli/dir/2005/29/oj",
+        "tags": [
+          "fairness",
+          "dark_patterns",
+          "consent",
+          "tracking"
+        ],
+        "verified": true
+      },
+      "KZ-PD-7": {
+        "id": "KZ-PD-7",
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "instrument": "Law of the Republic of Kazakhstan No. 94-V 'On Personal Data and their Protection' (21 May 2013)",
+        "ref": "Art. 7",
+        "title": "Conditions for collection and processing",
+        "summary": "Collection and processing of personal data is carried out with the consent of the subject, except in cases set by law. Transfer to third parties and cross-border transfer are subject to consent.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z1300000094",
+        "tags": [
+          "consent",
+          "lawfulness",
+          "sharing",
+          "recipients",
+          "processors",
+          "cookies",
+          "tracking"
+        ],
+        "verified": true
+      },
+      "KZ-PD-25": {
+        "id": "KZ-PD-25",
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "instrument": "Law of the Republic of Kazakhstan No. 94-V 'On Personal Data and their Protection' (21 May 2013)",
+        "ref": "Art. 25",
+        "title": "Duties of the owner and operator",
+        "summary": "The owner or operator must take legal, organisational and technical measures to protect personal data, be able to evidence consent, give the subject access to their data, and destroy data in the cases set by law.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z1300000094",
+        "tags": [
+          "security",
+          "logs",
+          "erasure",
+          "deletion",
+          "consent"
+        ],
+        "verified": true
+      },
+      "KZ-CP-10": {
+        "id": "KZ-CP-10",
+        "jurisdiction": "KZ",
+        "area": "consumer",
+        "instrument": "Law of the Republic of Kazakhstan No. 274-IV 'On Protection of Consumer Rights' (4 May 2010)",
+        "ref": "Art. 10",
+        "title": "Consumer right to information",
+        "summary": "The consumer has the right to receive full, reliable and timely information about goods, works and services and about the seller or provider.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z100000274_",
+        "tags": [
+          "information",
+          "misleading",
+          "sharing",
+          "fairness",
+          "erasure",
+          "omission",
+          "consent",
+          "tracking"
+        ],
+        "verified": true
+      }
+    },
+    "stats": {
+      "files_total": 9,
+      "files_scanned": 9,
+      "bearer": false,
+      "requests_pre_consent": 4,
+      "vendors_found": 6,
+      "claims_method": "heuristic",
+      "verdict_method": "deterministic",
+      "duration_s": 41.3
+    },
+    "disclaimer": "Groundtruth is a first-pass engineering check. It reports possible inconsistencies between observed product behaviour and the published privacy policy. It is not legal advice."
+  },
+  "error": null
+}

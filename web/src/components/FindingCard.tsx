@@ -5,22 +5,26 @@ import { ChevronDown } from "lucide-react";
 import { cn } from "cn";
 
 import { EvidenceBlock } from "@/components/EvidenceBlock";
+import { JurisdictionChips } from "@/components/JurisdictionChips";
 import { SeverityBadge, StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { AREA_LABEL, ruleCode, ruleLabel } from "@/lib/labels";
 import { SEVERITY_STATUS } from "@/lib/status";
-import type { Finding, Status } from "@/lib/types";
+import type { CellVerdict, Finding, Status } from "@/lib/types";
 
 const VISIBLE_EVIDENCE = 2;
 
 // `status` is the finding's status in one jurisdiction; it replaces the jurisdiction-neutral severity.
+// `matrix` adds a per-jurisdiction strip for lists that are not scoped to one jurisdiction.
 export function FindingCard({
   finding,
   status,
+  matrix,
   showAreas = true,
 }: {
   finding: Finding;
   status?: Status;
+  matrix?: CellVerdict[];
   showAreas?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -60,6 +64,7 @@ export function FindingCard({
           )}
         </div>
         <h3 className="text-lg leading-snug font-semibold tracking-tight text-foreground">{finding.title}</h3>
+        {matrix && <JurisdictionChips findingId={finding.id} matrix={matrix} />}
       </header>
 
       <div

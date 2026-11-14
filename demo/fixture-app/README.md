@@ -10,4 +10,6 @@ Planted issues:
 - `privacy.html` claims "we never share your data with third parties", does not mention AI, transfers, retention or deletion.
 - There is no delete-account route.
 
-Serve it: `make fixture` (from repo root) → site `http://localhost:4100/public/index.html`, policy `http://localhost:4100/privacy.html`.
+`privacy-fixed.html` is the same policy with the suggested clauses pasted in, for a before/after run: only the pre-consent trackers and the logged email remain, and both need code changes.
+
+Serve it: `make fixture` (from repo root) → site `http://localhost:4100/public/index.html`, policy `http://localhost:4100/privacy.html` (fixed version: `http://localhost:4100/privacy-fixed.html`).

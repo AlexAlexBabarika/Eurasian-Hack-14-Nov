@@ -10,8 +10,8 @@
     {
       "step": "clone",
       "status": "done",
-      "message": "8 files ready to scan",
-      "count": 8
+      "message": "9 files ready to scan",
+      "count": 9
     },
     {
       "step": "manifests",
@@ -919,7 +919,7 @@
         "evidence": [
           {
             "kind": "policy_quote",
-            "summary": "Policy text lists no right to erasure and no deletion method; no delete-account route found in 8 scanned files",
+            "summary": "Policy text lists no right to erasure and no deletion method; no delete-account route found in 9 scanned files",
             "file": null,
             "line": null,
             "snippet": null,
@@ -997,9 +997,9 @@
           "UK-GDPR-5-1-a",
           "UK-GDPR-13-1-c",
           "UK-GDPR-28",
-          "UK-PECR-6",
           "UK-PECR-SCHA1-5",
-          "UK-GDPR-44",
+          "UK-PECR-6",
+          "UK-GDPR-44A",
           "UK-GDPR-13-1-f",
           "UK-GDPR-17",
           "UK-GDPR-5-1-f",
@@ -1085,15 +1085,15 @@
         "area": "consumer",
         "status": "red",
         "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
-        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 227; Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 226. PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 225. UK: since the Data (Use and Access) Act 2025, analytics used solely for statistical purposes to improve the service may not need consent, if users get clear information and a simple way to object. The same evidence is treated more strictly in the EU. No way to delete an account or data: not in the policy, no route found in code. Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 227.",
+        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 226; Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 227. PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 225. UK: since the Data (Use and Access) Act 2025, analytics used solely for statistical purposes to improve the service may not need consent, if users get clear information and a simple way to object. The same evidence is treated more strictly in the EU. No way to delete an account or data: not in the policy, no route found in code. Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 227.",
         "finding_ids": [
           "F2",
           "F5",
           "F7"
         ],
         "provision_ids": [
-          "UK-DMCC-227",
           "UK-DMCC-226",
+          "UK-DMCC-227",
           "UK-DMCC-225"
         ],
         "fixes": [
@@ -1500,6 +1500,24 @@
         ],
         "verified": true
       },
+      "UK-PECR-SCHA1-5": {
+        "id": "UK-PECR-SCHA1-5",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "PECR Schedule A1, inserted by Data (Use and Access) Act 2025 Sch. 12",
+        "ref": "Sch. A1 para. 5",
+        "title": "Statistical-purposes exception for analytics cookies",
+        "summary": "Consent is not required where the sole purpose of the storage or access is to collect information for statistical purposes about how the service or website is used, with a view to improving it, provided the information is not shared with anyone else except to help make those improvements, the user is given clear and comprehensive information about the purpose, and the user is given a simple, free means of objecting and does not object.",
+        "official_url": "https://www.legislation.gov.uk/ukpga/2025/18/schedule/12",
+        "tags": [
+          "cookies",
+          "consent",
+          "tracking",
+          "statistical",
+          "analytics"
+        ],
+        "verified": true
+      },
       "UK-PECR-6": {
         "id": "UK-PECR-6",
         "jurisdiction": "UK",
@@ -1516,32 +1534,14 @@
         ],
         "verified": true
       },
-      "UK-PECR-SCHA1-5": {
-        "id": "UK-PECR-SCHA1-5",
-        "jurisdiction": "UK",
-        "area": "personal_data",
-        "instrument": "PECR Schedule A1, inserted by Data (Use and Access) Act 2025 Sch. 12",
-        "ref": "Sch. A1 para. 5",
-        "title": "Statistical-purposes exception for analytics cookies",
-        "summary": "Consent is not required where storage or access is solely to collect statistical information about how a service or website is used, with a view to improving it, provided the user is given clear information and a simple means to object. Advertising and cross-site tracking are outside the exception.",
-        "official_url": "https://www.legislation.gov.uk/ukpga/2025/18/schedule/12",
-        "tags": [
-          "cookies",
-          "consent",
-          "tracking",
-          "statistical",
-          "analytics"
-        ],
-        "verified": true
-      },
-      "UK-GDPR-44": {
-        "id": "UK-GDPR-44",
+      "UK-GDPR-44A": {
+        "id": "UK-GDPR-44A",
         "jurisdiction": "UK",
         "area": "personal_data",
         "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
         "ref": "Art. 44A",
         "title": "General principles for transfers",
-        "summary": "A controller or processor may transfer personal data to a third country or international organisation only if the transfer is approved by regulations under Art. 45A, is subject to appropriate safeguards (Art. 46) or relies on a derogation (Art. 49), and complies with the rest of the UK GDPR. Art. 44A replaced Art. 44 on 5 February 2026 (Data (Use and Access) Act 2025, Sch. 7).",
+        "summary": "A controller or processor may transfer personal data to a third country or international organisation only if the transfer is approved by regulations under Article 45A, is subject to appropriate safeguards (Article 46), or relies on a derogation (Article 49), and complies with the other provisions of the UK GDPR.",
         "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/44A",
         "tags": [
           "transfers"
@@ -1631,11 +1631,27 @@
         "ref": "Transparency in AI",
         "title": "Be transparent about AI processing of personal data",
         "summary": "The UK has no AI-specific statute. ICO guidance expects organisations to tell people when and how their personal data is processed by AI systems, as part of UK GDPR transparency. Guidance only, so status is capped at amber.",
-        "official_url": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/guidance-on-ai-and-data-protection/",
+        "official_url": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/guidance-on-ai-and-data-protection/how-do-we-ensure-transparency-in-ai/",
         "tags": [
           "ai",
           "transparency",
           "chatbot"
+        ],
+        "verified": true
+      },
+      "UK-DMCC-226": {
+        "id": "UK-DMCC-226",
+        "jurisdiction": "UK",
+        "area": "consumer",
+        "instrument": "Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1",
+        "ref": "s. 226",
+        "title": "Misleading actions",
+        "summary": "A practice involves a misleading action if it involves providing false or misleading information relating to a product, a trader or any other matter relevant to a transactional decision, or an overall presentation likely to deceive the average consumer. Under s. 225(4)(a) it is unfair if it is likely to cause the average consumer to take a transactional decision they would not otherwise have taken.",
+        "official_url": "https://www.legislation.gov.uk/ukpga/2024/13/section/226",
+        "tags": [
+          "misleading",
+          "sharing",
+          "fairness"
         ],
         "verified": true
       },
@@ -1653,22 +1669,6 @@
           "information",
           "erasure",
           "omission"
-        ],
-        "verified": true
-      },
-      "UK-DMCC-226": {
-        "id": "UK-DMCC-226",
-        "jurisdiction": "UK",
-        "area": "consumer",
-        "instrument": "Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1",
-        "ref": "s. 226",
-        "title": "Misleading actions",
-        "summary": "A practice involves a misleading action if it provides false or misleading information relating to the product or trader and is likely to cause the average consumer to take a transactional decision they would not otherwise take.",
-        "official_url": "https://www.legislation.gov.uk/ukpga/2024/13/section/226",
-        "tags": [
-          "misleading",
-          "sharing",
-          "fairness"
         ],
         "verified": true
       },
@@ -1823,7 +1823,7 @@
         "instrument": "Regulation (EU) 2016/679 (GDPR)",
         "ref": "Art. 44",
         "title": "General principle for transfers",
-        "summary": "Personal data may be transferred to a third country only if the conditions of Chapter V (adequacy decision or appropriate safeguards) are met.",
+        "summary": "Personal data may be transferred to a third country only if the conditions of Chapter V (adequacy decision, appropriate safeguards or a specific derogation) are met.",
         "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
         "tags": [
           "transfers"
@@ -1929,7 +1929,7 @@
         "instrument": "Directive 2005/29/EC (Unfair Commercial Practices Directive)",
         "ref": "Art. 6",
         "title": "Misleading actions",
-        "summary": "A practice is misleading if it contains false information, or is likely to deceive the average consumer, and causes a transactional decision the consumer would not otherwise have taken.",
+        "summary": "A practice is misleading if it contains false information, or is likely to deceive the average consumer, and causes or is likely to cause a transactional decision the consumer would not otherwise have taken.",
         "official_url": "https://eur-lex.europa.eu/eli/dir/2005/29/oj",
         "tags": [
           "misleading",
@@ -1962,7 +1962,7 @@
         "instrument": "Directive 2005/29/EC (Unfair Commercial Practices Directive)",
         "ref": "Art. 5",
         "title": "Prohibition of unfair commercial practices",
-        "summary": "Unfair commercial practices are prohibited: practices contrary to professional diligence that materially distort the economic behaviour of the average consumer.",
+        "summary": "Unfair commercial practices are prohibited: practices contrary to professional diligence that materially distort, or are likely to materially distort, the economic behaviour of the average consumer.",
         "official_url": "https://eur-lex.europa.eu/eli/dir/2005/29/oj",
         "tags": [
           "fairness",
@@ -2149,8 +2149,8 @@
       }
     },
     "stats": {
-      "files_total": 8,
-      "files_scanned": 8,
+      "files_total": 9,
+      "files_scanned": 9,
       "bearer": false,
       "requests_pre_consent": 4,
       "vendors_found": 6,
