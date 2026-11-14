@@ -999,8 +999,8 @@
           "UK-GDPR-28",
           "UK-PECR-6",
           "UK-PECR-SCHA1-5",
-          "UK-GDPR-13-1-f",
           "UK-GDPR-44",
+          "UK-GDPR-13-1-f",
           "UK-GDPR-17",
           "UK-GDPR-5-1-f",
           "UK-GDPR-5-1-e",
@@ -1044,9 +1044,7 @@
             "code_change": null
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F2": "red",
           "F4": "red",
@@ -1077,9 +1075,7 @@
             "code_change": "Show a visible notice in the product that responses are AI-generated (feature at src/app/api/chat/route.ts:12)."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F4": "amber"
         }
@@ -1114,9 +1110,7 @@
             "code_change": "Add a delete-account endpoint (for example DELETE /api/account) that removes the user's data, including at third-party vendors."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F2": "red",
           "F5": "amber",
@@ -1206,9 +1200,7 @@
             "code_change": null
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F2": "red",
           "F4": "red",
@@ -1239,9 +1231,7 @@
             "code_change": "Show a visible notice in the product that responses are AI-generated (feature at src/app/api/chat/route.ts:12)."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F4": "red"
         }
@@ -1276,9 +1266,7 @@
             "code_change": "Add a delete-account endpoint (for example DELETE /api/account) that removes the user's data, including at third-party vendors."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F2": "red",
           "F5": "red",
@@ -1360,9 +1348,7 @@
             "code_change": null
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F2": "red",
           "F4": "red",
@@ -1394,9 +1380,7 @@
             "code_change": "Show a visible notice in the product that responses are AI-generated (feature at src/app/api/chat/route.ts:12)."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F4": "red"
         }
@@ -1430,9 +1414,7 @@
             "code_change": "Add a delete-account endpoint (for example DELETE /api/account) that removes the user's data, including at third-party vendors."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F2": "red",
           "F5": "amber",
@@ -1468,7 +1450,7 @@
           "transparency",
           "sharing"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-GDPR-5-1-a": {
         "id": "UK-GDPR-5-1-a",
@@ -1485,7 +1467,7 @@
           "sharing",
           "data_categories"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-GDPR-13-1-c": {
         "id": "UK-GDPR-13-1-c",
@@ -1502,7 +1484,7 @@
           "data_categories",
           "ai"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-GDPR-28": {
         "id": "UK-GDPR-28",
@@ -1516,7 +1498,7 @@
         "tags": [
           "processors"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-PECR-6": {
         "id": "UK-PECR-6",
@@ -1532,7 +1514,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-PECR-SCHA1-5": {
         "id": "UK-PECR-SCHA1-5",
@@ -1550,6 +1532,20 @@
           "statistical",
           "analytics"
         ],
+        "verified": true
+      },
+      "UK-GDPR-44": {
+        "id": "UK-GDPR-44",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 44A",
+        "title": "General principles for transfers",
+        "summary": "A controller or processor may transfer personal data to a third country or international organisation only if the transfer is approved by regulations under Art. 45A, is subject to appropriate safeguards (Art. 46) or relies on a derogation (Art. 49), and complies with the rest of the UK GDPR. Art. 44A replaced Art. 44 on 5 February 2026 (Data (Use and Access) Act 2025, Sch. 7).",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/44A",
+        "tags": [
+          "transfers"
+        ],
         "verified": false
       },
       "UK-GDPR-13-1-f": {
@@ -1565,21 +1561,7 @@
           "transfers",
           "transparency"
         ],
-        "verified": false
-      },
-      "UK-GDPR-44": {
-        "id": "UK-GDPR-44",
-        "jurisdiction": "UK",
-        "area": "personal_data",
-        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
-        "ref": "Art. 44",
-        "title": "General principle for transfers",
-        "summary": "Personal data may be transferred outside the UK only if the conditions of Chapter V are met.",
-        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/44",
-        "tags": [
-          "transfers"
-        ],
-        "verified": false
+        "verified": true
       },
       "UK-GDPR-17": {
         "id": "UK-GDPR-17",
@@ -1595,7 +1577,7 @@
           "deletion",
           "rights"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-GDPR-5-1-f": {
         "id": "UK-GDPR-5-1-f",
@@ -1610,7 +1592,7 @@
           "security",
           "logs"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-GDPR-5-1-e": {
         "id": "UK-GDPR-5-1-e",
@@ -1624,7 +1606,7 @@
         "tags": [
           "retention"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-GDPR-13-2-a": {
         "id": "UK-GDPR-13-2-a",
@@ -1639,7 +1621,7 @@
           "retention",
           "transparency"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-ICO-AI-GUIDANCE": {
         "id": "UK-ICO-AI-GUIDANCE",
@@ -1655,7 +1637,7 @@
           "transparency",
           "chatbot"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-DMCC-227": {
         "id": "UK-DMCC-227",
@@ -1672,7 +1654,7 @@
           "erasure",
           "omission"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-DMCC-226": {
         "id": "UK-DMCC-226",
@@ -1688,7 +1670,7 @@
           "sharing",
           "fairness"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-DMCC-225": {
         "id": "UK-DMCC-225",
@@ -1705,7 +1687,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-5-1-a": {
         "id": "EU-GDPR-5-1-a",
@@ -1722,7 +1704,7 @@
           "sharing",
           "data_categories"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-13-1-e": {
         "id": "EU-GDPR-13-1-e",
@@ -1739,7 +1721,7 @@
           "transparency",
           "sharing"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-13-1-c": {
         "id": "EU-GDPR-13-1-c",
@@ -1756,17 +1738,17 @@
           "data_categories",
           "ai"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-EPRIVACY-5-3": {
         "id": "EU-EPRIVACY-5-3",
         "jurisdiction": "EU",
         "area": "personal_data",
-        "instrument": "Directive 2002/58/EC (ePrivacy Directive)",
+        "instrument": "Directive 2002/58/EC (ePrivacy Directive), as amended by Directive 2009/136/EC",
         "ref": "Art. 5(3)",
         "title": "Consent for cookies and similar technologies",
         "summary": "Storing information, or accessing information stored, on a user's device is only allowed with the user's consent after clear information, unless strictly necessary to provide a service the user requested. There is no exemption for analytics.",
-        "official_url": "https://eur-lex.europa.eu/eli/dir/2002/58/oj",
+        "official_url": "https://eur-lex.europa.eu/eli/dir/2002/58/2009-12-19",
         "tags": [
           "cookies",
           "consent",
@@ -1787,7 +1769,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-6": {
         "id": "EU-GDPR-6",
@@ -1803,7 +1785,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-28": {
         "id": "EU-GDPR-28",
@@ -1817,7 +1799,7 @@
         "tags": [
           "processors"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-13-1-f": {
         "id": "EU-GDPR-13-1-f",
@@ -1832,7 +1814,7 @@
           "transfers",
           "transparency"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-44": {
         "id": "EU-GDPR-44",
@@ -1846,7 +1828,7 @@
         "tags": [
           "transfers"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-17": {
         "id": "EU-GDPR-17",
@@ -1862,7 +1844,7 @@
           "deletion",
           "rights"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-13-2-b": {
         "id": "EU-GDPR-13-2-b",
@@ -1878,7 +1860,7 @@
           "rights",
           "transparency"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-5-1-f": {
         "id": "EU-GDPR-5-1-f",
@@ -1893,7 +1875,7 @@
           "security",
           "logs"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-5-1-e": {
         "id": "EU-GDPR-5-1-e",
@@ -1907,7 +1889,7 @@
         "tags": [
           "retention"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-13-2-a": {
         "id": "EU-GDPR-13-2-a",
@@ -1922,7 +1904,7 @@
           "retention",
           "transparency"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-AIACT-50-1": {
         "id": "EU-AIACT-50-1",
@@ -1938,7 +1920,7 @@
           "transparency",
           "chatbot"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-UCPD-6": {
         "id": "EU-UCPD-6",
@@ -1954,7 +1936,7 @@
           "sharing",
           "fairness"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-UCPD-7": {
         "id": "EU-UCPD-7",
@@ -1971,7 +1953,7 @@
           "erasure",
           "omission"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-UCPD-5": {
         "id": "EU-UCPD-5",
@@ -1988,7 +1970,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-PD-7": {
         "id": "KZ-PD-7",
@@ -2008,7 +1990,7 @@
           "cookies",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-PD-8": {
         "id": "KZ-PD-8",
@@ -2029,7 +2011,7 @@
           "transparency",
           "sharing"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-PD-12-2": {
         "id": "KZ-PD-12-2",
@@ -2045,7 +2027,7 @@
           "transfers",
           "retention"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-PD-16": {
         "id": "KZ-PD-16",
@@ -2059,7 +2041,7 @@
         "tags": [
           "transfers"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-PD-25": {
         "id": "KZ-PD-25",
@@ -2077,7 +2059,7 @@
           "deletion",
           "consent"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-PD-24": {
         "id": "KZ-PD-24",
@@ -2093,7 +2075,7 @@
           "deletion",
           "rights"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-AI-16": {
         "id": "KZ-AI-16",
@@ -2110,7 +2092,7 @@
           "rights",
           "chatbot"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-AI-21-1": {
         "id": "KZ-AI-21-1",
@@ -2126,7 +2108,7 @@
           "transparency",
           "chatbot"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-CP-10": {
         "id": "KZ-CP-10",
@@ -2147,7 +2129,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-CP-25": {
         "id": "KZ-CP-25",
@@ -2163,7 +2145,7 @@
           "misleading",
           "omission"
         ],
-        "verified": false
+        "verified": true
       }
     },
     "stats": {
