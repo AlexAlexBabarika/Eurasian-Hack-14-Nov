@@ -74,4 +74,8 @@ def template_fixes(f: Finding, j: Jurisdiction, observations: list[Observation])
             return [Fix(policy_clause="We keep your account data for as long as your account is active and delete "
                         "it within [period] after you close it. Analytics data is kept for [period].",
                         code_change=None)]  # fmt: skip
+        case "R10":
+            return [Fix(policy_clause=None, code_change=f"Read the visitor's stored consent choice before loading "
+                        f"{names}. After a refusal, do not load the tag, send its requests or set its cookies, "
+                        "on this page and on every later page load.")]  # fmt: skip
     return []

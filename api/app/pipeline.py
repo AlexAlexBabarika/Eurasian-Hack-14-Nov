@@ -30,6 +30,32 @@ EMPTY_CLAIMS = PolicyClaims(
 )  # fmt: skip
 
 
+def _passes(passes: list[tuple[str, site.ConsentPass]], net_obs: list[Observation], stats: dict) -> str:
+    """Per-pass stats and the tail of the site_scan message. Empty for a scan that only ran the first pass."""
+    if not passes:
+        return ""
+    still = [o.vendor for o in net_obs if trackers.seen(o, trackers.AFTER_REJECT) and trackers.is_tracker(o)]
+    gated = [o.vendor for o in net_obs if trackers.gated(o)]
+    stats["site_passes"] = {}
+    out = []
+    for name, p in passes:
+        failed = f"failed ({p.error[:80]})" if p.error else "no banner found"
+        stats["site_passes"][name] = f"clicked: {p.clicked}" if p.clicked else failed
+        if not p.clicked:
+            out.append(f"{name}: {failed}")
+            continue
+        stats[f"requests_after_{name}"] = len(p.requests)
+        if name == "reject":
+            stats["trackers_after_reject"] = still
+            verb = "still fires" if len(still) == 1 else "still fire"
+            out.append(f"after reject: {', '.join(still)} {verb}" if still else "after reject: no trackers")
+        else:
+            stats["vendors_after_accept_only"] = gated
+            more = f"{len(gated)} more vendor{'s' if len(gated) != 1 else ''}"
+            out.append(f"after accept: {more} ({', '.join(gated)})" if gated else "after accept: no more vendors")
+    return "; " + "; ".join(out)
+
+
 async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool = True) -> AuditReport:
     t0 = time.monotonic()
     stats: dict = {}
@@ -84,19 +110,21 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
 
     # site scan
     if req.site_url:
-        ev("site_scan", "running", "Loading the site in a clean browser, clicking nothing")
+        ev("site_scan", "running", "Loading the site in clean browsers: clicking nothing, rejecting, accepting")
         scan = await site.scan(req.site_url)
     else:
         scan = site.SiteScan(url="")
     net_obs = trackers.detect(scan)
     stats["requests_pre_consent"] = len(scan.requests)
+    passes = [(name, p) for name in ("reject", "accept") if (p := getattr(scan, name))]
     if not req.site_url:
         ev("site_scan", "skipped", "No live site given; only the code is compared with the policy")
-    elif scan.error and not scan.requests:
+    elif scan.error and not scan.requests and not any(p.clicked for _, p in passes):
         ev("site_scan", "error", f"Site scan failed: {scan.error[:160]}")
     else:
-        names = ", ".join(o.vendor or "" for o in net_obs) or "none"
-        ev("site_scan", "done", f"{len(scan.requests)} requests before consent; trackers: {names}", len(net_obs))
+        names = ", ".join(o.vendor or "" for o in net_obs if o.pre_consent) or "none"
+        message = f"{len(scan.requests)} requests before consent; trackers: {names}"
+        ev("site_scan", "done", message + _passes(passes, net_obs, stats), len(net_obs))
     observations = trackers.merge(code_obs, net_obs)
     stats["vendors_found"] = len([o for o in observations if o.vendor])
 
