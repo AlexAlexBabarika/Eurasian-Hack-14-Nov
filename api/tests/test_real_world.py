@@ -180,9 +180,9 @@ def test_no_deletion_finding_needs_scanned_code():
 # Found on Twenty: the clone timed out, nothing was scanned, and the matrix came back green.
 def test_unreadable_inputs_are_never_green():
     for area in AREAS:
-        cell = deterministic_cell("EU", area, [], [], gaps=["the repository"])
+        cell = deterministic_cell("EU", area, [], [], gaps=["the repository could not be read"])
         assert cell.status == "grey", area
-    assert "repository could not be read" in deterministic_cell("EU", "consumer", [], [], gaps=["the repository"]).headline
+    assert "repository could not be read" in deterministic_cell("EU", "consumer", [], [], gaps=["the repository could not be read"]).headline
     assert deterministic_cell("EU", "consumer", [], []).status == "green"
 
 

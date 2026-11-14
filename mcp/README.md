@@ -2,7 +2,7 @@
 
 `mcp/server.py` lets an AI assistant run the audit as a tool. It speaks MCP over stdio and has one tool:
 
-`audit_product(repo_url, site_url, policy_url, jurisdictions)` returns the Markdown report. `jurisdictions` is optional: a list of `UK`, `EU`, `KZ`.
+`audit_product(policy_url, repo_url, site_url, jurisdictions)` returns the Markdown report. `repo_url` and `site_url` are optional, but at least one is required. `jurisdictions` is optional: a list of `UK`, `EU`, `KZ`.
 
 Run `make setup` first. The assistant starts the server itself; you do not run it by hand.
 

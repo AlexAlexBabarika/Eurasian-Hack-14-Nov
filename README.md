@@ -24,6 +24,10 @@ make fixture              # serves demo/fixture-app on :4100
 
 Then open http://localhost:3000 and click "Use demo fixture".
 
+The repository field is optional: with only a site URL and a policy URL the audit compares the live site with the policy and marks what it could not see as not assessed.
+
+For a before/after rerun, the fixture also serves the same policy with the suggested fixes pasted in: http://localhost:4100/privacy-fixed.html. Run the audit again with that policy URL; only the two findings that need code changes remain.
+
 Without `LLM_API_KEY` the pipeline still runs end to end: policy claims come from keyword heuristics and verdict text from templates. With a key, the model extracts the claims and writes the verdict prose and fixes. Cell statuses are decided by deterministic rules either way.
 
 ### Docker
@@ -37,7 +41,7 @@ Inside the container `localhost` is the container itself. To audit something ser
 
 ### MCP server
 
-`mcp/server.py` exposes the audit as one tool, `audit_product(repo_url, site_url, policy_url, jurisdictions)`, over stdio and returns the Markdown report. `jurisdictions` is optional: a list of `UK`, `EU`, `KZ` that limits the matrix and verdicts; leave it out for all three. Needs `mcp` 2.x (installed by `make setup`).
+`mcp/server.py` exposes the audit as one tool, `audit_product(policy_url, repo_url, site_url, jurisdictions)`, over stdio and returns the Markdown report. `repo_url` and `site_url` are optional, but at least one is required. `jurisdictions` is optional: a list of `UK`, `EU`, `KZ` that limits the matrix and verdicts; leave it out for all three. Needs `mcp` 2.x (installed by `make setup`).
 
 ```sh
 uv run --project api python mcp/server.py
@@ -45,9 +49,42 @@ uv run --project api python mcp/server.py
 
 To use it from Claude Code, Cursor or Claude Desktop, see [mcp/README.md](mcp/README.md). The repo ships `.mcp.json` and `.cursor/mcp.json`, so the first two need no configuration.
 
+Example prompt: "Audit https://github.com/acme/app and https://acme.example against https://acme.example/privacy with the groundtruth tool, then list the findings that need a code change."
+
 With `DEMO_MODE=cached` (in `.env` or the server's environment), inputs that match a saved audit in `api/data/audits/` return that report at once, without cloning or scanning. Other inputs still run a live audit.
 
 If the API is reachable by other people (a public deploy, judges pasting their own URLs), set `PUBLIC_MODE=1`. Local paths are then refused, and so is any URL that points at a private or local address (`localhost`, `10.x`, cloud metadata `169.254.169.254`), including after redirects. Leave it off for the local demo, which audits `localhost:4100`.
+
+### Run it in CI
+
+The same audit runs from the command line and exits non-zero on a bad result. `--repo` and `--policy` take local paths or URLs; `--site` is optional and without it no browser is started.
+
+```sh
+uv run --project api python -m app.cli --repo . --policy docs/privacy.html --fail-on red --markdown report.md
+make audit repo=. policy=docs/privacy.html        # same thing; paths are relative to the repo root
+```
+
+Exit codes: `0` clean, `1` at least one matrix cell is `--fail-on` (`red`, `amber`) or worse, `2` a step failed (for example the policy could not be read), so the result is incomplete. `--fail-on never` only reports. Without `--site`, cells with no findings are grey (not assessed), not green.
+
+As a GitHub Action (the report is added to the job summary):
+
+```yaml
+name: Privacy audit
+on: pull_request
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: AlexAlexBabarika/Eurasian-Hack-14-Nov@main
+        with:
+          policy: docs/privacy.html
+          fail-on: red
+```
+
+Other inputs: `repo` (default `.`), `site`, `jurisdictions` (default `UK,EU,KZ`). This repository runs it on its own fixture in `.github/workflows/privacy-audit.yml`.
 
 ### LLM provider
 
@@ -59,7 +96,8 @@ If the API is reachable by other people (a public deploy, judges pasting their o
 |---|---|
 | `make test` | ruff + pytest (api), tsc + eslint (web). No network or API key needed. |
 | `make types` | Regenerate `web/src/lib/api-types.ts` from the FastAPI schema. |
-| `make sample` | Regenerate `contracts/sample_report.json` and the cached demo audit. |
+| `make sample` | Regenerate `contracts/sample_report.json` and the cached demo audits (original and fixed policy). |
+| `make audit repo=. policy=FILE_OR_URL` | Run one audit from the command line; non-zero exit on a red cell. Optional `site=`, `fail_on=`, `markdown=`. |
 | `make demo` | Run with `DEMO_MODE=cached`: matching inputs replay a cached audit. |
 | `docker compose up api` | API in a container with Chromium, git and Bearer. |
 

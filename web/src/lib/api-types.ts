@@ -11,7 +11,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * List Example Audits
+         * @description Saved demo audits (api/data/audits/demo-*.json).
+         */
+        get: operations["list_example_audits_audits_get"];
         put?: never;
         /** Create Audit */
         post: operations["create_audit_audits_post"];
@@ -124,12 +128,15 @@ export interface components {
             /** Disclaimer */
             disclaimer: string;
         };
-        /** AuditRequest */
+        /**
+         * AuditRequest
+         * @description repo_url or site_url may be omitted (not both): the audit then covers only what it can observe.
+         */
         AuditRequest: {
             /** Repo Url */
-            repo_url: string;
+            repo_url?: string | null;
             /** Site Url */
-            site_url: string;
+            site_url?: string | null;
             /** Policy Url */
             policy_url: string;
             /** Jurisdictions */
@@ -145,6 +152,28 @@ export interface components {
             report?: components["schemas"]["AuditReport"] | null;
             /** Error */
             error?: string | null;
+        };
+        /**
+         * AuditSummary
+         * @description One saved demo audit, for the examples list on the landing page.
+         */
+        AuditSummary: {
+            /** Id */
+            id: string;
+            /** Repo Url */
+            repo_url: string | null;
+            /** Site Url */
+            site_url: string | null;
+            /** Policy Url */
+            policy_url: string;
+            /** Findings */
+            findings: number;
+            /** Vendors */
+            vendors: number;
+            /** Status Counts */
+            status_counts: {
+                [key: string]: number;
+            };
         };
         /** CellVerdict */
         CellVerdict: {
@@ -370,6 +399,26 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    list_example_audits_audits_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditSummary"][];
+                };
+            };
+        };
+    };
     create_audit_audits_post: {
         parameters: {
             query?: never;

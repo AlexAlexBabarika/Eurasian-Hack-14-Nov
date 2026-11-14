@@ -1,0 +1,23 @@
+name: Privacy audit
+
+on:
+  pull_request:
+    paths:
+      - demo/fixture-app/**
+      - api/**
+      - action.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          repo: demo/fixture-app
+          policy: demo/fixture-app/privacy-fixed.html
+          fail-on: red

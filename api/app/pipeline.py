@@ -40,31 +40,38 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
     # clone
     files: list[RepoFile] = []
     repo_dir = None
-    ev("clone", "running", "Fetching repository")
-    try:
-        repo_dir = await repo.fetch(req.repo_url)
-        files, total = repo.walk(repo_dir)
-        stats["files_total"] = total
-        capped = f" of {total:,} (file cap; manifests and source files first)" if total > repo.MAX_FILES else ""
-        ev("clone", "done", f"{len(files):,} files ready to scan{capped}", len(files))
-    except Exception as e:  # noqa: BLE001
-        ev("clone", "error", f"Could not fetch repository: {str(e)[:160]}")
+    if req.repo_url:
+        ev("clone", "running", "Fetching repository")
+        try:
+            repo_dir = await repo.fetch(req.repo_url)
+            files, total = repo.walk(repo_dir)
+            stats["files_total"] = total
+            capped = f" of {total:,} (file cap; manifests and source files first)" if total > repo.MAX_FILES else ""
+            ev("clone", "done", f"{len(files):,} files ready to scan{capped}", len(files))
+        except Exception as e:  # noqa: BLE001
+            ev("clone", "error", f"Could not fetch repository: {str(e)[:160]}")
+    else:
+        ev("clone", "skipped", "No repository given; only the live site is compared with the policy")
     stats["files_scanned"] = len(files)
 
     # manifests + SDK catalog + code signals
-    ev("manifests", "running", "Matching dependencies and imports against the SDK catalog")
     code_obs: list[Observation] = []
     signals = CodeSignals()
-    try:
-        code_obs = manifests.detect(files)
-        signals = code_signals.detect(files)
-        names = ", ".join(o.vendor or "" for o in code_obs) or "none"
-        ev("manifests", "done", f"Vendors in code: {names}", len(code_obs))
-    except Exception as e:  # noqa: BLE001
-        ev("manifests", "error", f"Manifest detector failed: {str(e)[:160]}")
+    if req.repo_url:
+        ev("manifests", "running", "Matching dependencies and imports against the SDK catalog")
+        try:
+            code_obs = manifests.detect(files)
+            signals = code_signals.detect(files)
+            names = ", ".join(o.vendor or "" for o in code_obs) or "none"
+            ev("manifests", "done", f"Vendors in code: {names}", len(code_obs))
+        except Exception as e:  # noqa: BLE001
+            ev("manifests", "error", f"Manifest detector failed: {str(e)[:160]}")
+    else:
+        ev("manifests", "skipped", "No repository to read dependencies from")
 
     # bearer (optional)
-    ev("bearer", "running", "Running Bearer data-flow scan")
+    if req.repo_url:
+        ev("bearer", "running", "Running Bearer data-flow scan")
     result = await bearer.run(repo_dir) if repo_dir else bearer.BearerResult(message="No repository to scan")
     stats["bearer"] = result.ran
     signals.pii_logs.extend(result.pii_logs)
@@ -76,11 +83,16 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
     ev("bearer", "done" if result.ran else "skipped", result.message, len(result.data_types) if result.ran else None)
 
     # site scan
-    ev("site_scan", "running", "Loading the site in a clean browser, clicking nothing")
-    scan = await site.scan(req.site_url)
+    if req.site_url:
+        ev("site_scan", "running", "Loading the site in a clean browser, clicking nothing")
+        scan = await site.scan(req.site_url)
+    else:
+        scan = site.SiteScan(url="")
     net_obs = trackers.detect(scan)
     stats["requests_pre_consent"] = len(scan.requests)
-    if scan.error and not scan.requests:
+    if not req.site_url:
+        ev("site_scan", "skipped", "No live site given; only the code is compared with the policy")
+    elif scan.error and not scan.requests:
         ev("site_scan", "error", f"Site scan failed: {scan.error[:160]}")
     else:
         names = ", ".join(o.vendor or "" for o in net_obs) or "none"
@@ -123,7 +135,15 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
     jurisdictions = req.jurisdictions or JURISDICTIONS
     ev("law", "running", "Retrieving provisions from the curated corpus")
     ev("verdict", "running", "Writing verdicts per jurisdiction")
-    gaps = [name for name, missing in (("the repository", not files), ("the policy", not policy_text)) if missing]
+    gaps = []
+    if not req.repo_url:
+        gaps.append("no repository was given")
+    elif not files:
+        gaps.append("the repository could not be read")
+    if not req.site_url:
+        gaps.append("no live site was given")
+    if not policy_text:
+        gaps.append("the policy could not be read")
     matrix, provisions, method = await build_matrix(findings, observations, jurisdictions, use_llm=use_llm, gaps=gaps)
     stats["verdict_method"] = method
     ev("law", "done", f"{len(provisions)} provisions cited", len(provisions))

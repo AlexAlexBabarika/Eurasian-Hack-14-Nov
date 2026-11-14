@@ -3,36 +3,41 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { DEMO_ID, getAudit, subscribeToEvents } from "@/lib/api";
+import { getAudit, isBundledAudit, subscribeToEvents } from "@/lib/api";
+import { BUNDLED_AUDITS } from "@/lib/examples";
 import type { AuditReport, ProgressEvent } from "@/lib/types";
-import demoAudit from "../../../api/data/audits/demo-fixture.json";
 
 export type AuditState =
   | { phase: "running"; events: ProgressEvent[]; skip?: () => void }
   | { phase: "done"; events: ProgressEvent[]; report: AuditReport }
   | { phase: "error"; events: ProgressEvent[]; message: string; retry: () => void };
 
-const DEMO_REPORT = demoAudit.report as AuditReport;
-const DEMO_EVENTS = demoAudit.events as ProgressEvent[];
+type Replay = { id: string | null; shown: number; finished: boolean };
 
-function useDemoAudit(enabled: boolean): AuditState {
-  const [events, setEvents] = useState<ProgressEvent[]>([]);
-  const [finished, setFinished] = useState(false);
+function useBundledAudit(id: string): AuditState {
+  const audit = BUNDLED_AUDITS[id];
+  const [replay, setReplay] = useState<Replay>({ id: null, shown: 0, finished: false });
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!audit) return;
     const timers: ReturnType<typeof setTimeout>[] = [];
     let elapsed = 0;
-    for (const event of DEMO_EVENTS) {
+    audit.events.forEach((event, index) => {
       elapsed += event.status === "running" ? 250 : 650;
-      timers.push(setTimeout(() => setEvents((current) => [...current, event]), elapsed));
-    }
-    timers.push(setTimeout(() => setFinished(true), elapsed + 500));
+      timers.push(setTimeout(() => setReplay({ id, shown: index + 1, finished: false }), elapsed));
+    });
+    timers.push(setTimeout(() => setReplay({ id, shown: audit.events.length, finished: true }), elapsed + 500));
     return () => timers.forEach(clearTimeout);
-  }, [enabled]);
+  }, [id, audit]);
 
-  if (finished) return { phase: "done", events: DEMO_EVENTS, report: DEMO_REPORT };
-  return { phase: "running", events, skip: () => setFinished(true) };
+  if (!audit) return { phase: "running", events: [] };
+  const current = replay.id === id ? replay : { id, shown: 0, finished: false };
+  if (current.finished) return { phase: "done", events: audit.events, report: audit.report };
+  return {
+    phase: "running",
+    events: audit.events.slice(0, current.shown),
+    skip: () => setReplay({ id, shown: audit.events.length, finished: true }),
+  };
 }
 
 function useLiveAudit(id: string, enabled: boolean): AuditState {
@@ -74,8 +79,8 @@ function useLiveAudit(id: string, enabled: boolean): AuditState {
 }
 
 export function useAudit(id: string): AuditState {
-  const isDemo = id === DEMO_ID;
-  const demo = useDemoAudit(isDemo);
-  const live = useLiveAudit(id, !isDemo);
-  return isDemo ? demo : live;
+  const bundled = isBundledAudit(id);
+  const replayed = useBundledAudit(id);
+  const live = useLiveAudit(id, !bundled);
+  return bundled ? replayed : live;
 }

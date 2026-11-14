@@ -43,19 +43,26 @@ async def _audit_with_progress(req: AuditRequest, ctx: Context) -> AuditReport:
 
 @server.tool()
 async def audit_product(
-    repo_url: str, site_url: str, policy_url: str, ctx: Context, jurisdictions: list[Jurisdiction] | None = None
+    policy_url: str,
+    ctx: Context,
+    repo_url: str | None = None,
+    site_url: str | None = None,
+    jurisdictions: list[Jurisdiction] | None = None,
 ) -> str:
-    """Compare what a product does (public GitHub repo + live site) with what its privacy policy says.
+    """Compare what a product does (public GitHub repo and/or live site) with what its privacy policy says.
 
+    Give repo_url, site_url, or both; with only one, the audit covers only what that source shows.
     Returns a Markdown report: a UK/EU/KZ matrix, findings with evidence, cited provisions and suggested fixes.
     Reports possible inconsistencies only; not legal advice.
     jurisdictions limits the matrix and verdicts to some of "UK", "EU", "KZ"; leave it out for all three.
     """
+    if not repo_url and not site_url:
+        raise ToolError("give a repo_url, a site_url, or both")
     for name, value in (("repo_url", repo_url), ("site_url", site_url), ("policy_url", policy_url)):
-        if not value.startswith(("http://", "https://")):
+        if value and not value.startswith(("http://", "https://")):
             raise ToolError(f"{name} must be an http(s) URL")
     selected = [j for j in JURISDICTIONS if j in jurisdictions] if jurisdictions else None
-    req = AuditRequest(repo_url=repo_url, site_url=site_url, policy_url=policy_url, jurisdictions=selected)
+    req = AuditRequest(repo_url=repo_url or None, site_url=site_url or None, policy_url=policy_url, jurisdictions=selected)
     cached = store.find_cached(req) if os.getenv("DEMO_MODE") == "cached" else None
     if cached and cached.report:
         report = cached.report

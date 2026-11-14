@@ -135,14 +135,14 @@
   instrument: "Regulation (EU) 2016/679 (GDPR)"
   ref: "Art. 44"
   title: "General principle for transfers"
-  summary: "Personal data may be transferred to a third country only if the conditions of Chapter V (adequacy decision or appropriate safeguards) are met."
+  summary: "Personal data may be transferred to a third country only if the conditions of Chapter V (adequacy decision, appropriate safeguards or a specific derogation) are met."
   official_url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
   tags: [transfers]
   verified: false
 - id: EU-EPRIVACY-5-3
   jurisdiction: EU
   area: personal_data
-  instrument: "Directive 2002/58/EC (ePrivacy Directive)"
+  instrument: "Directive 2002/58/EC (ePrivacy Directive), as amended by Directive 2009/136/EC"
   ref: "Art. 5(3)"
   title: "Consent for cookies and similar technologies"
   summary: "Storing information, or accessing information stored, on a user's device is only allowed with the user's consent after clear information, unless strictly necessary to provide a service the user requested. There is no exemption for analytics."
@@ -175,7 +175,7 @@
   instrument: "Directive 2005/29/EC (Unfair Commercial Practices Directive)"
   ref: "Art. 5"
   title: "Prohibition of unfair commercial practices"
-  summary: "Unfair commercial practices are prohibited: practices contrary to professional diligence that materially distort the economic behaviour of the average consumer."
+  summary: "Unfair commercial practices are prohibited: practices contrary to professional diligence that materially distort, or are likely to materially distort, the economic behaviour of the average consumer."
   official_url: "https://eur-lex.europa.eu/eli/dir/2005/29/oj"
   tags: [fairness, dark_patterns, consent, tracking]
   verified: false
@@ -185,7 +185,7 @@
   instrument: "Directive 2005/29/EC (Unfair Commercial Practices Directive)"
   ref: "Art. 6"
   title: "Misleading actions"
-  summary: "A practice is misleading if it contains false information, or is likely to deceive the average consumer, and causes a transactional decision the consumer would not otherwise have taken."
+  summary: "A practice is misleading if it contains false information, or is likely to deceive the average consumer, and causes or is likely to cause a transactional decision the consumer would not otherwise have taken."
   official_url: "https://eur-lex.europa.eu/eli/dir/2005/29/oj"
   tags: [misleading, sharing, fairness]
   verified: false

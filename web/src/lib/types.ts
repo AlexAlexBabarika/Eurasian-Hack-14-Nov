@@ -6,6 +6,7 @@ export type AuditCreated = Schemas["AuditCreated"];
 export type AuditReport = Schemas["AuditReport"];
 export type AuditRequest = Schemas["AuditRequest"];
 export type AuditStatus = Schemas["AuditStatus"];
+export type AuditSummary = Schemas["AuditSummary"];
 export type CellVerdict = Schemas["CellVerdict"];
 export type Evidence = Schemas["Evidence"];
 export type Finding = Schemas["Finding"];
