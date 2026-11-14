@@ -14,6 +14,7 @@ from app.ingest.repo import RepoFile
 from app.ingest.site import SiteScan
 from app.models import Finding, Observation
 from app.verdict.engine import finding_status
+from app.verdict.fixes import PURPOSE
 
 EN_POLICY = "We collect your email address to create your account."
 RU_POLICY = (
@@ -160,3 +161,7 @@ def test_catalog_entries_are_unambiguous():
     packages = [p.lower() for v in catalog for p in v.packages]
     assert sorted(packages) == sorted(set(packages))
     assert all(v.purpose and re.fullmatch(r"[A-Z]{2}", v.country or "") for v in catalog)
+
+
+def test_every_catalog_purpose_has_a_label_for_fix_text():
+    assert {v.purpose for v in load_catalog()} <= set(PURPOSE)

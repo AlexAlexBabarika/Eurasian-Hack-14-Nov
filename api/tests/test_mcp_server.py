@@ -8,7 +8,7 @@ from mcp import Client
 from mcp.server.mcpserver.exceptions import ToolError
 
 from app import store
-from app.models import AuditRequest, ProgressEvent
+from app.models import AREAS, JURISDICTIONS, AuditRequest, ProgressEvent
 
 SERVER = Path(__file__).resolve().parents[2] / "mcp" / "server.py"
 
@@ -134,6 +134,34 @@ def test_unknown_jurisdiction_is_rejected(monkeypatch) -> None:
     with pytest.raises(ToolError):
         asyncio.run(module.server.call_tool("audit_product", {**DEMO, "jurisdictions": ["US"]}))
     assert calls == []
+
+
+@pytest.mark.parametrize("jurisdictions", [None, ["EU"]])
+def test_progress_rises_to_the_total_when_the_llm_reports_every_cell(monkeypatch, jurisdictions) -> None:
+    module = _load()
+    cells = len(jurisdictions or JURISDICTIONS) * len(AREAS)
+    before = ["clone", "manifests", "bearer", "site_scan", "policy_fetch", "claims", "diff"]
+    events = [ProgressEvent(step=s, status=status, message=s) for s in before for status in ("running", "done")]
+    events += [ProgressEvent(step=s, status="running", message=s) for s in ("law", "verdict")]
+    events += [ProgressEvent(step="verdict", status="running", message=f"{n} of {cells}", count=n) for n in range(1, cells + 1)]
+    events += [ProgressEvent(step=s, status="done", message=s) for s in ("law", "verdict", "done")]
+
+    async def fake_run_audit(audit_id, req, emit, use_llm=True):
+        for event in events:
+            emit(event)
+
+    sent: list[tuple[float, float]] = []
+
+    class Ctx:
+        async def report_progress(self, progress: float, total: float, message: str) -> None:
+            sent.append((progress, total))
+
+    monkeypatch.setattr(module, "run_audit", fake_run_audit)
+    asyncio.run(module._audit_with_progress(AuditRequest(**DEMO, jurisdictions=jurisdictions), Ctx()))
+    progress = [p for p, _ in sent]
+    assert len(progress) == len(events)  # every pipeline message reaches the client
+    assert all(a < b for a, b in zip(progress, progress[1:], strict=False))
+    assert progress[-1] == sent[-1][1] == max(progress)
 
 
 @pytest.mark.parametrize(
