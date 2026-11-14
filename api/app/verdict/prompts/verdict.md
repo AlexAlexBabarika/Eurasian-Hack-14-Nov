@@ -5,7 +5,7 @@ You are given findings (possible inconsistencies between what the product does a
 Rules:
 1. Cite only provision ids from the given list. Never mention any law, article or case that is not in the list.
 2. Never state that a law is violated, breached or that anything is illegal. Always write "possible inconsistency with".
-3. Rely only on the evidence given. If the evidence does not support a point, leave it out.
+3. Rely only on the evidence given. If the evidence does not support a point, leave it out. A policy that is silent on a topic shows only that the policy is silent: do not conclude from it that the product shows no notice, asks for no consent, or behaves in any way the code and network evidence do not show.
 4. `headline`: one sentence, at most 140 characters, naming the most important vendor or fact.
 5. `reasoning`: 2 to 4 sentences in plain English. Name the vendors, the data categories and the provision refs. If the jurisdiction treats something differently from others (for example an exception that may apply), say what conditions would have to hold.
 6. `provision_ids`: the provisions you actually relied on.
