@@ -3,6 +3,7 @@
 import time
 from collections.abc import Callable
 
+from app import llm
 from app.claims import extract as claims_extract
 from app.detect import bearer, code_signals, manifests, trackers
 from app.detect.code_signals import CodeSignals
@@ -129,35 +130,38 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
     stats["vendors_found"] = len([o for o in observations if o.vendor])
 
     # policy
-    ev("policy_fetch", "running", "Fetching the privacy policy")
     policy_text = ""
-    try:
-        policy_text = await policy.fetch(req.policy_url)
-        linked = policy_text.count(policy.LINKED_PAGE)
-        extra = f", including {linked} linked subprocessor page{'s' if linked > 1 else ''}" if linked else ""
-        ev("policy_fetch", "done", f"Policy text extracted ({len(policy_text):,} characters{extra})", len(policy_text))
-    except Exception as e:  # noqa: BLE001
-        ev("policy_fetch", "error", f"Could not fetch policy: {str(e)[:160]}")
+    if req.policy_url:
+        ev("policy_fetch", "running", "Fetching the privacy policy")
+        try:
+            policy_text = await policy.fetch(req.policy_url)
+            linked = policy_text.count(policy.LINKED_PAGE)
+            extra = f", including {linked} linked subprocessor page{'s' if linked > 1 else ''}" if linked else ""
+            ev("policy_fetch", "done", f"Policy text extracted ({len(policy_text):,} characters{extra})", len(policy_text))
+        except Exception as e:  # noqa: BLE001
+            ev("policy_fetch", "error", f"Could not fetch policy: {str(e)[:160]}")
+    else:
+        ev("policy_fetch", "skipped", "No privacy policy given; only the checks that need no policy run")
 
     # claims
-    findings = []
     claims = EMPTY_CLAIMS
+    model = llm.model_for(req.effort)
+    stats["effort"] = req.effort
     if policy_text:
         ev("claims", "running", "Extracting what the policy claims")
         if use_llm:
-            claims, method = await claims_extract.extract(policy_text)
+            claims, method = await claims_extract.extract(policy_text, model)
         else:
             claims, method = claims_extract.validate_quotes(claims_extract.heuristic(policy_text), policy_text), "heuristic"
         stats["claims_method"] = method
         ev("claims", "done", f"Claims extracted ({method}); sharing statement: {claims.sharing_statement}")
-
-        # diff: only meaningful when we have a policy to compare against
         ev("diff", "running", "Comparing observed behaviour with policy claims")
-        findings = run_rules(observations, claims, signals, req.policy_url, len(files))
-        ev("diff", "done", f"{len(findings)} possible inconsistencies", len(findings))
     else:
         ev("claims", "skipped", "No policy text, so nothing to compare against")
-        ev("diff", "skipped", "No policy text; no findings can be evidenced")
+        ev("diff", "running", "Running the checks that need no policy text")
+    # diff: without policy text only the rules that need none (consent, logs) can be evidenced
+    findings = run_rules(observations, claims, signals, req.policy_url if policy_text else None, len(files))
+    ev("diff", "done", f"{len(findings)} possible inconsistencies", len(findings))
 
     # law + verdict
     jurisdictions = req.jurisdictions or JURISDICTIONS
@@ -171,10 +175,10 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
     if not req.site_url:
         gaps.append("no live site was given")
     if not policy_text:
-        gaps.append("the policy could not be read")
+        gaps.append("the policy could not be read" if req.policy_url else "no privacy policy was given")
     matrix, provisions, method, llm_cells, fallbacks = await build_matrix(
         findings, observations, jurisdictions, use_llm=use_llm, gaps=gaps,
-        on_cell=lambda n, total: ev("verdict", "running", f"Writing verdicts: {n} of {total} cells", n),
+        on_cell=lambda n, total: ev("verdict", "running", f"Writing verdicts: {n} of {total} cells", n), model=model,
     )
     stats["verdict_method"] = method
     if method == "llm":

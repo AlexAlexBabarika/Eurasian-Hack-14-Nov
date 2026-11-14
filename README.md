@@ -26,6 +26,10 @@ Then open http://localhost:3000 and click "Use demo fixture".
 
 The repository field is optional: with only a site URL and a policy URL the audit compares the live site with the policy and marks what it could not see as not assessed.
 
+The policy field is optional too. Without a policy only the checks that need no policy text run (trackers before consent or after reject, personal data in logs); every other cell is grey, not green.
+
+The form's Effort choice picks the model: Fast uses `MODEL_FAST`, Strong uses `MODEL_STRONG`. It has no effect without `LLM_API_KEY`.
+
 For a before/after rerun, the fixture also serves the same policy with the suggested fixes pasted in: http://localhost:4100/privacy-fixed.html. Run the audit again with that policy URL; only the two findings that need code changes remain.
 
 Without `LLM_API_KEY` the pipeline still runs end to end: policy claims come from keyword heuristics and verdict text from templates. With a key, the model extracts the claims and writes the verdict prose and fixes. Cell statuses are decided by deterministic rules either way.
@@ -41,7 +45,7 @@ Inside the container `localhost` is the container itself. To audit something ser
 
 ### MCP server
 
-`mcp/server.py` exposes the audit as one tool, `audit_product(policy_url, repo_url, site_url, jurisdictions)`, over stdio and returns the Markdown report. `repo_url` and `site_url` are optional, but at least one is required. `jurisdictions` is optional: a list of `UK`, `EU`, `KZ` that limits the matrix and verdicts; leave it out for all three. Needs `mcp` 2.x (installed by `make setup`).
+`mcp/server.py` exposes the audit as one tool, `audit_product(policy_url, repo_url, site_url, jurisdictions, effort)`, over stdio and returns the Markdown report. `repo_url` and `site_url` are optional, but at least one is required. `policy_url` is optional. `effort` is `fast` (default) or `strong`. `jurisdictions` is optional: a list of `UK`, `EU`, `KZ` that limits the matrix and verdicts; leave it out for all three. Needs `mcp` 2.x (installed by `make setup`).
 
 ```sh
 uv run --project api python mcp/server.py
@@ -57,7 +61,7 @@ If the API is reachable by other people (a public deploy, judges pasting their o
 
 ### Run it in CI
 
-The same audit runs from the command line and exits non-zero on a bad result. `--repo` and `--policy` take local paths or URLs; `--site` is optional and without it no browser is started.
+The same audit runs from the command line and exits non-zero on a bad result. `--repo` and `--policy` take local paths or URLs; `--site` is optional and without it no browser is started. `--policy` is optional; without it only the checks that need no policy run. `--effort strong` uses `MODEL_STRONG`.
 
 ```sh
 uv run --project api python -m app.cli --repo . --policy docs/privacy.html --fail-on red --markdown report.md

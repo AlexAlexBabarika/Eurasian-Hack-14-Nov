@@ -12,5 +12,5 @@
 - `make test` runs ruff + pytest (api) and tsc + eslint (web). Tests need no API key or network.
 - `make types` regenerates web/src/lib/api-types.ts from the FastAPI OpenAPI schema.
 - `make sample` regenerates contracts/sample_report.json from demo/fixture-app (offline, no LLM). It also regenerates api/data/audits/demo-fixture.json and api/data/audits/demo-fixture-fixed.json (the same fixture with privacy-fixed.html).
-- `make audit repo=PATH_OR_URL policy=PATH_OR_URL [site=URL] [fail_on=red|amber|never] [markdown=FILE]` runs `app.cli` (paths relative to the repo root). Exit 1 if a cell is at least `fail_on` bad, 2 if a step errored.
-- LLM calls go through `api/app/llm.py` only (OpenAI-compatible API; `LLM_API_KEY`, `LLM_BASE_URL`, `MODEL_FAST`). Without a key the claims and verdict steps fall back to deterministic heuristics, so the pipeline still runs end-to-end.
+- `make audit repo=PATH_OR_URL [policy=PATH_OR_URL] [site=URL] [effort=fast|strong] [fail_on=red|amber|never] [markdown=FILE]` runs `app.cli` (paths relative to the repo root). Exit 1 if a cell is at least `fail_on` bad, 2 if a step errored.
+- LLM calls go through `api/app/llm.py` only (OpenAI-compatible API; `LLM_API_KEY`, `LLM_BASE_URL`, `MODEL_FAST`, `MODEL_STRONG`). `AuditRequest.effort` (`fast` | `strong`) picks the model. `policy_url` is optional: without policy text only R5, R8 and R10 run. Without a key the claims and verdict steps fall back to deterministic heuristics, so the pipeline still runs end-to-end.

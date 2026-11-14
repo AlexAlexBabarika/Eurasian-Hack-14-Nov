@@ -43,6 +43,10 @@ def model_strong() -> str:
     return os.getenv("MODEL_STRONG") or model_fast()
 
 
+def model_for(effort: str) -> str:
+    return model_strong() if effort == "strong" else model_fast()
+
+
 def available() -> bool:
     return bool(_api_key())
 

@@ -34,7 +34,7 @@ def llm_audit(monkeypatch, tmp_path):
     monkeypatch.setenv("LLM_BASE_URL", "https://llm.test/v1")
     monkeypatch.setenv("MODEL_FAST", "vendor/model")
 
-    def run(verdict: Handler) -> tuple[AuditReport, list[ProgressEvent], list[dict]]:
+    def run(verdict: Handler, effort: str = "fast") -> tuple[AuditReport, list[ProgressEvent], list[dict]]:
         bodies: list[dict] = []
 
         def handler(request: httpx.Request) -> httpx.Response:
@@ -50,7 +50,7 @@ def llm_audit(monkeypatch, tmp_path):
         monkeypatch.setattr(llm, "_transport", httpx.MockTransport(handler))
         events: list[ProgressEvent] = []
         req = AuditRequest(repo_url=str(sample.FIXTURE), site_url=sample.SITE_URL,
-                           policy_url=str(sample.FIXTURE / "privacy.html"))  # fmt: skip
+                           policy_url=str(sample.FIXTURE / "privacy.html"), effort=effort)  # fmt: skip
         with patch("app.ingest.site.scan", fake_scan):
             report = asyncio.run(run_audit("t", req, events.append))
         return report, events, bodies
@@ -66,6 +66,14 @@ def test_each_finished_cell_emits_a_verdict_progress_event(llm_audit):
     assert [e.count for e in verdict[1:13]] == list(range(1, 13))
     assert "12 of 12" in verdict[12].message
     assert verdict[-1].count == len(report.matrix) == 12
+
+
+def test_effort_picks_the_model(llm_audit, monkeypatch):
+    monkeypatch.setenv("MODEL_STRONG", "vendor/strong")
+    report, _, bodies = llm_audit(lambda body: tool_reply(prose()))
+    assert {b["model"] for b in bodies} == {"vendor/model"} and report.stats["effort"] == "fast"
+    report, _, bodies = llm_audit(lambda body: tool_reply(prose()), effort="strong")
+    assert {b["model"] for b in bodies} == {"vendor/strong"} and report.stats["effort"] == "strong"
 
 
 def test_verdict_calls_skip_reasoning_and_cap_output(llm_audit, monkeypatch):

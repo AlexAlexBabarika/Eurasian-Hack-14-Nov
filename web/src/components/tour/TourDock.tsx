@@ -68,18 +68,18 @@ function Dock() {
     // One quiet invitation on the landing page, until it is dismissed.
     if (pathname !== "/" || tour.hintDismissed) return null;
     return (
-      <div className="fixed bottom-4 left-1/2 z-40 flex w-max max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-1 rounded-full border border-white/15 bg-card/95 py-1 pr-1 pl-3 text-sm shadow-lg backdrop-blur">
-        <Link href="/tour" className={cn("inline-flex items-center gap-2 rounded-full py-1 text-foreground", FOCUS)}>
-          <Compass aria-hidden className="size-4 text-signal" />
+      <div className="fixed bottom-5 left-1/2 z-40 flex w-max max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-2 rounded-full border border-white/15 bg-card/95 py-2 pr-2 pl-5 text-base font-medium shadow-lg backdrop-blur sm:text-lg">
+        <Link href="/tour" className={cn("inline-flex items-center gap-3 rounded-full py-2 text-foreground", FOCUS)}>
+          <Compass aria-hidden className="size-6 text-signal" />
           Judging this? Take the guided tour
         </Link>
         <button
           type="button"
           aria-label="Hide the tour invitation"
           onClick={() => write({ ...tour, hintDismissed: true })}
-          className={cn("rounded-full p-1.5 text-muted-foreground hover:text-foreground", FOCUS)}
+          className={cn("rounded-full p-2.5 text-muted-foreground hover:text-foreground", FOCUS)}
         >
-          <X aria-hidden className="size-3.5" />
+          <X aria-hidden className="size-5" />
         </button>
       </div>
     );

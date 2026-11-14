@@ -254,7 +254,14 @@ function Report({
             <div className="grid gap-6 lg:grid-cols-2">
               <section className="space-y-3">
                 <h3 className="font-serif text-2xl text-paper">What the policy says</h3>
-                <PolicyClaimsPanel claims={report.claims} />
+                {report.inputs.policy_url ? (
+                  <PolicyClaimsPanel claims={report.claims} />
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    No privacy policy was given, so there are no claims to compare with. Only the checks that need no policy
+                    ran.
+                  </p>
+                )}
               </section>
               <section className="space-y-3">
                 <h3 className="font-mono text-lg font-medium text-foreground">What the product does</h3>

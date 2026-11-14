@@ -4,7 +4,8 @@
     "repo_url": "https://github.com/AlexAlexBabarika/Eurasian-Hack-14-Nov/tree/main/demo/fixture-app",
     "site_url": "http://localhost:4100/public/index.html",
     "policy_url": "http://localhost:4100/privacy.html",
-    "jurisdictions": null
+    "jurisdictions": null,
+    "effort": "fast"
   },
   "observations": [
     {
@@ -41,10 +42,10 @@
         },
         {
           "kind": "code",
-          "summary": "email handled in a file that calls Sentry",
+          "summary": "email passed to Sentry",
           "file": "src/lib/sentry.ts",
-          "line": 9,
-          "snippet": "});\n\nexport function setSentryUser(user: { id: string; email: string }) {\n  Sentry.setUser({ id: user.id, email: user.email });\n}",
+          "line": 10,
+          "snippet": "\nexport function setSentryUser(user: { id: string; email: string }) {\n  Sentry.setUser({ id: user.id, email: user.email });\n}",
           "url": null,
           "quote": null
         }
@@ -85,16 +86,16 @@
         },
         {
           "kind": "code",
-          "summary": "email handled in a file that calls Mixpanel",
+          "summary": "email passed to Mixpanel",
           "file": "src/lib/analytics.ts",
-          "line": 7,
-          "snippet": "posthog.init(\"phc_demo_key\", { api_host: \"https://eu.i.posthog.com\" });\n\nexport type User = { id: string; email: string; name: string };\n\nexport function identifyUser(user: User) {",
+          "line": 12,
+          "snippet": "  mixpanel.identify(user.id);\n  mixpanel.people.set({\n    $email: user.email,\n    $name: user.name,\n  });",
           "url": null,
           "quote": null
         },
         {
           "kind": "code",
-          "summary": "name handled in a file that calls Mixpanel",
+          "summary": "name passed to Mixpanel",
           "file": "src/lib/analytics.ts",
           "line": 13,
           "snippet": "  mixpanel.people.set({\n    $email: user.email,\n    $name: user.name,\n  });\n  posthog.identify(user.id, { email: user.email, name: user.name });",
@@ -135,10 +136,10 @@
         },
         {
           "kind": "code",
-          "summary": "email handled in a file that calls OpenAI",
+          "summary": "email passed to OpenAI",
           "file": "src/app/api/chat/route.ts",
-          "line": 8,
-          "snippet": "  const { user, message } = await req.json();\n\n  console.log(\"chat request from\", user.email, message);\n\n  const completion = await openai.chat.completions.create({",
+          "line": 16,
+          "snippet": "      { role: \"user\", content: message },\n    ],\n    user: user.email,\n  });\n",
           "url": null,
           "quote": null
         },
@@ -188,19 +189,19 @@
         },
         {
           "kind": "code",
-          "summary": "email handled in a file that calls PostHog",
+          "summary": "email passed to PostHog",
           "file": "src/lib/analytics.ts",
-          "line": 7,
-          "snippet": "posthog.init(\"phc_demo_key\", { api_host: \"https://eu.i.posthog.com\" });\n\nexport type User = { id: string; email: string; name: string };\n\nexport function identifyUser(user: User) {",
+          "line": 15,
+          "snippet": "    $name: user.name,\n  });\n  posthog.identify(user.id, { email: user.email, name: user.name });\n}\n",
           "url": null,
           "quote": null
         },
         {
           "kind": "code",
-          "summary": "name handled in a file that calls PostHog",
+          "summary": "name passed to PostHog",
           "file": "src/lib/analytics.ts",
-          "line": 13,
-          "snippet": "  mixpanel.people.set({\n    $email: user.email,\n    $name: user.name,\n  });\n  posthog.identify(user.id, { email: user.email, name: user.name });",
+          "line": 15,
+          "snippet": "    $name: user.name,\n  });\n  posthog.identify(user.id, { email: user.email, name: user.name });\n}\n",
           "url": null,
           "quote": null
         },
@@ -257,16 +258,16 @@
         },
         {
           "kind": "code",
-          "summary": "email handled in a file that calls Stripe",
+          "summary": "email passed to Stripe",
           "file": "src/lib/billing.ts",
-          "line": 5,
-          "snippet": "const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? \"\");\n\nexport async function createCustomer(user: { email: string; name: string }) {\n  return stripe.customers.create({ email: user.email, name: user.name });\n}",
+          "line": 6,
+          "snippet": "\nexport async function createCustomer(user: { email: string; name: string }) {\n  return stripe.customers.create({ email: user.email, name: user.name });\n}",
           "url": null,
           "quote": null
         },
         {
           "kind": "code",
-          "summary": "name handled in a file that calls Stripe",
+          "summary": "name passed to Stripe",
           "file": "src/lib/billing.ts",
           "line": 6,
           "snippet": "\nexport async function createCustomer(user: { email: string; name: string }) {\n  return stripe.customers.create({ email: user.email, name: user.name });\n}",
@@ -414,19 +415,19 @@
         },
         {
           "kind": "code",
-          "summary": "email handled in a file that calls Sentry",
+          "summary": "email passed to Sentry",
           "file": "src/lib/sentry.ts",
-          "line": 9,
-          "snippet": "});\n\nexport function setSentryUser(user: { id: string; email: string }) {\n  Sentry.setUser({ id: user.id, email: user.email });\n}",
+          "line": 10,
+          "snippet": "\nexport function setSentryUser(user: { id: string; email: string }) {\n  Sentry.setUser({ id: user.id, email: user.email });\n}",
           "url": null,
           "quote": null
         },
         {
           "kind": "code",
-          "summary": "email handled in a file that calls Mixpanel",
+          "summary": "email passed to Mixpanel",
           "file": "src/lib/analytics.ts",
-          "line": 7,
-          "snippet": "posthog.init(\"phc_demo_key\", { api_host: \"https://eu.i.posthog.com\" });\n\nexport type User = { id: string; email: string; name: string };\n\nexport function identifyUser(user: User) {",
+          "line": 12,
+          "snippet": "  mixpanel.identify(user.id);\n  mixpanel.people.set({\n    $email: user.email,\n    $name: user.name,\n  });",
           "url": null,
           "quote": null
         }
@@ -572,7 +573,7 @@
         },
         {
           "kind": "code",
-          "summary": "name handled in a file that calls Mixpanel",
+          "summary": "name passed to Mixpanel",
           "file": "src/lib/analytics.ts",
           "line": 13,
           "snippet": "  mixpanel.people.set({\n    $email: user.email,\n    $name: user.name,\n  });\n  posthog.identify(user.id, { email: user.email, name: user.name });",
@@ -581,10 +582,10 @@
         },
         {
           "kind": "code",
-          "summary": "name handled in a file that calls PostHog",
+          "summary": "name passed to PostHog",
           "file": "src/lib/analytics.ts",
-          "line": 13,
-          "snippet": "  mixpanel.people.set({\n    $email: user.email,\n    $name: user.name,\n  });\n  posthog.identify(user.id, { email: user.email, name: user.name });",
+          "line": 15,
+          "snippet": "    $name: user.name,\n  });\n  posthog.identify(user.id, { email: user.email, name: user.name });\n}\n",
           "url": null,
           "quote": null
         },
@@ -599,10 +600,10 @@
         },
         {
           "kind": "code",
-          "summary": "email handled in a file that calls Stripe",
+          "summary": "email passed to Stripe",
           "file": "src/lib/billing.ts",
-          "line": 5,
-          "snippet": "const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? \"\");\n\nexport async function createCustomer(user: { email: string; name: string }) {\n  return stripe.customers.create({ email: user.email, name: user.name });\n}",
+          "line": 6,
+          "snippet": "\nexport async function createCustomer(user: { email: string; name: string }) {\n  return stripe.customers.create({ email: user.email, name: user.name });\n}",
           "url": null,
           "quote": null
         }
@@ -861,7 +862,7 @@
       "jurisdiction": "UK",
       "area": "personal_data",
       "status": "red",
-      "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+      "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal…",
       "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with UK GDPR Art. 13(1)(e); UK GDPR Art. 5(1)(a). User content is sent to OpenAI (AI provider); policy does not mention AI processing. Possible inconsistency with UK GDPR Art. 13(1)(c). Sentry, Mixpanel, OpenAI and 3 more observed in code or network traffic; policy names no such recipients. Possible inconsistency with UK GDPR Art. 13(1)(e); UK GDPR Art. 28. Data categories observed but not described in the policy: device_id, ip, name, payment, user_content. Possible inconsistency with UK GDPR Art. 13(1)(c); UK GDPR Art. 5(1)(a). 5 more findings are listed below.",
       "finding_ids": [
         "F2",
@@ -966,7 +967,7 @@
       "jurisdiction": "UK",
       "area": "consumer",
       "status": "red",
-      "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+      "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal…",
       "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 226; Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 227. PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 225. UK: since the Data (Use and Access) Act 2025, analytics used solely for statistical purposes to improve the service may not need consent, if users get clear information and a simple way to object. The same evidence is treated more strictly in the EU. No way to delete an account or data: not in the policy, no route found in code. Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 227.",
       "finding_ids": [
         "F2",
@@ -1015,7 +1016,7 @@
       "jurisdiction": "EU",
       "area": "personal_data",
       "status": "red",
-      "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+      "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal…",
       "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Regulation Art. 13(1)(e); Regulation Art. 5(1)(a). User content is sent to OpenAI (AI provider); policy does not mention AI processing. Possible inconsistency with Regulation Art. 13(1)(c). PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Directive 2002/58/EC Art. 5(3); Regulation Art. 7; Regulation Art. 6(1). EU: consent is required before non-essential cookies or trackers, including analytics. Sentry, Mixpanel, OpenAI and 3 more observed in code or network traffic; policy names no such recipients. Possible inconsistency with Regulation Art. 13(1)(e); Regulation Art. 28. 5 more findings are listed below.",
       "finding_ids": [
         "F2",
@@ -1122,7 +1123,7 @@
       "jurisdiction": "EU",
       "area": "consumer",
       "status": "red",
-      "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+      "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal…",
       "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Directive 2005/29/EC Art. 6; Directive 2005/29/EC Art. 7. PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Directive 2005/29/EC Art. 5. EU: consent is required before non-essential cookies or trackers, including analytics. No way to delete an account or data: not in the policy, no route found in code. Possible inconsistency with Directive 2005/29/EC Art. 7.",
       "finding_ids": [
         "F2",
@@ -1171,7 +1172,7 @@
       "jurisdiction": "KZ",
       "area": "personal_data",
       "status": "red",
-      "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+      "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal…",
       "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Art. 7 (Conditions for collection and processing); Art. 8(4) (Required content of consent). User content is sent to OpenAI (AI provider); policy does not mention AI processing. Personal data goes to vendors based in US (Sentry, Mixpanel, OpenAI and 3 more); policy does not mention international transfers. Possible inconsistency with Art. 12(2) (Storage in Kazakhstan and retention period); Art. 16 (Cross-border transfer); Art. 8(4) (Required content of consent). Kazakhstan requires personal data to be stored in a database located in Kazakhstan and restricts cross-border transfer; confirm where data of Kazakhstan users is stored. Sentry, Mixpanel, OpenAI and 3 more observed in code or network traffic; policy names no such recipients. Possible inconsistency with Art. 8(4) (Required content of consent); Art. 7 (Conditions for collection and processing). 5 more findings are listed below.",
       "finding_ids": [
         "F2",
@@ -1271,7 +1272,7 @@
       "jurisdiction": "KZ",
       "area": "consumer",
       "status": "red",
-      "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+      "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal…",
       "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Art. 10 (Consumer right to information); Art. 25 (Seller's duty to provide information). PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Art. 10 (Consumer right to information). Kazakhstan has no cookie-specific rule; general consent requirements for collection apply. No way to delete an account or data: not in the policy, no route found in code. Possible inconsistency with Art. 10 (Consumer right to information); Art. 25 (Seller's duty to provide information).",
       "finding_ids": [
         "F2",
@@ -2036,6 +2037,7 @@
     "bearer": false,
     "requests_pre_consent": 4,
     "vendors_found": 6,
+    "effort": "fast",
     "claims_method": "heuristic",
     "verdict_method": "deterministic",
     "duration_s": 41.3
