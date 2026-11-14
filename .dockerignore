@@ -1,0 +1,11 @@
+.git
+.env
+web
+**/.venv
+**/node_modules
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+api/data/llm_cache
+api/data/audits/*
+!api/data/audits/demo-*.json

@@ -6,13 +6,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "api"))
 
-from mcp.server.fastmcp import FastMCP  # noqa: E402
+from mcp.server.mcpserver import MCPServer  # noqa: E402
 
 from app.models import AuditRequest  # noqa: E402
 from app.pipeline import run_audit  # noqa: E402
 from app.report.markdown import render  # noqa: E402
 
-server = FastMCP("groundtruth")
+server = MCPServer("groundtruth")
 
 
 @server.tool()
