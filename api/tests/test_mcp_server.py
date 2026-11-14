@@ -123,3 +123,15 @@ def test_unknown_jurisdiction_is_rejected(monkeypatch) -> None:
     with pytest.raises(ToolError):
         asyncio.run(module.server.call_tool("audit_product", {**DEMO, "jurisdictions": ["US"]}))
     assert calls == []
+
+
+@pytest.mark.parametrize(
+    ("config", "root_placeholder"),
+    [(".mcp.json", "${CLAUDE_PROJECT_DIR:-.}"), (".cursor/mcp.json", "${workspaceFolder}")],
+)
+def test_shipped_client_config_starts_this_server(config: str, root_placeholder: str) -> None:
+    root = SERVER.parents[1]
+    entry = json.loads((root / config).read_text())["mcpServers"]["groundtruth"]
+    args = [a.replace(root_placeholder, str(root)) for a in entry["args"]]
+    assert entry["command"] == "uv"
+    assert args == ["run", "--project", str(root / "api"), "python", str(SERVER)]

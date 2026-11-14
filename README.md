@@ -43,6 +43,8 @@ Inside the container `localhost` is the container itself. To audit something ser
 uv run --project api python mcp/server.py
 ```
 
+To use it from Claude Code, Cursor or Claude Desktop, see [mcp/README.md](mcp/README.md). The repo ships `.mcp.json` and `.cursor/mcp.json`, so the first two need no configuration.
+
 With `DEMO_MODE=cached` (in `.env` or the server's environment), inputs that match a saved audit in `api/data/audits/` return that report at once, without cloning or scanning. Other inputs still run a live audit.
 
 ### LLM provider

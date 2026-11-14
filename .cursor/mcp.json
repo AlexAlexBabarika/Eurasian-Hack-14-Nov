@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "groundtruth": {
+      "command": "uv",
+      "args": ["run", "--project", "${workspaceFolder}/api", "python", "${workspaceFolder}/mcp/server.py"]
+    }
+  }
+}
