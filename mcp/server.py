@@ -25,7 +25,7 @@ from app.models import (  # noqa: E402
 from app.pipeline import run_audit  # noqa: E402
 from app.report.markdown import render  # noqa: E402
 
-server = MCPServer("groundtruth")
+server = MCPServer("proveryai")
 
 # Every step reports "running" and then its outcome, except the last, which reports once.
 PROGRESS_TOTAL = 2 * len(get_args(Step)) - 1

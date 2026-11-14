@@ -1,0 +1,6 @@
+{$API_DOMAIN} {
+	reverse_proxy api:8000 {
+		# /audits/{id}/events is a server-sent event stream; do not buffer it.
+		flush_interval -1
+	}
+}

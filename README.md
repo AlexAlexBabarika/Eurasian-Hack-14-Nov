@@ -1,10 +1,21 @@
-# Groundtruth
+# ProveryAI
 
-Privacy policy vs. code auditor. Give it a GitHub repo, a live site URL and a privacy policy URL; it finds what the product actually collects and sends, compares that with what the policy claims, and maps each possible inconsistency to official law in the UK, EU and Kazakhstan.
+**Checks what your privacy policy says against what your code and live site actually do, under UK, EU and Kazakhstan law.**
+
+Give it a GitHub repo, a live site URL and a privacy policy URL. It finds what the product actually collects and sends, compares that with what the policy claims, and maps each possible inconsistency to official law in the UK, EU and Kazakhstan. The result is a 3 x 4 traffic-light matrix (jurisdiction x legal area); every cell has evidence, a link to the official text and a fix you can paste.
+
+The name is the second half of the proverb *doveryai, no proveryai*: trust, but verify.
 
 Not legal advice. Every finding carries evidence; every legal reference comes from the curated corpus in `api/app/law/corpus/`.
 
-Full plan: [PLAN.md](PLAN.md). Rules for coding agents: [AGENTS.md](AGENTS.md).
+| | |
+|---|---|
+| Live | https://proveryai.babarika.dev (see [docs/DEPLOY.md](docs/DEPLOY.md)) |
+| Demo video | [demo/SCRIPT.md](demo/SCRIPT.md) (script and recording steps) |
+| Pitch deck | [docs/pitch.pdf](docs/pitch.pdf), source in [docs/PITCH.md](docs/PITCH.md) |
+| Submission, tools and how AI was used | [SUBMISSION.md](SUBMISSION.md) |
+| Original build plan | [PLAN.md](PLAN.md) (written under the working name Groundtruth) |
+| Rules for coding agents | [AGENTS.md](AGENTS.md) |
 
 ## Quick start
 
@@ -53,7 +64,7 @@ uv run --project api python mcp/server.py
 
 To use it from Claude Code, Cursor or Claude Desktop, see [mcp/README.md](mcp/README.md). The repo ships `.mcp.json` and `.cursor/mcp.json`, so the first two need no configuration.
 
-Example prompt: "Audit https://github.com/acme/app and https://acme.example against https://acme.example/privacy with the groundtruth tool, then list the findings that need a code change."
+Example prompt: "Audit https://github.com/acme/app and https://acme.example against https://acme.example/privacy with the proveryai tool, then list the findings that need a code change."
 
 With `DEMO_MODE=cached` (in `.env` or the server's environment), inputs that match a saved audit in `api/data/audits/` return that report at once, without cloning or scanning. Other inputs still run a live audit.
 
@@ -111,7 +122,7 @@ Other inputs: `repo` (default `.`), `site`, `jurisdictions` (default `UK,EU,KZ`)
 1. **Ingest**: shallow clone, Playwright site load with no clicks (requests and cookies before consent), policy text via trafilatura.
 2. **Detect**: dependency manifests and imports matched against `sdk_catalog.yaml` (49 vendors, including services common on Kazakhstan products such as Yandex Metrica, VK, 2GIS and Halyk ePay), optional Bearer CLI scan, grep signals for delete-account routes and personal data in logs.
 3. **Claims**: policy text to `PolicyClaims`; quotes must be exact substrings of the policy.
-4. **Diff**: deterministic rules R1-R9 produce findings.
+4. **Diff**: deterministic rules R1-R10 produce findings.
 5. **Law**: tag filter + BM25 over the curated corpus.
 6. **Verdict**: a 3 x 4 matrix (jurisdiction x legal area) with reasoning, citations and paste-ready fixes.
 
@@ -120,3 +131,7 @@ Other inputs: `repo` (default `.`), `site`, `jurisdictions` (default `UK,EU,KZ`)
 The corpus has 51 provisions (EU 20, UK 20, KZ 11). 47 have `verified: true` and 4 have `verified: false` (`EU-EPRIVACY-5-3`, `UK-GDPR-22`, `UK-GDPR-44A`, `UK-DPA-2018`); the report flags citations that are not verified.
 
 The 47 were checked against their `official_url` on 14 November 2026 by an AI agent, not yet by a person. The rule at the top of each corpus file still applies: a human opens each `official_url`, confirms the reference and summary, and only then is `verified: true` final. Entries that nobody confirms go back to `false`. The checklists for that pass, one per corpus file with the sentence to find on each official page, are `api/app/law/corpus/CHECKLIST-eu.md`, `CHECKLIST-uk.md` and `CHECKLIST-kz.md` (the last one against the Russian text).
+
+## Team
+
+Boris Sheryakov, Alex Babarika, Gor Vardanyan. Built at the Eurasian Hack, 14 November 2026.

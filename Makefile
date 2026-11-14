@@ -14,8 +14,8 @@ web:
 	cd web && pnpm dev
 
 types:
-	cd api && uv run python -c "import json; from app.main import app; print(json.dumps(app.openapi()))" > /tmp/groundtruth-openapi.json
-	cd web && pnpm exec openapi-typescript /tmp/groundtruth-openapi.json -o src/lib/api-types.ts
+	cd api && uv run python -c "import json; from app.main import app; print(json.dumps(app.openapi()))" > /tmp/proveryai-openapi.json
+	cd web && pnpm exec openapi-typescript /tmp/proveryai-openapi.json -o src/lib/api-types.ts
 
 test:
 	cd api && uv run ruff check . && uv run pytest -q

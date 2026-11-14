@@ -17,7 +17,7 @@ export type TourStep = {
   look: string[];
 };
 
-export const TOUR_STORAGE_KEY = "groundtruth-tour";
+export const TOUR_STORAGE_KEY = "proveryai-tour";
 
 const before = BUNDLED_AUDITS[DEMO_ID]?.report;
 const after = BUNDLED_AUDITS[DEMO_FIXED_ID]?.report;

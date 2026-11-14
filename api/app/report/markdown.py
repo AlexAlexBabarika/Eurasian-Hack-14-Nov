@@ -27,7 +27,7 @@ def finding_status_by_jurisdiction(r: AuditReport, finding_id: str) -> dict[str,
 
 
 def render(r: AuditReport) -> str:
-    out = ["# Groundtruth audit report", "", f"> {r.disclaimer}", ""]
+    out = ["# ProveryAI audit report", "", f"> {r.disclaimer}", ""]
     out += [f"- Repository: {r.inputs.get('repo_url') or 'not given'}", f"- Site: {r.inputs.get('site_url') or 'not given'}",
             f"- Policy: {r.inputs.get('policy_url') or 'not given'}",
             f"- Files scanned: {r.stats.get('files_scanned')}, vendors found: {r.stats.get('vendors_found')}, "

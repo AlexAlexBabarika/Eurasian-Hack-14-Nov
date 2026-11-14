@@ -40,13 +40,13 @@
     {
       "step": "site_scan",
       "status": "running",
-      "message": "Loading the site in a clean browser, clicking nothing",
+      "message": "Loading the site in clean browsers: clicking nothing, rejecting, accepting",
       "count": null
     },
     {
       "step": "site_scan",
       "status": "done",
-      "message": "80 requests before consent; trackers: Google Tag Manager, Google Ads, PostHog",
+      "message": "80 requests before consent; trackers: Google Tag Manager, Google Ads, PostHog; reject: no banner found; accept: no banner found",
       "count": 3
     },
     {
@@ -70,7 +70,7 @@
     {
       "step": "claims",
       "status": "done",
-      "message": "Claims extracted (llm); sharing statement: unclear",
+      "message": "Claims extracted (llm); sharing statement: processors_only",
       "count": null
     },
     {
@@ -82,8 +82,8 @@
     {
       "step": "diff",
       "status": "done",
-      "message": "4 possible inconsistencies",
-      "count": 4
+      "message": "2 possible inconsistencies",
+      "count": 2
     },
     {
       "step": "law",
@@ -98,10 +98,82 @@
       "count": null
     },
     {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 1 of 12 cells",
+      "count": 1
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 2 of 12 cells",
+      "count": 2
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 3 of 12 cells",
+      "count": 3
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 4 of 12 cells",
+      "count": 4
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 5 of 12 cells",
+      "count": 5
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 6 of 12 cells",
+      "count": 6
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 7 of 12 cells",
+      "count": 7
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 8 of 12 cells",
+      "count": 8
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 9 of 12 cells",
+      "count": 9
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 10 of 12 cells",
+      "count": 10
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 11 of 12 cells",
+      "count": 11
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 12 of 12 cells",
+      "count": 12
+    },
+    {
       "step": "law",
       "status": "done",
-      "message": "22 provisions cited",
-      "count": 22
+      "message": "15 provisions cited",
+      "count": 15
     },
     {
       "step": "verdict",
@@ -112,7 +184,7 @@
     {
       "step": "done",
       "status": "done",
-      "message": "Audit finished in 29.1s",
+      "message": "Audit finished in 26.5s",
       "count": null
     }
   ],
@@ -122,7 +194,8 @@
       "repo_url": "https://github.com/mfts/papermark",
       "site_url": "https://www.papermark.com",
       "policy_url": "https://www.papermark.com/privacy",
-      "jurisdictions": null
+      "jurisdictions": null,
+      "effort": "fast"
     },
     "observations": [
       {
@@ -131,8 +204,7 @@
         "vendor_country": "US",
         "data_categories": [
           "payment",
-          "email",
-          "name"
+          "email"
         ],
         "purpose_guess": "payments",
         "is_ai": false,
@@ -203,24 +275,6 @@
           },
           {
             "kind": "code",
-            "summary": "email handled in a file that calls Stripe",
-            "file": "ee/stripe/webhooks/checkout-session-completed.ts",
-            "line": 112,
-            "snippet": "        where: { role: \"ADMIN\" },\n        select: {\n          user: { select: { id: true, email: true, name: true } },\n        },\n      },",
-            "url": null,
-            "quote": null
-          },
-          {
-            "kind": "code",
-            "summary": "name handled in a file that calls Stripe",
-            "file": "ee/stripe/webhooks/checkout-session-completed.ts",
-            "line": 132,
-            "snippet": "      user: {\n        email: team.users[0].user.email as string,\n        name: team.users[0].user.name as string,\n      },\n      planType: plan.slug,",
-            "url": null,
-            "quote": null
-          },
-          {
-            "kind": "code",
             "summary": "Stripe SDK imported",
             "file": "ee/stripe/webhooks/customer-subscription-deleted.ts",
             "line": 5,
@@ -257,10 +311,10 @@
           },
           {
             "kind": "code",
-            "summary": "email handled in a file that calls Stripe",
+            "summary": "email passed to Stripe",
             "file": "ee/features/security/lib/fraud-prevention.ts",
-            "line": 23,
-            "snippet": " * Add email to Stripe Radar value list for blocking\n */\nexport async function addEmailToStripeRadar(email: string): Promise<boolean> {\n  try {\n    const stripeClient = stripeInstance();",
+            "line": 28,
+            "snippet": "    await stripeClient.radar.valueListItems.create({\n      value_list: process.env.STRIPE_LIST_ID!,\n      value: email,\n    });\n",
             "url": null,
             "quote": null
           }
@@ -335,8 +389,8 @@
             "kind": "code",
             "summary": "User-provided content passed to OpenAI",
             "file": "ee/features/ai/lib/chat/send-message.ts",
-            "line": 8,
-            "snippet": "interface SendMessageOptions {\n  chatId: string;\n  content: string;\n  vectorStoreId: string;\n  /** Permission-scoped dataroom document IDs; undefined means unrestricted */",
+            "line": 390,
+            "snippet": "      model: openai(\"gpt-4o-mini\"),\n      maxOutputTokens: 200,\n      messages: [\n        {\n          role: \"system\",",
             "url": null,
             "quote": null
           },
@@ -391,9 +445,7 @@
         "id": "obs-3",
         "vendor": "AWS SDK",
         "vendor_country": "US",
-        "data_categories": [
-          "email"
-        ],
+        "data_categories": [],
         "purpose_guess": "infrastructure",
         "is_ai": false,
         "pre_consent": false,
@@ -535,15 +587,6 @@
           },
           {
             "kind": "code",
-            "summary": "email handled in a file that calls AWS SDK",
-            "file": "pages/api/file/tus-viewer/[[...file]].ts",
-            "line": 69,
-            "snippet": "    select: {\n      teamId: true,\n      email: true,\n      groups: { select: { groupId: true } },\n    },",
-            "url": null,
-            "quote": null
-          },
-          {
-            "kind": "code",
             "summary": "AWS SDK SDK imported",
             "file": "pages/api/file/tus/[[...file]].ts",
             "line": 6,
@@ -557,15 +600,6 @@
             "file": "ee/features/dataroom-freeze/lib/trigger/dataroom-freeze-archive.ts",
             "line": 7,
             "snippet": "  S3Client,\n} from \"@aws-sdk/client-s3\";\nimport { Upload } from \"@aws-sdk/lib-storage\";",
-            "url": null,
-            "quote": null
-          },
-          {
-            "kind": "code",
-            "summary": "email handled in a file that calls AWS SDK",
-            "file": "ee/features/dataroom-freeze/lib/trigger/dataroom-freeze-archive.ts",
-            "line": 722,
-            "snippet": "          orderBy: { createdAt: \"asc\" },\n          include: {\n            user: { select: { name: true, email: true } },\n            viewer: { select: { email: true } },\n          },",
             "url": null,
             "quote": null
           },
@@ -623,7 +657,7 @@
           },
           {
             "kind": "code",
-            "summary": "email handled in a file that calls PostHog",
+            "summary": "email passed to PostHog",
             "file": "components/providers/posthog-provider.tsx",
             "line": 32,
             "snippet": "            if (session) {\n              posthog.identify(\n                (session.user as CustomUser).email ??\n                  (session.user as CustomUser).id,\n                {",
@@ -702,7 +736,7 @@
             "file": null,
             "line": null,
             "snippet": null,
-            "url": "https://ad.doubleclick.net/ccm/s/collect?_gsid=n479LXqi77hHBJKJmQ4ua1szRDy-YPmoAg&auid=927926348.1794656971&gtm=45He6bb1v9226064026za200zd9226064026xeaxf1&fmt=8",
+            "url": "https://ad.doubleclick.net/ccm/s/collect?auid=17317625.1794666662&gtm=45He6bb1v9226064026za200zd9226064026xeaxf1&fmt=8",
             "quote": null
           },
           {
@@ -711,7 +745,7 @@
             "file": null,
             "line": null,
             "snippet": null,
-            "url": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/17198795665/?random=1794656970927&cv=11&fst=1794656970927&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be6bb1z8f_AW-17198795665za20ozb9226064026zd9226064026xecxf1&gcd=13l3l3l3l1l1&dma=0&tag_exp=115938466~115938468~117776795~118897920",
+            "url": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/17198795665/?random=1794666662451&cv=11&fst=1794666662451&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be6bb1z8f_AW-17198795665za20ozb9226064026zd9226064026xecxf1&gcd=13l3l3l3l1l1&dma=0&tag_exp=115938465~115938468~118897920~118897930",
             "quote": null
           },
           {
@@ -732,22 +766,24 @@
         "name",
         "usage",
         "device_id",
-        "ip"
+        "ip",
+        "user_content",
+        "payment"
       ],
       "named_processors": [
-        "Plausible Analytics",
-        "GitHub",
         "Stripe",
+        "Plausible",
+        "GitHub",
         "Vercel",
         "AWS",
-        "PostHog EU",
+        "PostHog",
         "Resend",
         "Upstash",
         "Tinybird",
         "Trigger.dev",
         "PlanetScale"
       ],
-      "sharing_statement": "unclear",
+      "sharing_statement": "processors_only",
       "mentions_ai": false,
       "international_transfers": true,
       "retention_stated": true,
@@ -762,154 +798,19 @@
       "deletion_method": "If you wish to be informed what Personal Data we hold about you and if you want it to be removed from our systems, please email us at support@papermark.com.",
       "cookie_consent_described": true,
       "quotes": {
-        "international_transfers": "Your information, including Personal Data, may be transferred to – and maintained on – computers located outside of your state, province, country or other governmental jurisdiction where the data protection laws may differ from those of your jurisdiction.",
-        "retention_stated": "We will retain your Personal Data only for as long as is necessary for the purposes set out in this Privacy Policy."
+        "data_categories": "This Usage Data may include information such as your computer's Internet Protocol address (e.g. IP address), browser type, browser version, the pages of our Service that you visit, the time and date of your visit, the time spent on those pages, unique device identifiers and other diagnostic data.",
+        "named_processors": "GitHub is provided by GitHub, Inc.",
+        "sharing_statement": "These third parties have access to your Personal Data only to perform these tasks on our behalf and are obligated not to disclose or use it for any other purpose.",
+        "international_transfers": "If you are located outside United States and choose to provide information to us, please note that we transfer the data, including Personal Data, to United States and process it there.",
+        "retention_stated": "We will retain your Personal Data only for as long as is necessary for the purposes set out in this Privacy Policy.",
+        "rights_listed": "the right to access, update or to delete the information we have on you;",
+        "deletion_method": "If you wish to be informed what Personal Data we hold about you and if you want it to be removed from our systems, please email us at support@papermark.com.",
+        "cookie_consent_described": "You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent."
       }
     },
     "findings": [
       {
         "id": "F1",
-        "rule": "R1_UNDISCLOSED_PROCESSOR",
-        "title": "OpenAI, Google Tag Manager and Google Ads observed in code or network traffic; policy names no such recipients",
-        "severity": "medium",
-        "areas": [
-          "personal_data"
-        ],
-        "observation_ids": [
-          "obs-2",
-          "obs-5",
-          "obs-6"
-        ],
-        "evidence": [
-          {
-            "kind": "code",
-            "summary": "OpenAI SDK imported",
-            "file": "lib/openai.ts",
-            "line": 1,
-            "snippet": "import OpenAI from \"openai\";\n",
-            "url": null,
-            "quote": null
-          },
-          {
-            "kind": "network",
-            "summary": "Request to Google Tag Manager before any consent interaction",
-            "file": null,
-            "line": null,
-            "snippet": null,
-            "url": "https://www.googletagmanager.com/gtm.js?id=GTM-WH2DMPB6",
-            "quote": null
-          },
-          {
-            "kind": "network",
-            "summary": "Request to Google Ads before any consent interaction",
-            "file": null,
-            "line": null,
-            "snippet": null,
-            "url": "https://www.googletagmanager.com/gtag/js?id=AW-17198795665&cx=c&gtm=4e6bb1",
-            "quote": null
-          },
-          {
-            "kind": "code",
-            "summary": "OpenAI SDK imported",
-            "file": "ee/features/ai/lib/chat/generate-chat-title.ts",
-            "line": 1,
-            "snippet": "import { openai } from \"@ai-sdk/openai\";\nimport { generateText } from \"ai\";",
-            "url": null,
-            "quote": null
-          },
-          {
-            "kind": "network",
-            "summary": "Request to Google Ads before any consent interaction",
-            "file": null,
-            "line": null,
-            "snippet": null,
-            "url": "https://ad.doubleclick.net/ccm/s/collect?_gsid=n479LXqi77hHBJKJmQ4ua1szRDy-YPmoAg&auid=927926348.1794656971&gtm=45He6bb1v9226064026za200zd9226064026xeaxf1&fmt=8",
-            "quote": null
-          },
-          {
-            "kind": "code",
-            "summary": "User-provided content passed to OpenAI",
-            "file": "ee/features/ai/lib/chat/generate-chat-title.ts",
-            "line": 16,
-            "snippet": "    const { text } = await generateText({\n      model: openai(\"gpt-4o-mini\"),\n      prompt: `Generate a short, descriptive title (max 6 words) for a chat that starts with this message: \"${truncatedMessage}\". Only return the title, nothing else.`,\n      providerOptions: {\n        openai: {",
-            "url": null,
-            "quote": null
-          },
-          {
-            "kind": "network",
-            "summary": "Request to Google Ads before any consent interaction",
-            "file": null,
-            "line": null,
-            "snippet": null,
-            "url": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/17198795665/?random=1794656970927&cv=11&fst=1794656970927&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be6bb1z8f_AW-17198795665za20ozb9226064026zd9226064026xecxf1&gcd=13l3l3l3l1l1&dma=0&tag_exp=115938466~115938468~117776795~118897920",
-            "quote": null
-          },
-          {
-            "kind": "code",
-            "summary": "OpenAI SDK imported",
-            "file": "ee/features/ai/lib/chat/send-message.ts",
-            "line": 1,
-            "snippet": "import { OpenAIResponsesProviderOptions, openai } from \"@ai-sdk/openai\";\nimport { generateText, streamText } from \"ai\";",
-            "url": null,
-            "quote": null
-          }
-        ],
-        "policy_quote": null
-      },
-      {
-        "id": "F2",
-        "rule": "R3_UNDISCLOSED_DATA_CATEGORY",
-        "title": "Data categories observed but not described in the policy: payment, user_content",
-        "severity": "medium",
-        "areas": [
-          "personal_data"
-        ],
-        "observation_ids": [
-          "obs-1",
-          "obs-2"
-        ],
-        "evidence": [
-          {
-            "kind": "code",
-            "summary": "Stripe SDK imported",
-            "file": "ee/stripe/client.ts",
-            "line": 2,
-            "snippet": "// Stripe Client SDK\nimport { Stripe as StripeProps, loadStripe } from \"@stripe/stripe-js\";\n",
-            "url": null,
-            "quote": null
-          },
-          {
-            "kind": "code",
-            "summary": "Stripe SDK imported",
-            "file": "ee/stripe/index.ts",
-            "line": 1,
-            "snippet": "import Stripe from \"stripe\";\n",
-            "url": null,
-            "quote": null
-          },
-          {
-            "kind": "code",
-            "summary": "OpenAI SDK imported",
-            "file": "lib/openai.ts",
-            "line": 1,
-            "snippet": "import OpenAI from \"openai\";\n",
-            "url": null,
-            "quote": null
-          },
-          {
-            "kind": "code",
-            "summary": "OpenAI SDK imported",
-            "file": "ee/features/ai/lib/chat/generate-chat-title.ts",
-            "line": 1,
-            "snippet": "import { openai } from \"@ai-sdk/openai\";\nimport { generateText } from \"ai\";",
-            "url": null,
-            "quote": null
-          }
-        ],
-        "policy_quote": null
-      },
-      {
-        "id": "F3",
         "rule": "R4_AI_PROCESSING_UNDISCLOSED",
         "title": "User content is sent to OpenAI (AI provider); policy does not mention AI processing",
         "severity": "high",
@@ -934,8 +835,8 @@
             "kind": "code",
             "summary": "User-provided content passed to OpenAI",
             "file": "ee/features/ai/lib/chat/send-message.ts",
-            "line": 8,
-            "snippet": "interface SendMessageOptions {\n  chatId: string;\n  content: string;\n  vectorStoreId: string;\n  /** Permission-scoped dataroom document IDs; undefined means unrestricted */",
+            "line": 390,
+            "snippet": "      model: openai(\"gpt-4o-mini\"),\n      maxOutputTokens: 200,\n      messages: [\n        {\n          role: \"system\",",
             "url": null,
             "quote": null
           },
@@ -961,7 +862,7 @@
         "policy_quote": null
       },
       {
-        "id": "F4",
+        "id": "F2",
         "rule": "R5_TRACKING_BEFORE_CONSENT",
         "title": "PostHog, Google Tag Manager and Google Ads fire before any consent interaction on the site",
         "severity": "high",
@@ -1008,7 +909,7 @@
             "file": null,
             "line": null,
             "snippet": null,
-            "url": "https://ad.doubleclick.net/ccm/s/collect?_gsid=n479LXqi77hHBJKJmQ4ua1szRDy-YPmoAg&auid=927926348.1794656971&gtm=45He6bb1v9226064026za200zd9226064026xeaxf1&fmt=8",
+            "url": "https://ad.doubleclick.net/ccm/s/collect?auid=17317625.1794666662&gtm=45He6bb1v9226064026za200zd9226064026xeaxf1&fmt=8",
             "quote": null
           },
           {
@@ -1017,7 +918,7 @@
             "file": null,
             "line": null,
             "snippet": null,
-            "url": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/17198795665/?random=1794656970927&cv=11&fst=1794656970927&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be6bb1z8f_AW-17198795665za20ozb9226064026zd9226064026xecxf1&gcd=13l3l3l3l1l1&dma=0&tag_exp=115938466~115938468~117776795~118897920",
+            "url": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/17198795665/?random=1794666662451&cv=11&fst=1794666662451&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be6bb1z8f_AW-17198795665za20ozb9226064026zd9226064026xecxf1&gcd=13l3l3l3l1l1&dma=0&tag_exp=115938465~115938468~118897920~118897930",
             "quote": null
           },
           {
@@ -1030,7 +931,7 @@
             "quote": null
           }
         ],
-        "policy_quote": null
+        "policy_quote": "You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent."
       }
     ],
     "matrix": [
@@ -1038,102 +939,85 @@
         "jurisdiction": "UK",
         "area": "personal_data",
         "status": "red",
-        "headline": "PostHog, Google Tag Manager and Google Ads fire before consent; OpenAI receives user content undisclosed",
-        "reasoning": "PostHog, Google Tag Manager and Google Ads set cookies and fire requests (the ph_..._posthog cookie, _gcl_au, gtm.js and gtag/js) before any consent interaction, a possible inconsistency with PECR reg. 6(1); the statistical-purposes exception in PECR Sch. A1 para. 5 would only apply if storage were solely for statistics to improve the service and users were given clear information and a simple means to object, and it does not cover Google Ads advertising or cross-site tracking. User content is passed to OpenAI from send-message.ts and generate-ai-structure.ts while the policy does not mention AI processing and names no recipient such as OpenAI, Google Tag Manager or Google Ads, a possible inconsistency with UK GDPR Art. 13(1)(c), Art. 13(1)(e), Art. 28 and Art. 5(1)(a). The payment and user_content data categories observed through Stripe and OpenAI are likewise not described in the policy, a further possible inconsistency with Art. 13(1)(c) and Art. 5(1)(a).",
+        "headline": "PostHog, Google Tag Manager and Google Ads fire before any consent interaction",
+        "reasoning": "On the site, a PostHog cookie and requests to Google Tag Manager and Google Ads are seen before any consent interaction, and PostHog, Google Tag Manager and Google Ads receive usage data, device ID, IP address and, for PostHog, email address. Because Google Ads is advertising and PostHog and Google Tag Manager also record sessions, the statistical-purposes exception is unlikely to cover them, so a possible inconsistency with PECR reg. 6(1) and Schedule A1 para. 5 arises; that exception would only apply if the sole purpose were statistics about how the site is used, the data were not shared with anyone else except to help improve it, clear information were given and a simple, free means of objecting existed. Separately, user content is sent to OpenAI for AI features while the policy does not mention AI, machine learning or automated processing, a possible inconsistency with UK GDPR Art. 13(1)(c) as to the stated purposes and legal basis.",
         "finding_ids": [
-          "F3",
-          "F4",
           "F1",
           "F2"
         ],
         "provision_ids": [
           "UK-PECR-6",
           "UK-PECR-SCHA1-5",
-          "UK-GDPR-13-1-c",
-          "UK-GDPR-13-1-e",
-          "UK-GDPR-28",
-          "UK-GDPR-5-1-a"
+          "UK-GDPR-13-1-c"
         ],
         "fixes": [
           {
-            "policy_clause": "We use OpenAI (US) to power our AI features, including generating chat titles, sending chat messages and generating AI data room structures. When you use these features, the text and files you submit (your user content) are sent to OpenAI as our service provider so it can generate the result. OpenAI processes this content on our behalf under a written contract, and we list OpenAI as a recipient of your personal data in our list of third parties.",
+            "policy_clause": "We use AI features powered by OpenAI to process content you submit, such as messages and document or data-room text, so that we can generate titles, draft replies and build data-room structures. The legal basis we rely on for this processing is [legal basis].",
             "code_change": null
           },
           {
-            "policy_clause": "We use PostHog for analytics and Google Tag Manager and Google Ads for analytics and advertising. These services set cookies and identifiers (for example the PostHog cookie ph_phc_..._posthog and the Google Ads cookie _gcl_au) and collect your usage data, device identifier and IP address. We only load PostHog, Google Tag Manager (GTM-WH2DMPB6) and Google Ads (AW-17198795665) after you accept analytics and advertising cookies in our consent banner, and you can change or withdraw that choice at any time in [settings location].",
-            "code_change": "Do not initialise PostHog, the Google Tag Manager container GTM-WH2DMPB6 or the Google Ads tag AW-17198795665 on page load. Move the gtm.js/gtag.js snippet and the PostHog init behind the consent callback so they load only after the user grants analytics/advertising consent, and tear them down on withdrawal."
-          },
-          {
-            "policy_clause": "We use Stripe (US) to process payments. When you subscribe to a paid plan or make a payment, we share your name, email address and payment details with Stripe as our payment provider.",
-            "code_change": null
+            "policy_clause": "We use PostHog for product analytics and Google Tag Manager and Google Ads for analytics and advertising. These tools may set cookies and collect your usage data, device ID, IP address and email address before you interact with our consent banner. We ask for your consent before these tools run, and you can withdraw it at any time via [consent settings link].",
+            "code_change": "Load PostHog, Google Tag Manager and Google Ads tags only after consent is recorded (e.g. gate the PostHog init and the GTM container in the site layout/consent provider, and remove the pre-consent `ph_phc_..._posthog` and `_gcl_au` cookies)."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
-          "F3": "red",
-          "F4": "red",
-          "F1": "amber",
-          "F2": "amber"
+          "F1": "red",
+          "F2": "red"
         }
       },
       {
         "jurisdiction": "UK",
         "area": "ai_transparency",
         "status": "amber",
-        "headline": "User content is passed to OpenAI for AI features while Papermark's privacy policy does not mention AI processing.",
-        "reasoning": "Code evidence shows user content being passed to OpenAI in three places: AI chat title generation (ee/features/ai/lib/chat/generate-chat-title.ts), AI chat messages (ee/features/ai/lib/chat/send-message.ts) and AI data-room structure generation (pages/api/teams/[teamId]/datarooms/generate-ai-structure.ts), yet the privacy policy does not mention AI, machine learning or automated processing. The UK has no AI-specific statute, so this cell rests on the ICO Guidance on AI and data protection (Transparency in AI), which expects organisations to tell people when and how their personal data is processed by AI systems as part of UK GDPR transparency. That makes the mismatch between the code and the policy a possible inconsistency with UK-ICO-AI-GUIDANCE; because the guidance is not statutory, the status is capped at amber rather than higher. Note that the policy's silence on AI shows only that it is silent — it does not itself show what notices are or are not given to users in the product.",
+        "headline": "User content sent to OpenAI for AI features but policy is silent on AI processing",
+        "reasoning": "Code shows user content passed to OpenAI in chat title generation (generate-chat-title.ts:16), message sending (send-message.ts:390) and AI dataroom structure generation (generate-ai-structure.ts:109), while the privacy policy does not mention AI, machine learning or automated processing at all. Under ICO Guidance on AI and data protection, Transparency in AI, organisations are expected to tell people when and how their personal data is processed by AI systems, so the silence in the policy is a possible inconsistency with that expectation. Because the UK has no AI-specific statute and this rests on regulator guidance rather than legislation, the cell is capped at amber.",
         "finding_ids": [
-          "F3"
+          "F1"
         ],
         "provision_ids": [
           "UK-ICO-AI-GUIDANCE"
         ],
         "fixes": [
           {
-            "policy_clause": "We use OpenAI, a US-based AI provider, to power our AI features. When you use these features, the content you provide — including chat messages, chat titles and the data room or document content used to generate an AI structure — is sent to OpenAI and processed on our behalf to generate the result you asked for. OpenAI processes this content as our service provider and does not use it to train its own models. This processing may involve transferring your content outside the UK to the United States; where it does, we rely on [transfer mechanism]. We keep AI inputs and outputs for [retention period].",
-            "code_change": "Add a visible, dismissible notice next to the AI chat input and the AI structure-generation button (the UI that calls ee/features/ai/lib/chat/send-message.ts and pages/api/teams/[teamId]/datarooms/generate-ai-structure.ts) stating that the content entered is sent to OpenAI for AI processing, with a link to the updated privacy policy. Do not remove or suppress any existing logging or evidence of the transfer."
+            "policy_clause": "We use artificial intelligence to power certain features, such as generating chat titles and document room structures. When you use these features, the content you provide is sent to our AI provider, OpenAI, and processed to generate the result. You can choose not to use these features if you prefer not to have your content processed in this way.",
+            "code_change": null
           },
           {
-            "policy_clause": "Our AI features are not used to make automated decisions that have a legal or similarly significant effect on you without human review. If you have questions about how your content is used in our AI features, you can contact us at [contact email].",
-            "code_change": null
+            "policy_clause": null,
+            "code_change": "Ensure user content sent to OpenAI in ee/features/ai/lib/chat/generate-chat-title.ts, ee/features/ai/lib/chat/send-message.ts and pages/api/teams/[teamId]/datarooms/generate-ai-structure.ts is limited to what the feature needs, and add a comment at each call site noting the AI processing so the privacy review stays current."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
-          "F3": "amber"
+          "F1": "amber"
         }
       },
       {
         "jurisdiction": "UK",
         "area": "consumer",
         "status": "red",
-        "headline": "PostHog, Google Tag Manager and Google Ads tags fire on papermark.com before any consent choice",
-        "reasoning": "On papermark.com, PostHog sets a `ph_...` cookie and collects usage data, device identifiers, IP address and email address, Google Tag Manager loads with usage data, device identifiers and IP, and Google Ads loads with usage data, device identifiers and IP and sets the `_gcl_au` cookie — all before the visitor has made any consent choice. Because tracking of this kind runs before the consumer has any say, and an omission of that fact from what the site tells consumers can mislead them, this is a possible inconsistency with UK-DMCC-225, which prohibits misleading omissions and practices that fall short of professional diligence. Whether the inconsistency actually arises depends on conditions: it would turn on whether the information presented to the average consumer at the point these tags load clearly identifies the vendors and the data collected, and any exception for purely statistical purposes would not stretch to Google Ads' advertising trackers.",
+        "headline": "PostHog, Google Tag Manager and Google Ads fire before any consent interaction",
+        "reasoning": "Cookie and network evidence shows PostHog, Google Tag Manager and Google Ads requests and cookies (including `_gcl_au`) set on the site before any consent interaction, with usage data, device ID, IP address and, for PostHog, email address collected. The UK statistical-purposes exception does not extend to advertising or session-recording trackers, so it would only be relevant to strictly statistical analytics; it cannot cover Google Ads here. This may be a possible inconsistency with s. 225 (unfair commercial practices, including misleading omissions), because visitors may not be told about, or asked to agree to, tracking that starts on arrival. Outcomes would turn on whether the site clearly and prominently discloses these pre-consent trackers and their purposes.",
         "finding_ids": [
-          "F4"
+          "F2"
         ],
         "provision_ids": [
           "UK-DMCC-225"
         ],
         "fixes": [
           {
-            "policy_clause": "We use the following third-party tools on our site: PostHog (analytics — usage data, device identifiers, IP address and email address), Google Tag Manager (analytics — usage data, device identifiers and IP address) and Google Ads (advertising — usage data, device identifiers and IP address). Some of these tools load as soon as you open our site, before you have made any choice about cookies or tracking. Where we need your consent to load a tool, we will not load it until you give that consent, and you can withdraw your consent at any time by [withdrawal method]. We keep this data for [retention period] and share it with these providers as described above.",
-            "code_change": "Gate the tags behind consent: in the head/layout component that injects the Google Tag Manager container (GTM-WH2DMPB6), the Google Ads tag (AW-17198795665) and the PostHog snippet, do not load gtm.js, gtag/js or the PostHog initialiser on page load. Instead set Google Consent Mode to default-denied and initialise PostHog only after the consent banner records a grant, then update consent state on change."
+            "policy_clause": "We use PostHog for product analytics and Google Tag Manager and Google Ads for analytics and advertising. These tools may set cookies and receive your usage data, device ID, IP address and, for PostHog, your email address, and they may begin before you interact with our consent banner. You can opt out at any time via [opt-out link], and we keep this data for [retention period].",
+            "code_change": "Gate PostHog, Google Tag Manager and Google Ads (gtm.js, gtag/js, doubleclick collect) behind the consent banner: do not load or fire them until the user has given consent, in the site's tag/consent loading module."
           },
           {
-            "policy_clause": "We tell you about the analytics and advertising tools that run on our site before they start: PostHog, Google Tag Manager and Google Ads. Before you make a choice, we show you [banner/notice text] explaining that these tools collect usage data, device identifiers and IP address (and, for PostHog, your email address if you are signed in) and that Google Ads uses this data for advertising. You can accept or reject these tools, and change your choice at any time at [settings link].",
-            "code_change": null
+            "policy_clause": "Where we rely on consent for analytics and advertising cookies, we ask for it before those cookies are set, and we explain that refusing consent does not prevent you from using the site.",
+            "code_change": "Ensure the consent banner defaults to no trackers and that refusing consent leaves PostHog and Google tags unloaded; add a test asserting no requests to googletagmanager.com, doubleclick.net or PostHog before consent."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
-          "F4": "red"
+          "F2": "red"
         }
       },
       {
@@ -1152,11 +1036,9 @@
         "jurisdiction": "EU",
         "area": "personal_data",
         "status": "red",
-        "headline": "PostHog, Google Tag Manager and Google Ads fire before consent, and OpenAI receives user content the policy never mentions.",
-        "reasoning": "On the EU site, PostHog, Google Tag Manager and Google Ads requests and cookies (the PostHog cookie and `_gcl_au`) were observed before any consent interaction, a possible inconsistency with ePrivacy Directive Art. 5(3) — which has no analytics exemption — and with GDPR Art. 7 and Art. 6(1) on demonstrable consent and a valid legal basis. User content is passed to OpenAI in ee/features/ai/lib/chat/generate-chat-title.ts, ee/features/ai/lib/chat/send-message.ts and the dataroom generate-ai-structure API while the policy does not mention AI processing, a possible inconsistency with Art. 13(1)(c) (purposes and legal basis) and Art. 5(1)(a). The policy also names none of OpenAI, Google Tag Manager, Google Ads or Stripe as recipients, a possible inconsistency with Art. 13(1)(e), and using OpenAI as a processor engages Art. 28 processor-contract requirements; the observed payment and user_content categories are likewise undescribed under Art. 13(1)(c). The ePrivacy exception would only help if the cookies were strictly necessary to deliver a service the user requested, and the analytics and advertising evidence does not support that for these vendors.",
+        "headline": "PostHog, Google Tag Manager, Google Ads fire before consent; OpenAI gets user content",
+        "reasoning": "Non-essential trackers from PostHog, Google Tag Manager and Google Ads are seen setting cookies and making requests on papermark.com before any consent interaction, and they receive usage data, device ID and IP address (PostHog also email address). Under Directive 2002/58/EC Art. 5(3), storing or accessing information on a device needs prior consent unless strictly necessary to provide a requested service, and without a valid legal basis under Regulation Art. 6(1) the consent requirements of Regulation Art. 7 apply, including being able to demonstrate consent. Separately, user content is passed to OpenAI for AI features while the privacy policy does not mention AI, machine learning or automated processing, which is a possible inconsistency with the information duty in Regulation Art. 13(1)(c) on purposes and legal basis.",
         "finding_ids": [
-          "F3",
-          "F4",
           "F1",
           "F2"
         ],
@@ -1164,91 +1046,76 @@
           "EU-EPRIVACY-5-3",
           "EU-GDPR-7",
           "EU-GDPR-6",
-          "EU-GDPR-13-1-c",
-          "EU-GDPR-13-1-e",
-          "EU-GDPR-28",
-          "EU-GDPR-5-1-a"
+          "EU-GDPR-13-1-c"
         ],
         "fixes": [
           {
-            "policy_clause": "We use OpenAI to process the content you submit to our AI features — for example chat messages and the document text used to generate AI document structures and chat titles — in order to generate those responses and structures for you. We do not use this content for any other purpose.",
+            "policy_clause": "We load analytics and advertising technologies, including PostHog, Google Tag Manager and Google Ads, only after you have given consent through our cookie banner. Until then, no non-essential cookies or trackers are set and no usage data, device ID or IP address is sent to these providers. You can withdraw your consent at any time with the same ease as giving it.",
+            "code_change": "Gate PostHog initialization, the Google Tag Manager container (GTM-WH2DMPB6) and the Google Ads tag (AW-17198795665) behind the consent state in the site's consent manager so no script, cookie or network request fires before consent is recorded."
+          },
+          {
+            "policy_clause": "We use OpenAI to power AI features such as generating document room structures and chat titles. When you use these features, the content you provide is sent to OpenAI for processing on our behalf for that purpose. Our legal basis for this processing is [legal basis].",
             "code_change": null
           },
           {
-            "policy_clause": "We use PostHog for product analytics, and Google Tag Manager and Google Ads for analytics and advertising measurement. These providers may set cookies on your device and receive your usage data, device identifier and IP address. We load them only after you have consented through our cookie banner, and you can withdraw your consent at any time with the same ease as giving it.",
-            "code_change": "Load PostHog, Google Tag Manager and Google Ads only after the consent banner records an affirmative choice; do not initialise them on page load in the global layout/head and do not set the PostHog cookie or the _gcl_au cookie before consent."
-          },
-          {
-            "policy_clause": "We use Stripe to process payments, and Stripe receives your payment details, your name and your email address. We also process the content you submit to our AI features, such as chat messages and document text, as described above.",
+            "policy_clause": "If you do not consent to analytics and advertising cookies, we do not run PostHog, Google Tag Manager or Google Ads on your device, and we do not sell or share your usage data, device ID or IP address with them for advertising.",
             "code_change": null
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
-          "F3": "red",
-          "F4": "red",
-          "F1": "amber",
-          "F2": "amber"
+          "F1": "red",
+          "F2": "red"
         }
       },
       {
         "jurisdiction": "EU",
         "area": "ai_transparency",
         "status": "red",
-        "headline": "User content goes to OpenAI for AI processing, but the privacy policy never mentions AI — possible inconsistency with AI Act Art. 50(1).",
-        "reasoning": "Code evidence shows user content being passed to OpenAI in ee/features/ai/lib/chat/generate-chat-title.ts, ee/features/ai/lib/chat/send-message.ts and pages/api/teams/[teamId]/datarooms/generate-ai-structure.ts, while the privacy policy text does not mention AI, machine learning or automated processing (it is silent, which on its own only shows silence, not what users are told in-product). Under Art. 50(1) of the AI Act, providers of AI systems intended to interact directly with people must design them so users are informed they are interacting with an AI system, unless that is obvious from the context — a possible inconsistency here. Whether the \"obvious from context\" exception could apply depends on conditions we cannot verify from this evidence, e.g. whether the chat interface itself makes the AI nature unmistakable to the user before and while they type. This is a description of a possible inconsistency, not legal advice.",
+        "headline": "User content goes to OpenAI for AI features while the policy never mentions AI processing",
+        "reasoning": "Code evidence shows user content being sent to OpenAI (US) from the chat title, chat message and data room AI-structure features (generate-chat-title.ts, send-message.ts, generate-ai-structure.ts). The privacy policy does not mention AI, machine learning or automated processing at all, so people interacting with these features are not told, in the policy, that they are interacting with an AI system. That combination may be a possible inconsistency with Art. 50(1), which requires that people be informed they are interacting with an AI system unless that is obvious from the context; whether the exception applies depends on how the interface presents these features to the user.",
         "finding_ids": [
-          "F3"
+          "F1"
         ],
         "provision_ids": [
           "EU-AIACT-50-1"
         ],
         "fixes": [
           {
-            "policy_clause": "We use OpenAI, a US-based AI provider, to power our AI features in Papermark. This includes generating titles for chats, drafting replies to your chat messages, and generating AI data room structures. When you use these features, the content you enter — including chat messages and other user content you submit — is sent to OpenAI for processing on our behalf, and is [retention period] and [used/not used for model training].",
-            "code_change": "Add a persistent, visible notice in the chat UI that renders AI-generated output via ee/features/ai/lib/chat/send-message.ts (e.g. \"You are interacting with an AI system. Responses are generated by AI.\") shown at the message input before the user sends, and surface the same notice in the AI structure generation flow that calls pages/api/teams/[teamId]/datarooms/generate-ai-structure.ts."
+            "policy_clause": "Some features of our service are powered by AI. When you use our AI chat and data room structure features, the content you enter (such as your messages and documents) is sent to our AI provider, OpenAI, so that it can generate a response or a suggested structure. We also use OpenAI to generate short titles for your AI chats. When you use these features, you are interacting with an AI system rather than a person.",
+            "code_change": null
           },
           {
-            "policy_clause": "You can choose not to use the AI chat, AI chat title and AI data room structure features; if you do, the content you would otherwise enter into them is not sent to OpenAI. To exercise any available controls over AI processing, contact us at [contact email].",
-            "code_change": null
+            "policy_clause": "We label AI-generated output and AI-driven interfaces so that you can tell when you are interacting with an AI system.",
+            "code_change": "In ee/features/ai/lib/chat/send-message.ts and ee/features/ai/lib/chat/generate-chat-title.ts, keep the existing in-product AI disclosure visible (do not remove it to rely on the policy alone)."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
-          "F3": "red"
+          "F1": "red"
         }
       },
       {
         "jurisdiction": "EU",
         "area": "consumer",
         "status": "red",
-        "headline": "PostHog, Google Tag Manager and Google Ads fire on papermark.com before any consent interaction",
-        "reasoning": "Cookie and network evidence shows the PostHog cookie `ph_phc_FLSpiXB7aDMlA1BOEYveAbLvxOoU8kZjkj5ODUiqj0D_posthog`, the Google Ads cookie `_gcl_au`, a Google Tag Manager request (GTM-WH2DMPB6) and Google Ads conversion requests (AW-17198795665, ad.doubleclick.net) all firing before any consent interaction. Through these tags, PostHog receives usage data, a device id, IP and email, while Google Tag Manager and Google Ads receive usage data, a device id and IP. Because data collection begins before the visitor is given any choice, the site's presentation of its data practices may be contrary to professional diligence and may materially distort the average consumer's behaviour, a possible inconsistency with EU-UCPD-5; on the evidence given, no condition or exemption appears that would remove it. This is not legal advice.",
+        "headline": "PostHog, Google Tag Manager and Google Ads trackers fire before any consent",
+        "reasoning": "Cookie and network evidence from www.papermark.com shows PostHog, Google Tag Manager and Google Ads being set or contacted before any consent interaction, and these recipients receive usage data, device ID and IP address (PostHog also receives email address). Under the Unfair Commercial Practices Directive, Art. 5, this may be a possible inconsistency with the requirement of professional diligence if the average consumer's economic behaviour is materially distorted, or is likely to be materially distorted, by tracking that begins before they are given a choice. Whether that threshold is met would depend on the nature, timing and visibility of the pre-consent tracking and on its effect on consumer decisions.",
         "finding_ids": [
-          "F4"
+          "F2"
         ],
         "provision_ids": [
           "EU-UCPD-5"
         ],
         "fixes": [
           {
-            "policy_clause": "We use PostHog, Google Tag Manager and Google Ads to understand how our site is used and to measure our advertising. These tools set cookies and receive your usage data, a device identifier and your IP address, and PostHog also receives your email address. We load these cookies and tags only after you accept non-essential cookies, we keep the data for [retention period], and you can change or withdraw your choice at any time in [cookie settings link].",
-            "code_change": null
-          },
-          {
-            "policy_clause": null,
-            "code_change": "In the page template that loads the site shell, remove the PostHog snippet, the Google Tag Manager snippet (GTM-WH2DMPB6) and the Google Ads gtag snippet (AW-17198795665) from the unconditional head load, and inject them only from the consent handler after the visitor accepts non-essential cookies; verify that no `ph_..._posthog` or `_gcl_au` cookie is set on first page view before that acceptance."
+            "policy_clause": "Before any non-essential cookies or tracking technologies are set, we ask for your consent. Until you consent, we do not load PostHog, Google Tag Manager or Google Ads on our site. If you consent, PostHog may receive usage data, device ID, IP address and email address, and Google Tag Manager and Google Ads may receive usage data, device ID and IP address. You can withdraw your consent at any time via [consent settings link], and we keep consent records for [retention period].",
+            "code_change": "Gate the PostHog and Google Tag Manager initialisation scripts (and the Google Ads gtag/DoubleClick conversions) behind the consent state: do not load or call them until the consent interaction resolves to granted, e.g. in the site's analytics/marketing bootstrap module replace the eager script injection and the ph_phc_* cookie creation with calls that run only after the consent callback, and set the _gcl_au cookie only after consent."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
-          "F4": "red"
+          "F2": "red"
         }
       },
       {
@@ -1267,50 +1134,43 @@
         "jurisdiction": "KZ",
         "area": "personal_data",
         "status": "red",
-        "headline": "User content goes to OpenAI, and PostHog, Google Tag Manager and Google Ads fire before any consent interaction.",
-        "reasoning": "User content is passed to OpenAI from ee/features/ai/lib/chat/generate-chat-title.ts:16, ee/features/ai/lib/chat/send-message.ts:8 and pages/api/teams/[teamId]/datarooms/generate-ai-structure.ts:109, while Stripe handles payment, email and name data; the policy describes neither the AI processing nor the payment and user_content categories, a possible inconsistency with Art. 8(4), which requires consent to state the data collected and whether data may be transferred to third parties. PostHog's ph_..._posthog cookie and Google Ads' _gcl_au cookie, plus googletagmanager.com/gtm.js, gtag/js and doubleclick collect requests, are seen before any consent interaction, so collection and transfer to these US recipients appears to run outside the consent condition in Art. 7. Kazakhstan has no cookie-specific rule, so the general consent requirements apply: a compliant consent would have to be obtained and recorded beforehand and state the validity period, the list of data categories and the cross-border transfer, and if those conditions hold the possible inconsistency would not arise.",
+        "headline": "PostHog, Google Ads and 1 more fire before consent; user content goes to OpenAI",
+        "reasoning": "Code shows user content being passed to OpenAI for AI features, while the privacy policy does not mention AI, machine learning or automated processing, so users may not be told about this processing or its cross-border transfer to a US provider. Separately, cookies and network requests for PostHog, Google Tag Manager and Google Ads (usage data, device ID, IP address, email address) are seen on the site before any consent interaction. Under Art. 7, collection, transfer to third parties and cross-border transfer require the subject's consent unless a case set by law applies, so the timing of these analytics and advertising requests may be a possible inconsistency with Art. 7. Kazakhstan has no cookie-specific rule, so the general consent requirement in Art. 7 is the relevant standard.",
         "finding_ids": [
-          "F3",
           "F1",
-          "F2",
-          "F4"
+          "F2"
         ],
         "provision_ids": [
-          "KZ-PD-8",
           "KZ-PD-7"
         ],
         "fixes": [
           {
-            "policy_clause": "We use OpenAI to process content you submit, including chat messages, chat titles and AI-generated data room structures, and we use Stripe to process payments together with your name and email address. Your payment data and your user content are processed on the basis of your consent, which is valid for [retention period].",
+            "policy_clause": "When you use our AI features, the content you submit (such as chat messages and prompts) is sent to our AI service provider, OpenAI, which processes it on our behalf to generate responses. This may involve transfer of your content outside Kazakhstan. We do not include your AI inputs in our own model training.",
             "code_change": null
           },
           {
-            "policy_clause": "We share usage data, device identifiers, IP addresses and, for signed-in users, your email address with PostHog, Google Tag Manager and Google Ads for analytics and advertising, and this involves transfer of that data to recipients in the United States. This sharing is based on your consent, and you can withdraw it at any time.",
-            "code_change": null
+            "policy_clause": "We use PostHog for product analytics, and Google Tag Manager and Google Ads for analytics and advertising. These providers may receive your usage data, device ID, IP address and email address. We ask for your consent before these tools are loaded and, where you do not consent, we do not set the associated cookies or make the associated requests.",
+            "code_change": "Gate PostHog, Google Tag Manager and Google Ads (gtag config, AW-17198795665 and the DoubleClick collect call) behind the consent banner so no script, cookie (`ph_phc_...`, `_gcl_au`) or network request fires in `pages/_app.tsx`/document head until the user has given consent."
           },
           {
-            "policy_clause": "We ask for your consent before we load any analytics or advertising technology. PostHog, Google Tag Manager and Google Ads cookies and requests are only set after you consent, and you can withdraw your consent or change your choice at any time in [settings location].",
-            "code_change": "In the tracking bootstrap that initialises PostHog and injects the Google Tag Manager / gtag (GTM-WH2DMPB6, AW-17198795665) snippet, gate all loading behind a recorded consent signal so that no ph_* or _gcl_au cookie is set and no request to googletagmanager.com or doubleclick.net is made until consent is stored; keep the existing consent banner and its logs intact."
+            "policy_clause": "[Retention period] We keep the data described above only for as long as needed for the purposes stated, after which we delete or anonymise it.",
+            "code_change": null
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
-          "F3": "red",
-          "F1": "amber",
-          "F2": "amber",
-          "F4": "amber"
+          "F1": "red",
+          "F2": "amber"
         }
       },
       {
         "jurisdiction": "KZ",
         "area": "ai_transparency",
         "status": "red",
-        "headline": "Papermark sends user content to OpenAI while its privacy policy does not mention AI processing.",
-        "reasoning": "Code in ee/features/ai/lib/chat/generate-chat-title.ts:16, ee/features/ai/lib/chat/send-message.ts:8 and pages/api/teams/[teamId]/datarooms/generate-ai-structure.ts:109 passes user-provided content to OpenAI, while the privacy policy at https://www.papermark.com/privacy does not mention AI, machine learning or automated processing. That is a possible inconsistency with Art. 21(1), which requires users to be informed that goods, works and services are produced or provided using artificial intelligence systems, and with Art. 16(1), which gives users rights when interacting with an AI system. The Art. 16(1) rights to an explanation of results affecting rights and to refuse interaction apply only where the interaction is not mandatory by law and the result affects the user's rights, so a Kazakhstan-facing AI feature that merely drafts chat titles or data room structures may not trigger all of them, but the information duty in Art. 21(1) would still need to be addressed. These provisions come into force on 18 January 2026, so the disclosure gap is a live one for a service available in Kazakhstan.",
+        "headline": "User content sent to OpenAI for AI features; policy never mentions AI",
+        "reasoning": "Code shows user content passed to OpenAI in the chat title generator, the message sender and the AI data-room structure generator, while the privacy policy does not mention AI, machine learning or automated processing at all. Under Art. 21(1) users must be informed that goods, works and services are produced or provided using AI systems, and Art. 16(1) gives users rights to read the AI system's user agreement, to data protection, to explanations of results affecting their rights, and to refuse non-mandatory interaction. The policy's silence means these notices and rights are not reflected in the text; whether Art. 16(1) and Art. 21(1) require action here would depend on whether the AI features are treated as services provided using AI systems and, for the refusal right, whether interaction is mandatory by law.",
         "finding_ids": [
-          "F3"
+          "F1"
         ],
         "provision_ids": [
           "KZ-AI-16",
@@ -1318,48 +1178,48 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We use OpenAI to process the content you submit when you use our AI features, including generating chat titles, sending AI chat messages and generating data room structures. The user content you provide for these features is sent to OpenAI for that purpose and is kept for [retention period]. These features are produced using artificial intelligence systems; you have the right to ask for an explanation of results that affect your rights and to refuse to interact with them where that interaction is not required by law.",
+            "policy_clause": "We use artificial intelligence systems, including OpenAI, to provide some of our features. When you use these features, the content you provide (such as your messages, prompts and document text) is sent to OpenAI so that it can generate results, for example chat titles, replies and suggested data room structures. We tell you when a result is produced by an AI system, we explain, on request, how a result that affects your rights was produced, and you can choose not to interact with these AI features where that interaction is not required by law. We keep the content sent to OpenAI for [retention period] and handle it in accordance with our data protection obligations.",
             "code_change": null
           },
           {
-            "policy_clause": "Before you use any AI feature, we show you that it is AI-generated and that your input is processed by OpenAI, and we tell you how to opt out of the feature where it is not mandatory.",
-            "code_change": "In ee/features/ai/lib/chat/send-message.ts and ee/features/ai/lib/chat/generate-chat-title.ts, have the chat UI render a visible 'AI-generated by OpenAI' label next to AI output and a short notice that user content is sent to OpenAI; do not gate or suppress this notice."
+            "policy_clause": "You have the right to read the terms that apply to our AI features, to the protection of your personal data processed by them, to an explanation of results that affect your rights, and to refuse to interact with an AI system where that interaction is not mandatory by law. To exercise these rights, contact us at [contact email].",
+            "code_change": null
+          },
+          {
+            "policy_clause": null,
+            "code_change": "In ee/features/ai/lib/chat/generate-chat-title.ts:16, ee/features/ai/lib/chat/send-message.ts:390 and pages/api/teams/[teamId]/datarooms/generate-ai-structure.ts:109, show an in-product AI notice before user content is sent to OpenAI, and record that the notice was shown."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
-          "F3": "red"
+          "F1": "red"
         }
       },
       {
         "jurisdiction": "KZ",
         "area": "consumer",
         "status": "amber",
-        "headline": "PostHog, Google Tag Manager and Google Ads tags fire on papermark.com before any consent interaction.",
-        "reasoning": "On papermark.com, PostHog, Google Tag Manager and Google Ads load before any consent interaction: the PostHog cookie `ph_phc_FLSpiXB7aDMlA1BOEYveAbLvxOoU8kZjkj5ODUiqj0D_posthog` and Google Ads' `_gcl_au` cookie are set on the site, and requests go out to googletagmanager.com and doubleclick.net. The data collected as seen in the evidence covers usage, device id and IP address for all three vendors, plus email for PostHog. Kazakhstan has no cookie-specific rule, so the question is whether the general consumer information duty in Art. 10 (KZ-CP-10) is met when analytics and advertising tags act before the consumer is told about them. That provision gives the consumer a right to full, reliable and timely information about the service, and the pre-consent firing creates a possible inconsistency with it because the tags run before any information or interaction step; this is amber rather than red because the evidence shows ordinary analytics and ads measurement, not concealed data use.",
+        "headline": "PostHog, Google Tag Manager and Google Ads fire before any consent interaction",
+        "reasoning": "The site sets a PostHog cookie and sends requests to Google Tag Manager and Google Ads (including advertising requests) before any consent interaction. PostHog receives usage data, device ID, IP address and email address, while Google Tag Manager and Google Ads receive usage data, device ID and IP address. Kazakhstan has no cookie-specific rule, so general consent requirements for collection apply, and the absence of consumer-facing information at the point where these trackers run creates a possible inconsistency with the consumer's right to full, reliable and timely information under Art. 10. This is not legal advice.",
         "finding_ids": [
-          "F4"
+          "F2"
         ],
         "provision_ids": [
           "KZ-CP-10"
         ],
         "fixes": [
           {
-            "policy_clause": "We want you to know that when you visit our site, PostHog (analytics), Google Tag Manager and Google Ads (analytics and advertising) load and may set cookies, including our PostHog cookie and Google Ads' `_gcl_au` cookie, and may collect your usage data, device identifier and IP address as soon as the page opens, before you interact with any consent prompt. Where you have provided it to us, PostHog may also receive your email address. We keep this data for [retention period] and you can contact us at [contact email] to ask what we hold about you.",
-            "code_change": null
+            "policy_clause": "We use PostHog, Google Tag Manager and Google Ads to understand how our site is used and to measure our advertising. These tools may collect your usage data, device ID, IP address and, for PostHog, your email address, and may set cookies on your device. Where these tools run before you make a choice, we tell you about it in the banner shown on your first visit, and you can [accept/decline] before the tools load.",
+            "code_change": "Defer loading of PostHog, Google Tag Manager (GTM-WH2DMPB6, AW-17198795665) and Google Ads/Doubleclick tags until the visitor makes a consent choice; gate the snippet that sets `ph_phc_..._posthog` and `_gcl_au` behind the consent state."
           },
           {
-            "policy_clause": null,
-            "code_change": "In the site's tag/analytics initialisation (the snippet loading gtm.js?id=GTM-WH2DMPB6, the Google Ads tag AW-17198795665 and the PostHog snippet), do not fire on page load: load PostHog, Google Tag Manager and Google Ads only after the consent banner records a choice, and leave them unloaded when consent is refused."
+            "policy_clause": "We provide clear information about the cookies and analytics and advertising tools used on this site (including PostHog, Google Tag Manager and Google Ads), what data they collect, and how you can contact us with questions about this processing. We keep the related cookies for [retention period].",
+            "code_change": null
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
-          "F4": "amber"
+          "F2": "amber"
         }
       },
       {
@@ -1384,13 +1244,13 @@
         "ref": "reg. 6(1), as substituted by Data (Use and Access) Act 2025 s. 112",
         "title": "Storing or accessing information on a user's device",
         "summary": "A person must not store information, or gain access to information stored, in a user's terminal equipment unless an exception in Schedule A1 applies (for example consent, or strict necessity).",
-        "official_url": "https://www.legislation.gov.uk/ukpga/2025/18/section/112",
+        "official_url": "https://www.legislation.gov.uk/uksi/2003/2426/regulation/6",
         "tags": [
           "cookies",
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-PECR-SCHA1-5": {
         "id": "UK-PECR-SCHA1-5",
@@ -1399,8 +1259,8 @@
         "instrument": "PECR Schedule A1, inserted by Data (Use and Access) Act 2025 Sch. 12",
         "ref": "Sch. A1 para. 5",
         "title": "Statistical-purposes exception for analytics cookies",
-        "summary": "Consent is not required where storage or access is solely to collect statistical information about how a service or website is used, with a view to improving it, provided the user is given clear information and a simple means to object. Advertising and cross-site tracking are outside the exception.",
-        "official_url": "https://www.legislation.gov.uk/ukpga/2025/18/schedule/12",
+        "summary": "Consent is not required where the sole purpose of the storage or access is to collect information for statistical purposes about how the service or website is used, with a view to improving it, provided the information is not shared with anyone else except to help make those improvements, the user is given clear and comprehensive information about the purpose, and the user is given a simple, free means of objecting and does not object.",
+        "official_url": "https://www.legislation.gov.uk/uksi/2003/2426/schedule/A1",
         "tags": [
           "cookies",
           "consent",
@@ -1408,7 +1268,7 @@
           "statistical",
           "analytics"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-GDPR-13-1-c": {
         "id": "UK-GDPR-13-1-c",
@@ -1425,55 +1285,7 @@
           "data_categories",
           "ai"
         ],
-        "verified": false
-      },
-      "UK-GDPR-13-1-e": {
-        "id": "UK-GDPR-13-1-e",
-        "jurisdiction": "UK",
-        "area": "personal_data",
-        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
-        "ref": "Art. 13(1)(e)",
-        "title": "Recipients must be disclosed",
-        "summary": "When collecting data, the controller must tell the person the recipients or categories of recipients of the personal data.",
-        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/13",
-        "tags": [
-          "processors",
-          "recipients",
-          "transparency",
-          "sharing"
-        ],
-        "verified": false
-      },
-      "UK-GDPR-28": {
-        "id": "UK-GDPR-28",
-        "jurisdiction": "UK",
-        "area": "personal_data",
-        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
-        "ref": "Art. 28",
-        "title": "Processors",
-        "summary": "A controller may only use processors that provide sufficient guarantees, under a contract that sets out the processing.",
-        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/28",
-        "tags": [
-          "processors"
-        ],
-        "verified": false
-      },
-      "UK-GDPR-5-1-a": {
-        "id": "UK-GDPR-5-1-a",
-        "jurisdiction": "UK",
-        "area": "personal_data",
-        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
-        "ref": "Art. 5(1)(a)",
-        "title": "Lawfulness, fairness and transparency",
-        "summary": "Personal data must be processed lawfully, fairly and in a transparent manner in relation to the data subject.",
-        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/5",
-        "tags": [
-          "fairness",
-          "transparency",
-          "sharing",
-          "data_categories"
-        ],
-        "verified": false
+        "verified": true
       },
       "UK-ICO-AI-GUIDANCE": {
         "id": "UK-ICO-AI-GUIDANCE",
@@ -1482,14 +1294,14 @@
         "instrument": "ICO Guidance on AI and data protection (regulator guidance, not statute)",
         "ref": "Transparency in AI",
         "title": "Be transparent about AI processing of personal data",
-        "summary": "The UK has no AI-specific statute. ICO guidance expects organisations to tell people when and how their personal data is processed by AI systems, as part of UK GDPR transparency. Guidance only, so status is capped at amber.",
-        "official_url": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/guidance-on-ai-and-data-protection/",
+        "summary": "The UK has no AI-specific statute. ICO guidance expects organisations to tell people when and how their personal data is processed by AI systems, as part of UK GDPR transparency.",
+        "official_url": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/guidance-on-ai-and-data-protection/how-do-we-ensure-transparency-in-ai/",
         "tags": [
           "ai",
           "transparency",
           "chatbot"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-DMCC-225": {
         "id": "UK-DMCC-225",
@@ -1506,17 +1318,17 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-EPRIVACY-5-3": {
         "id": "EU-EPRIVACY-5-3",
         "jurisdiction": "EU",
         "area": "personal_data",
-        "instrument": "Directive 2002/58/EC (ePrivacy Directive)",
+        "instrument": "Directive 2002/58/EC (ePrivacy Directive), as amended by Directive 2009/136/EC",
         "ref": "Art. 5(3)",
         "title": "Consent for cookies and similar technologies",
-        "summary": "Storing information, or accessing information stored, on a user's device is only allowed with the user's consent after clear information, unless strictly necessary to provide a service the user requested. There is no exemption for analytics.",
-        "official_url": "https://eur-lex.europa.eu/eli/dir/2002/58/oj",
+        "summary": "Storing information, or accessing information stored, on a user's device is only allowed with the user's consent after clear information, unless strictly necessary to provide a service the user requested.",
+        "official_url": "https://eur-lex.europa.eu/eli/dir/2002/58/2009-12-19",
         "tags": [
           "cookies",
           "consent",
@@ -1537,7 +1349,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-6": {
         "id": "EU-GDPR-6",
@@ -1553,7 +1365,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-13-1-c": {
         "id": "EU-GDPR-13-1-c",
@@ -1570,55 +1382,7 @@
           "data_categories",
           "ai"
         ],
-        "verified": false
-      },
-      "EU-GDPR-13-1-e": {
-        "id": "EU-GDPR-13-1-e",
-        "jurisdiction": "EU",
-        "area": "personal_data",
-        "instrument": "Regulation (EU) 2016/679 (GDPR)",
-        "ref": "Art. 13(1)(e)",
-        "title": "Recipients must be disclosed",
-        "summary": "When collecting data, the controller must tell the person the recipients or categories of recipients of the personal data.",
-        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
-        "tags": [
-          "processors",
-          "recipients",
-          "transparency",
-          "sharing"
-        ],
-        "verified": false
-      },
-      "EU-GDPR-28": {
-        "id": "EU-GDPR-28",
-        "jurisdiction": "EU",
-        "area": "personal_data",
-        "instrument": "Regulation (EU) 2016/679 (GDPR)",
-        "ref": "Art. 28",
-        "title": "Processors",
-        "summary": "A controller may only use processors that provide sufficient guarantees, under a contract that sets out the subject matter, duration, nature and purpose of the processing.",
-        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
-        "tags": [
-          "processors"
-        ],
-        "verified": false
-      },
-      "EU-GDPR-5-1-a": {
-        "id": "EU-GDPR-5-1-a",
-        "jurisdiction": "EU",
-        "area": "personal_data",
-        "instrument": "Regulation (EU) 2016/679 (GDPR)",
-        "ref": "Art. 5(1)(a)",
-        "title": "Lawfulness, fairness and transparency",
-        "summary": "Personal data must be processed lawfully, fairly and in a transparent manner in relation to the data subject. A policy statement that contradicts actual processing is hard to square with transparency.",
-        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
-        "tags": [
-          "fairness",
-          "transparency",
-          "sharing",
-          "data_categories"
-        ],
-        "verified": false
+        "verified": true
       },
       "EU-AIACT-50-1": {
         "id": "EU-AIACT-50-1",
@@ -1634,7 +1398,7 @@
           "transparency",
           "chatbot"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-UCPD-5": {
         "id": "EU-UCPD-5",
@@ -1643,7 +1407,7 @@
         "instrument": "Directive 2005/29/EC (Unfair Commercial Practices Directive)",
         "ref": "Art. 5",
         "title": "Prohibition of unfair commercial practices",
-        "summary": "Unfair commercial practices are prohibited: practices contrary to professional diligence that materially distort the economic behaviour of the average consumer.",
+        "summary": "Unfair commercial practices are prohibited: practices contrary to professional diligence that materially distort, or are likely to materially distort, the economic behaviour of the average consumer.",
         "official_url": "https://eur-lex.europa.eu/eli/dir/2005/29/oj",
         "tags": [
           "fairness",
@@ -1651,28 +1415,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
-      },
-      "KZ-PD-8": {
-        "id": "KZ-PD-8",
-        "jurisdiction": "KZ",
-        "area": "personal_data",
-        "instrument": "Law of the Republic of Kazakhstan No. 94-V 'On Personal Data and their Protection' (21 May 2013)",
-        "ref": "Art. 8(4)",
-        "title": "Required content of consent",
-        "summary": "Consent must state, among other things, its validity period, whether data may be transferred to third parties, whether cross-border transfer takes place, and the list of data collected.",
-        "official_url": "https://adilet.zan.kz/eng/docs/Z1300000094",
-        "tags": [
-          "consent",
-          "recipients",
-          "processors",
-          "transfers",
-          "data_categories",
-          "retention",
-          "transparency",
-          "sharing"
-        ],
-        "verified": false
+        "verified": true
       },
       "KZ-PD-7": {
         "id": "KZ-PD-7",
@@ -1692,7 +1435,7 @@
           "cookies",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-AI-16": {
         "id": "KZ-AI-16",
@@ -1709,7 +1452,7 @@
           "rights",
           "chatbot"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-AI-21-1": {
         "id": "KZ-AI-21-1",
@@ -1725,7 +1468,7 @@
           "transparency",
           "chatbot"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-CP-10": {
         "id": "KZ-CP-10",
@@ -1746,7 +1489,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       }
     },
     "stats": {
@@ -1754,12 +1497,18 @@
       "files_scanned": 1720,
       "bearer": false,
       "requests_pre_consent": 80,
+      "site_passes": {
+        "reject": "no banner found",
+        "accept": "no banner found"
+      },
       "vendors_found": 6,
+      "effort": "fast",
       "claims_method": "llm",
       "verdict_method": "llm",
-      "duration_s": 29.1
+      "verdict_fallbacks": 0,
+      "duration_s": 26.5
     },
-    "disclaimer": "Groundtruth is a first-pass engineering check. It reports possible inconsistencies between observed product behaviour and the published privacy policy. It is not legal advice."
+    "disclaimer": "ProveryAI is a first-pass engineering check. It reports possible inconsistencies between observed product behaviour and the published privacy policy. It is not legal advice."
   },
   "error": null
 }

@@ -1,6 +1,6 @@
-# Groundtruth: guide for judges
+# ProveryAI: guide for judges
 
-Groundtruth checks whether a product's privacy policy matches what its code and live site do, and maps each
+ProveryAI checks whether a product's privacy policy matches what its code and live site do, and maps each
 mismatch to UK, EU and Kazakhstan law. This guide shows every feature in about five minutes.
 
 Not legal advice: results are worded as possible inconsistencies for a lawyer to review.

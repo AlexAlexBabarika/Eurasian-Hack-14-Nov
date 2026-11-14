@@ -52,7 +52,7 @@ async def fetch(repo_url: str) -> Path:
     owner, repo, ref, subdir = m.groups()
     token = os.getenv("GITHUB_TOKEN")
     auth = f"x-access-token:{token}@" if token else ""
-    dest = Path(tempfile.mkdtemp(prefix="groundtruth-"))
+    dest = Path(tempfile.mkdtemp(prefix="proveryai-"))
     return await _clone(f"https://{auth}github.com/{owner}/{repo}.git", ref, dest, subdir)
 
 

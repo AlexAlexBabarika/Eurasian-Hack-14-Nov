@@ -10,7 +10,7 @@ JURISDICTIONS: list[Jurisdiction] = ["UK", "EU", "KZ"]
 AREAS: list[Area] = ["personal_data", "ai_transparency", "consumer", "financial"]
 
 DISCLAIMER = (
-    "Groundtruth is a first-pass engineering check. It reports possible inconsistencies between "
+    "ProveryAI is a first-pass engineering check. It reports possible inconsistencies between "
     "observed product behaviour and the published privacy policy. It is not legal advice."
 )
 

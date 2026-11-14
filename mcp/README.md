@@ -1,4 +1,4 @@
-# Groundtruth MCP server
+# ProveryAI MCP server
 
 `mcp/server.py` lets an AI assistant run the audit as a tool. It speaks MCP over stdio and has one tool:
 
@@ -12,13 +12,13 @@ The repo ships `.mcp.json`, so there is nothing to configure:
 
 ```sh
 cd Eurasian-Hack-14-Nov
-claude            # approve the "groundtruth" server when asked
-claude mcp list   # should show: groundtruth ... Connected
+claude            # approve the "proveryai" server when asked
+claude mcp list   # should show: proveryai ... Connected
 ```
 
 ## Cursor
 
-The repo ships `.cursor/mcp.json`. Open the repo folder in Cursor, then switch on `groundtruth` under Customize in the sidebar (Settings > MCP in older versions).
+The repo ships `.cursor/mcp.json`. Open the repo folder in Cursor, then switch on `proveryai` under Customize in the sidebar (Settings > MCP in older versions).
 
 ## Claude Desktop
 
@@ -27,7 +27,7 @@ Claude Desktop has no project config, so it needs absolute paths. Add this to `c
 ```json
 {
   "mcpServers": {
-    "groundtruth": {
+    "proveryai": {
       "command": "uv",
       "args": ["run", "--project", "/ABSOLUTE/PATH/Eurasian-Hack-14-Nov/api", "python", "/ABSOLUTE/PATH/Eurasian-Hack-14-Nov/mcp/server.py"]
     }

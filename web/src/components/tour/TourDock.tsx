@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 type TourState = { active: boolean; step: number; open: boolean; hintDismissed: boolean };
 
 const IDLE: TourState = { active: false, step: 0, open: true, hintDismissed: false };
-const EVENT = "groundtruth-tour-change";
+const EVENT = "proveryai-tour-change";
 let cachedRaw: string | null | undefined;
 let cachedState: TourState = IDLE;
 

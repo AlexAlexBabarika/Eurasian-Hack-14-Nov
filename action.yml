@@ -1,4 +1,4 @@
-name: Groundtruth privacy audit
+name: ProveryAI privacy audit
 description: Compare a privacy policy with the code (and optionally the live site) and fail the job on possible inconsistencies.
 
 inputs:
@@ -55,7 +55,7 @@ runs:
             *) printf '%s' "$GITHUB_WORKSPACE/$1" ;;
           esac
         }
-        report="$RUNNER_TEMP/groundtruth-report.md"
+        report="$RUNNER_TEMP/proveryai-report.md"
         rm -f "$report"
         args=(--fail-on "$GT_FAIL_ON" --jurisdictions "$GT_JURISDICTIONS" --markdown "$report")
         if [ -n "$GT_POLICY" ]; then args+=(--policy "$(resolve "$GT_POLICY")"); fi
@@ -67,7 +67,7 @@ runs:
         if [ -f "$report" ]; then cat "$report" >> "$GITHUB_STEP_SUMMARY"; fi
         # One comment per pull request, found again by its marker and updated in place.
         post_comment() {
-          local marker='<!-- groundtruth-privacy-audit -->' body="$RUNNER_TEMP/groundtruth-comment.md" comments id
+          local marker='<!-- proveryai-privacy-audit -->' body="$RUNNER_TEMP/proveryai-comment.md" comments id
           comments="repos/$GITHUB_REPOSITORY/issues/$GT_PR/comments"
           # GitHub rejects comments over 65536 characters; cut at a line break below that.
           { printf '%s\n' "$marker"; awk '{ n += length($0) + 1 } n > 60000 { print "\n_Report shortened to fit a comment. The full report is in the job summary._"; exit } { print }' "$report"; } > "$body"
@@ -79,6 +79,6 @@ runs:
           fi
         }
         if [ "$GT_COMMENT" = "true" ] && [ -n "$GT_PR" ] && [ -f "$report" ]; then
-          post_comment || echo "::warning::Groundtruth could not post the report as a pull request comment. The job needs 'pull-requests: write'; pull requests from forks get a read-only token."
+          post_comment || echo "::warning::ProveryAI could not post the report as a pull request comment. The job needs 'pull-requests: write'; pull requests from forks get a read-only token."
         fi
         exit "$code"

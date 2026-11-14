@@ -65,7 +65,7 @@ async def fetch(policy_url: str) -> str:
         safety.check_local_path()
         if local.is_file():
             return html_to_text(local.read_text())[:MAX_CHARS]
-    headers = {"User-Agent": "Mozilla/5.0 (Groundtruth policy fetcher)"}
+    headers = {"User-Agent": "Mozilla/5.0 (ProveryAI policy fetcher)"}
     async with httpx.AsyncClient(
         timeout=TIMEOUT_S, follow_redirects=True, transport=_transport, headers=headers,
         event_hooks={"request": [_guard]},
