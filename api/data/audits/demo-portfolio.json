@@ -1,0 +1,1269 @@
+{
+  "status": "done",
+  "events": [
+    {
+      "step": "clone",
+      "status": "running",
+      "message": "Fetching repository",
+      "count": null
+    },
+    {
+      "step": "clone",
+      "status": "done",
+      "message": "1,687 files ready to scan",
+      "count": 1687
+    },
+    {
+      "step": "manifests",
+      "status": "running",
+      "message": "Matching dependencies and imports against the SDK catalog",
+      "count": null
+    },
+    {
+      "step": "manifests",
+      "status": "done",
+      "message": "Vendors in code: Sentry, Stripe, AWS SDK",
+      "count": 3
+    },
+    {
+      "step": "bearer",
+      "status": "running",
+      "message": "Running Bearer data-flow scan",
+      "count": null
+    },
+    {
+      "step": "bearer",
+      "status": "skipped",
+      "message": "Bearer CLI not installed; using manifest detector only",
+      "count": null
+    },
+    {
+      "step": "site_scan",
+      "status": "running",
+      "message": "Loading the site in clean browsers: clicking nothing, rejecting, accepting",
+      "count": null
+    },
+    {
+      "step": "site_scan",
+      "status": "done",
+      "message": "26 requests before consent; trackers: none; reject: no banner found; accept: no banner found",
+      "count": 0
+    },
+    {
+      "step": "policy_fetch",
+      "status": "running",
+      "message": "Fetching the privacy policy",
+      "count": null
+    },
+    {
+      "step": "policy_fetch",
+      "status": "done",
+      "message": "Policy text extracted (780 characters)",
+      "count": 780
+    },
+    {
+      "step": "claims",
+      "status": "running",
+      "message": "Extracting what the policy claims",
+      "count": null
+    },
+    {
+      "step": "claims",
+      "status": "done",
+      "message": "Claims extracted (llm); sharing statement: processors_only",
+      "count": null
+    },
+    {
+      "step": "diff",
+      "status": "running",
+      "message": "Comparing observed behaviour with policy claims",
+      "count": null
+    },
+    {
+      "step": "diff",
+      "status": "done",
+      "message": "5 possible inconsistencies",
+      "count": 5
+    },
+    {
+      "step": "law",
+      "status": "running",
+      "message": "Retrieving provisions from the curated corpus",
+      "count": null
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts per jurisdiction",
+      "count": null
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 1 of 12 cells",
+      "count": 1
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 2 of 12 cells",
+      "count": 2
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 3 of 12 cells",
+      "count": 3
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 4 of 12 cells",
+      "count": 4
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 5 of 12 cells",
+      "count": 5
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 6 of 12 cells",
+      "count": 6
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 7 of 12 cells",
+      "count": 7
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 8 of 12 cells",
+      "count": 8
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 9 of 12 cells",
+      "count": 9
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 10 of 12 cells",
+      "count": 10
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 11 of 12 cells",
+      "count": 11
+    },
+    {
+      "step": "verdict",
+      "status": "running",
+      "message": "Writing verdicts: 12 of 12 cells",
+      "count": 12
+    },
+    {
+      "step": "law",
+      "status": "done",
+      "message": "26 provisions cited",
+      "count": 26
+    },
+    {
+      "step": "verdict",
+      "status": "done",
+      "message": "12 matrix cells (llm)",
+      "count": 12
+    },
+    {
+      "step": "done",
+      "status": "done",
+      "message": "Audit finished in 29.9s",
+      "count": null
+    }
+  ],
+  "report": {
+    "id": "demo-portfolio",
+    "inputs": {
+      "repo_url": "https://github.com/AlexAlexBabarika/portfolio-app",
+      "site_url": "https://staging.the-portfolio.app",
+      "policy_url": "https://staging.the-portfolio.app/privacy",
+      "jurisdictions": null,
+      "effort": "fast"
+    },
+    "observations": [
+      {
+        "id": "obs-1",
+        "vendor": "Sentry",
+        "vendor_country": "US",
+        "data_categories": [
+          "device_id",
+          "ip",
+          "usage"
+        ],
+        "purpose_guess": "error_monitoring",
+        "is_ai": false,
+        "pre_consent": false,
+        "evidence": [
+          {
+            "kind": "manifest",
+            "summary": "sentry-sdk declared as a dependency",
+            "file": "packages/py-common/pyproject.toml",
+            "line": 23,
+            "snippet": "\"sentry-sdk>=2.0\",",
+            "url": null,
+            "quote": null
+          }
+        ]
+      },
+      {
+        "id": "obs-2",
+        "vendor": "Stripe",
+        "vendor_country": "US",
+        "data_categories": [
+          "payment"
+        ],
+        "purpose_guess": "payments",
+        "is_ai": false,
+        "pre_consent": false,
+        "evidence": [
+          {
+            "kind": "manifest",
+            "summary": "stripe declared as a dependency",
+            "file": "services/api-gateway/pyproject.toml",
+            "line": 20,
+            "snippet": "\"stripe>=12,<16\",",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "services/api-gateway/app/resources.py",
+            "line": 35,
+            "snippet": "import httpx\nimport stripe\nfrom portfolio_common.db import build_engine, build_sessionmaker",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "services/api-gateway/app/entitlements/stripe_provider.py",
+            "line": 22,
+            "snippet": "\nimport stripe\nfrom stripe import StripeClient",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "services/api-gateway/tests/test_reconcile.py",
+            "line": 10,
+            "snippet": "import pytest\nimport stripe\nfrom app.config import get_settings",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "services/api-gateway/tests/test_stripe_provider.py",
+            "line": 11,
+            "snippet": "import pytest\nimport stripe\nfrom app.config import get_settings",
+            "url": null,
+            "quote": null
+          }
+        ]
+      },
+      {
+        "id": "obs-3",
+        "vendor": "AWS SDK",
+        "vendor_country": "US",
+        "data_categories": [],
+        "purpose_guess": "infrastructure",
+        "is_ai": false,
+        "pre_consent": false,
+        "evidence": [
+          {
+            "kind": "manifest",
+            "summary": "boto3 declared as a dependency",
+            "file": "services/api-gateway/pyproject.toml",
+            "line": 26,
+            "snippet": "\"boto3>=1.43.89\",",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "AWS SDK SDK imported",
+            "file": "services/api-gateway/app/r2.py",
+            "line": 19,
+            "snippet": "import anyio.to_thread\nimport boto3\n",
+            "url": null,
+            "quote": null
+          }
+        ]
+      }
+    ],
+    "claims": {
+      "data_categories": [
+        "ip"
+      ],
+      "named_processors": [
+        "Brandfetch"
+      ],
+      "sharing_statement": "processors_only",
+      "mentions_ai": false,
+      "international_transfers": false,
+      "retention_stated": false,
+      "rights_listed": [],
+      "deletion_method": null,
+      "cookie_consent_described": false,
+      "quotes": {
+        "ip": "To show them, your browser sends Brandfetch your IP address and the ticker or ISIN of each holding we look up a logo for.",
+        "named_processors": "The company logos next to your holdings load directly from Brandfetch, a logo service.",
+        "sharing_statement": "To show them, your browser sends Brandfetch your IP address and the ticker or ISIN of each holding we look up a logo for."
+      }
+    },
+    "findings": [
+      {
+        "id": "F1",
+        "rule": "R3_UNDISCLOSED_DATA_CATEGORY",
+        "title": "Data categories observed but not described in the policy: device_id, payment, usage",
+        "severity": "medium",
+        "areas": [
+          "personal_data"
+        ],
+        "observation_ids": [
+          "obs-1",
+          "obs-2"
+        ],
+        "evidence": [
+          {
+            "kind": "manifest",
+            "summary": "sentry-sdk declared as a dependency",
+            "file": "packages/py-common/pyproject.toml",
+            "line": 23,
+            "snippet": "\"sentry-sdk>=2.0\",",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "services/api-gateway/app/resources.py",
+            "line": 35,
+            "snippet": "import httpx\nimport stripe\nfrom portfolio_common.db import build_engine, build_sessionmaker",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "services/api-gateway/app/entitlements/stripe_provider.py",
+            "line": 22,
+            "snippet": "\nimport stripe\nfrom stripe import StripeClient",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "manifest",
+            "summary": "sentry-sdk declared as a dependency",
+            "file": "packages/py-common/pyproject.toml",
+            "line": 23,
+            "snippet": "\"sentry-sdk>=2.0\",",
+            "url": null,
+            "quote": null
+          }
+        ],
+        "policy_quote": null
+      },
+      {
+        "id": "F2",
+        "rule": "R6_TRANSFER_UNDISCLOSED",
+        "title": "Personal data goes to vendors based in US (Sentry and Stripe); policy does not mention international transfers",
+        "severity": "medium",
+        "areas": [
+          "personal_data"
+        ],
+        "observation_ids": [
+          "obs-1",
+          "obs-2"
+        ],
+        "evidence": [
+          {
+            "kind": "manifest",
+            "summary": "sentry-sdk declared as a dependency",
+            "file": "packages/py-common/pyproject.toml",
+            "line": 23,
+            "snippet": "\"sentry-sdk>=2.0\",",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "services/api-gateway/app/resources.py",
+            "line": 35,
+            "snippet": "import httpx\nimport stripe\nfrom portfolio_common.db import build_engine, build_sessionmaker",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "services/api-gateway/app/entitlements/stripe_provider.py",
+            "line": 22,
+            "snippet": "\nimport stripe\nfrom stripe import StripeClient",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "services/api-gateway/tests/test_reconcile.py",
+            "line": 10,
+            "snippet": "import pytest\nimport stripe\nfrom app.config import get_settings",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "Stripe SDK imported",
+            "file": "services/api-gateway/tests/test_stripe_provider.py",
+            "line": 11,
+            "snippet": "import pytest\nimport stripe\nfrom app.config import get_settings",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "manifest",
+            "summary": "stripe declared as a dependency",
+            "file": "services/api-gateway/pyproject.toml",
+            "line": 20,
+            "snippet": "\"stripe>=12,<16\",",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "policy_quote",
+            "summary": "Policy text does not mention international transfers",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://staging.the-portfolio.app/privacy",
+            "quote": null
+          }
+        ],
+        "policy_quote": null
+      },
+      {
+        "id": "F3",
+        "rule": "R7_NO_DELETION_PATH",
+        "title": "No way to delete an account or data: not in the policy, no route found in code",
+        "severity": "medium",
+        "areas": [
+          "personal_data",
+          "consumer"
+        ],
+        "observation_ids": [],
+        "evidence": [
+          {
+            "kind": "policy_quote",
+            "summary": "Policy text lists no right to erasure and no deletion method; no delete-account route found in 1687 scanned files",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://staging.the-portfolio.app/privacy",
+            "quote": null
+          }
+        ],
+        "policy_quote": null
+      },
+      {
+        "id": "F4",
+        "rule": "R8_PII_IN_LOGS",
+        "title": "Personal data is written to application logs",
+        "severity": "medium",
+        "areas": [
+          "personal_data"
+        ],
+        "observation_ids": [],
+        "evidence": [
+          {
+            "kind": "code",
+            "summary": "`email` written to application logs",
+            "file": "services/api-gateway/app/users.py",
+            "line": 118,
+            "snippet": "    ) -> None:\n        if get_settings().environment in VERIFICATION_TOKEN_LOG_ENVIRONMENTS:\n            logger.info(\"email verification token for %s: %s\", user.email, token)\n        else:\n            logger.info(\"email verification requested for user %s\", user.id)",
+            "url": null,
+            "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "`email` written to application logs",
+            "file": "services/api-gateway/app/users.py",
+            "line": 126,
+            "snippet": "    ) -> None:\n        if get_settings().environment in RESET_TOKEN_LOG_ENVIRONMENTS:\n            logger.info(\"password reset token for %s: %s\", user.email, token)\n        else:\n            logger.info(\"password reset requested for user %s\", user.id)",
+            "url": null,
+            "quote": null
+          }
+        ],
+        "policy_quote": null
+      },
+      {
+        "id": "F5",
+        "rule": "R9_NO_RETENTION_PERIOD",
+        "title": "Policy states no retention period or criteria",
+        "severity": "low",
+        "areas": [
+          "personal_data"
+        ],
+        "observation_ids": [],
+        "evidence": [
+          {
+            "kind": "policy_quote",
+            "summary": "Policy text does not state how long personal data is kept",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://staging.the-portfolio.app/privacy",
+            "quote": null
+          }
+        ],
+        "policy_quote": null
+      }
+    ],
+    "matrix": [
+      {
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "status": "amber",
+        "headline": "Device ID, payment and usage data go to Sentry and Stripe; policy omits them",
+        "reasoning": "The policy does not describe device ID, payment or usage data, which the code and manifests show flowing to Sentry (US, error monitoring, receives device ID, IP address and usage data) and Stripe (US, payments, receives payment data). Because Sentry and Stripe are US-based, personal data appears to leave the UK and the policy says nothing about international transfers or the safeguards relied on, so Art. 13(1)(f) and Art. 44A are engaged; a transfer would need an approved mechanism, appropriate safeguards or a derogation. The policy states no retention period or criteria, which is a possible inconsistency with Art. 13(2)(a) and Art. 5(1)(e), and the code writes email addresses to application logs, a possible inconsistency with Art. 5(1)(f). No right to erasure or deletion route appears in the policy or in 1687 scanned files, a possible inconsistency with Art. 17; the missing descriptions also engage Art. 13(1)(c) and Art. 5(1)(a).",
+        "finding_ids": [
+          "F1",
+          "F2",
+          "F3",
+          "F4",
+          "F5"
+        ],
+        "provision_ids": [
+          "UK-GDPR-13-1-c",
+          "UK-GDPR-5-1-a",
+          "UK-GDPR-44A",
+          "UK-GDPR-13-1-f",
+          "UK-GDPR-17",
+          "UK-GDPR-5-1-f",
+          "UK-GDPR-5-1-e",
+          "UK-GDPR-13-2-a"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We share your device ID, IP address and usage data with Sentry, our error-monitoring provider based in the US, and your payment data with Stripe, our payment provider based in the US. These transfers outside the UK rely on [safeguards relied on, e.g. the UK IDTA / the UK Addendum to the EU Standard Contractual Clauses]. We keep personal data for [retention period] or, where that is not fixed, we decide how long to keep it using these criteria: [criteria].",
+            "code_change": null
+          },
+          {
+            "policy_clause": "You can ask us to delete your account and the personal data we hold about you at any time by [contact method, e.g. emailing privacy@...], and we will do so without undue delay unless we are required to keep it for [reason, e.g. tax or accounting law].",
+            "code_change": "Add a delete-account endpoint and flow (e.g. in services/api-gateway/app/users.py) that erases or anonymises the user's personal data, and reference it from the account settings UI."
+          },
+          {
+            "policy_clause": null,
+            "code_change": "In services/api-gateway/app/users.py lines 118 and 126, stop writing `email` to application logs; log a user id or a redacted/hashed value instead."
+          }
+        ],
+        "unverified_notes": [],
+        "finding_statuses": {
+          "F1": "amber",
+          "F2": "amber",
+          "F3": "amber",
+          "F4": "amber",
+          "F5": "amber"
+        }
+      },
+      {
+        "jurisdiction": "UK",
+        "area": "ai_transparency",
+        "status": "green",
+        "headline": "No possible inconsistencies detected for AI transparency",
+        "reasoning": "None of the checks we ran (R1-R10) produced a finding for this cell. This reflects only what was visible in the repository, the public site and the policy text.",
+        "finding_ids": [],
+        "provision_ids": [],
+        "fixes": [],
+        "unverified_notes": [],
+        "finding_statuses": {}
+      },
+      {
+        "jurisdiction": "UK",
+        "area": "consumer",
+        "status": "amber",
+        "headline": "No account deletion route found in code, and policy omits erasure rights",
+        "reasoning": "The privacy policy at the-portfolio.app lists no right to erasure and no method for deleting an account or data, and no delete-account route was found across 1687 scanned files. Under UK consumer protection law, omitting material information the average consumer needs to take an informed transactional decision is a possible inconsistency with s. 227 of the Digital Markets, Competition and Consumers Act 2024. The evidence shows only that the policy is silent and that no route appeared in the code scan; it does not show what the product does beyond that. This is not legal advice.",
+        "finding_ids": [
+          "F3"
+        ],
+        "provision_ids": [
+          "UK-DMCC-227"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "You can delete your account and the personal data we hold about you at any time from [Settings > Account > Delete account], or by emailing [privacy contact]. When you ask us to delete your account, we will delete or anonymise your personal data within [retention period], except where we are required to keep certain records by law.",
+            "code_change": "Add a delete-account route in the app settings (e.g. settings/account screen) that calls the existing account deletion endpoint and confirms deletion to the user; if no endpoint exists, add one that deletes or anonymises the user record."
+          }
+        ],
+        "unverified_notes": [],
+        "finding_statuses": {
+          "F3": "amber"
+        }
+      },
+      {
+        "jurisdiction": "UK",
+        "area": "financial",
+        "status": "grey",
+        "headline": "Needs questionnaire",
+        "reasoning": "Financial licensing cannot be assessed from code and policy alone. Out of scope for this scan.",
+        "finding_ids": [],
+        "provision_ids": [],
+        "fixes": [],
+        "unverified_notes": [],
+        "finding_statuses": {}
+      },
+      {
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "status": "amber",
+        "headline": "Sentry and Stripe get device ID, payment and usage data with no transfer notice",
+        "reasoning": "Sentry (error monitoring) receives device ID, IP address and usage data, and Stripe (payments) receives payment data, while the policy does not describe device ID, payment or usage data — a possible inconsistency with Art. 13(1)(c) and Art. 5(1)(a). Both vendors are US-based and the policy says nothing about international transfers, a possible inconsistency with Art. 13(1)(f) and Art. 44; an adequacy decision or appropriate safeguards under Chapter V would have to be in place. The policy also states no retention period or criteria, and no erasure right or deletion route appears in the policy or the 1687 scanned files, pointing to Art. 13(2)(a), Art. 13(2)(b) and Art. 17. Email is written to application logs, a possible inconsistency with Art. 5(1)(f).",
+        "finding_ids": [
+          "F1",
+          "F2",
+          "F3",
+          "F4",
+          "F5"
+        ],
+        "provision_ids": [
+          "EU-GDPR-13-1-c",
+          "EU-GDPR-5-1-a",
+          "EU-GDPR-13-1-f",
+          "EU-GDPR-44",
+          "EU-GDPR-17",
+          "EU-GDPR-13-2-b",
+          "EU-GDPR-5-1-f",
+          "EU-GDPR-5-1-e",
+          "EU-GDPR-13-2-a"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We share personal data with Sentry, which provides error monitoring and receives device ID, IP address and usage data, and with Stripe, which processes payments and receives payment data. We also collect device ID, payment and usage data as described in this policy. Our vendors are based in the United States, and we rely on [adequacy decision / appropriate safeguards] for these transfers.",
+            "code_change": "None."
+          },
+          {
+            "policy_clause": "You have the right to access, rectify, erase, restrict, object to and port your personal data. You can delete your account and associated data in [settings / deletion route], or by contacting us at [contact email].",
+            "code_change": "Add a delete-account endpoint in services/api-gateway/app/users.py that erases the user record and associated personal data, and expose it in the app UI."
+          },
+          {
+            "policy_clause": "We keep personal data only for as long as necessary for the purposes described above, and in any case for [retention period] or according to these criteria: [retention criteria].",
+            "code_change": "In services/api-gateway/app/users.py:118 and :126, stop writing `email` to application logs; log a non-identifying user reference instead."
+          }
+        ],
+        "unverified_notes": [],
+        "finding_statuses": {
+          "F1": "amber",
+          "F2": "amber",
+          "F3": "amber",
+          "F4": "amber",
+          "F5": "amber"
+        }
+      },
+      {
+        "jurisdiction": "EU",
+        "area": "ai_transparency",
+        "status": "green",
+        "headline": "No possible inconsistencies detected for AI transparency",
+        "reasoning": "None of the checks we ran (R1-R10) produced a finding for this cell. This reflects only what was visible in the repository, the public site and the policy text.",
+        "finding_ids": [],
+        "provision_ids": [],
+        "fixes": [],
+        "unverified_notes": [],
+        "finding_statuses": {}
+      },
+      {
+        "jurisdiction": "EU",
+        "area": "consumer",
+        "status": "amber",
+        "headline": "Policy and app offer no account or data deletion route in EU-facing build",
+        "reasoning": "The privacy policy at staging.the-portfolio.app/privacy does not mention any right to erasure or any method for deleting an account or personal data, and a scan of 1687 files found no delete-account route. Under the Unfair Commercial Practices Directive, omitting material information that the average consumer needs for an informed transactional decision can be a possible inconsistency with Art. 7. Because the policy is simply silent on deletion, the evidence shows only that no deletion route was found and that the policy does not describe one; it does not show how deletion requests would be handled if made by other means.",
+        "finding_ids": [
+          "F3"
+        ],
+        "provision_ids": [
+          "EU-UCPD-7"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We give you the ability to delete your account and the personal data linked to it. You can start a deletion request from your account settings, or by contacting us at [contact email]. We complete deletion requests within [retention period] and tell you which data we keep, and for how long, where we are required to keep it.",
+            "code_change": "Add a delete-account route (for example DELETE /api/account) plus a visible control in account settings that calls it, and wire it to the deletion workflow so a user request actually removes their account and data."
+          },
+          {
+            "policy_clause": "This policy explains how you can ask us to delete your account and personal data, and what happens to your data after a deletion request. If this policy does not describe a deletion method for your situation, contact us at [contact email] and we will action the request.",
+            "code_change": null
+          }
+        ],
+        "unverified_notes": [],
+        "finding_statuses": {
+          "F3": "amber"
+        }
+      },
+      {
+        "jurisdiction": "EU",
+        "area": "financial",
+        "status": "grey",
+        "headline": "Needs questionnaire",
+        "reasoning": "Financial licensing cannot be assessed from code and policy alone. Out of scope for this scan.",
+        "finding_ids": [],
+        "provision_ids": [],
+        "fixes": [],
+        "unverified_notes": [],
+        "finding_statuses": {}
+      },
+      {
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "status": "red",
+        "headline": "Device ID, payment and usage sent to Sentry and Stripe in the US",
+        "reasoning": "Code and manifest evidence show Sentry (US) receiving device ID, IP address and usage data for error monitoring, and Stripe (US) receiving payment data, while the policy does not mention international transfers — a possible inconsistency with Art. 16, which allows cross-border transfer only to states ensuring data protection or on limited grounds such as the subject's consent. Art. 12(2) requires personal data to be stored in a database located in Kazakhstan with retention tied to achievement of the collection purposes, and the policy shows no retention period or criteria. The policy also does not describe the device ID, payment and usage categories collected, which bears on Art. 8(4)'s requirement that consent state the list of data collected and whether cross-border transfer takes place. Email is written to application logs and no deletion route or erasure right appears in the policy, which relates to Art. 25 (protection measures and destruction of data) and Art. 24 (subject rights, including destruction).",
+        "finding_ids": [
+          "F2",
+          "F1",
+          "F3",
+          "F4",
+          "F5"
+        ],
+        "provision_ids": [
+          "KZ-PD-12-2",
+          "KZ-PD-16",
+          "KZ-PD-8",
+          "KZ-PD-25",
+          "KZ-PD-24"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We use Sentry (based in the United States) for error monitoring, which receives your device ID, IP address and usage data, and Stripe (based in the United States) for payments, which receives your payment data. This means your personal data is transferred outside Kazakhstan; we transfer it only to states that ensure protection of personal data or with your consent, and you can ask us for details of these transfers at [contact email].",
+            "code_change": null
+          },
+          {
+            "policy_clause": "We keep your personal data only until the purposes for which it was collected are achieved or until [retention period], after which we delete it. We store the personal data of users in Kazakhstan in a database located in Kazakhstan.",
+            "code_change": null
+          },
+          {
+            "policy_clause": "You can ask us what personal data we hold about you, ask us to change, block or delete it, and withdraw your consent at any time. You can delete your account and the personal data linked to it from [settings page / account menu] or by contacting us at [contact email].",
+            "code_change": "Add a delete-account route in services/api-gateway/app/users.py (e.g. DELETE /users/me) that erases the user's data; stop writing email to application logs at services/api-gateway/app/users.py:118 and :126."
+          }
+        ],
+        "unverified_notes": [],
+        "finding_statuses": {
+          "F2": "red",
+          "F1": "amber",
+          "F3": "amber",
+          "F4": "amber",
+          "F5": "amber"
+        }
+      },
+      {
+        "jurisdiction": "KZ",
+        "area": "ai_transparency",
+        "status": "green",
+        "headline": "No possible inconsistencies detected for AI transparency",
+        "reasoning": "None of the checks we ran (R1-R10) produced a finding for this cell. This reflects only what was visible in the repository, the public site and the policy text.",
+        "finding_ids": [],
+        "provision_ids": [],
+        "fixes": [],
+        "unverified_notes": [],
+        "finding_statuses": {}
+      },
+      {
+        "jurisdiction": "KZ",
+        "area": "consumer",
+        "status": "amber",
+        "headline": "No account or data deletion route found in 1687 files; policy silent on erasure",
+        "reasoning": "The privacy policy at staging.the-portfolio.app/privacy does not mention any right to erasure or any deletion method, and no delete-account route was found across 1687 scanned files. Under Kazakhstan consumer protection rules, the consumer has a right to full, reliable and timely information about the service (Art. 10) and the provider must give mandatory information about the service (Art. 25), so the absence of information about how a consumer can delete an account or data is a possible inconsistency with these duties. This is not a finding that deletion requests are refused in practice; the evidence only shows that the policy is silent and that no route exists in the scanned code.",
+        "finding_ids": [
+          "F3"
+        ],
+        "provision_ids": [
+          "KZ-CP-10",
+          "KZ-CP-25"
+        ],
+        "fixes": [
+          {
+            "policy_clause": "We provide a way to delete your account and the personal data linked to it. You can delete your account at any time from the account settings in the app, or by emailing [contact email]. When you delete your account, we erase [list the personal data categories, e.g. device ID, IP address] within [retention period], except where we are required to keep records for legal or accounting purposes, in which case we keep them for [retention period] and then delete them.",
+            "code_change": "Add a delete-account route (e.g. in the account settings screen) that calls the backend deletion endpoint and removes or de-identifies the stored personal data; the route was not found in the 1687 scanned files."
+          },
+          {
+            "policy_clause": null,
+            "code_change": "Ensure the deletion endpoint is reachable from the app and documented in the privacy policy at staging.the-portfolio.app/privacy."
+          }
+        ],
+        "unverified_notes": [],
+        "finding_statuses": {
+          "F3": "amber"
+        }
+      },
+      {
+        "jurisdiction": "KZ",
+        "area": "financial",
+        "status": "grey",
+        "headline": "Needs questionnaire",
+        "reasoning": "Financial licensing cannot be assessed from code and policy alone. Out of scope for this scan.",
+        "finding_ids": [],
+        "provision_ids": [],
+        "fixes": [],
+        "unverified_notes": [],
+        "finding_statuses": {}
+      }
+    ],
+    "provisions": {
+      "UK-GDPR-13-1-c": {
+        "id": "UK-GDPR-13-1-c",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 13(1)(c)",
+        "title": "Purposes and legal basis must be disclosed",
+        "summary": "When collecting data from the person, the controller must state the purposes of the processing and its legal basis.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/13",
+        "tags": [
+          "purposes",
+          "transparency",
+          "data_categories",
+          "ai"
+        ],
+        "verified": true
+      },
+      "UK-GDPR-5-1-a": {
+        "id": "UK-GDPR-5-1-a",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 5(1)(a)",
+        "title": "Lawfulness, fairness and transparency",
+        "summary": "Personal data must be processed lawfully, fairly and in a transparent manner in relation to the data subject.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/5",
+        "tags": [
+          "fairness",
+          "transparency",
+          "sharing",
+          "data_categories"
+        ],
+        "verified": true
+      },
+      "UK-GDPR-44A": {
+        "id": "UK-GDPR-44A",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 44A",
+        "title": "General principles for transfers",
+        "summary": "A controller or processor may transfer personal data to a third country or international organisation only if the transfer is approved by regulations under Article 45A, is subject to appropriate safeguards (Article 46), or relies on a derogation (Article 49), and complies with the other provisions of the UK GDPR.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/44A",
+        "tags": [
+          "transfers"
+        ],
+        "verified": false
+      },
+      "UK-GDPR-13-1-f": {
+        "id": "UK-GDPR-13-1-f",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 13(1)(f)",
+        "title": "International transfers must be disclosed",
+        "summary": "The controller must tell the person if it intends to transfer personal data to a third country or international organisation, and the safeguards relied on.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/13",
+        "tags": [
+          "transfers",
+          "transparency"
+        ],
+        "verified": true
+      },
+      "UK-GDPR-17": {
+        "id": "UK-GDPR-17",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 17",
+        "title": "Right to erasure",
+        "summary": "The person has the right to have personal data erased without undue delay in listed cases.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/17",
+        "tags": [
+          "erasure",
+          "deletion",
+          "rights"
+        ],
+        "verified": true
+      },
+      "UK-GDPR-5-1-f": {
+        "id": "UK-GDPR-5-1-f",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 5(1)(f)",
+        "title": "Integrity and confidentiality",
+        "summary": "Personal data must be processed with appropriate security, including protection against unauthorised access.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/5",
+        "tags": [
+          "security",
+          "logs"
+        ],
+        "verified": true
+      },
+      "UK-GDPR-5-1-e": {
+        "id": "UK-GDPR-5-1-e",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 5(1)(e)",
+        "title": "Storage limitation",
+        "summary": "Personal data must be kept in identifiable form no longer than necessary for the purposes for which it is processed.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/5",
+        "tags": [
+          "retention"
+        ],
+        "verified": true
+      },
+      "UK-GDPR-13-2-a": {
+        "id": "UK-GDPR-13-2-a",
+        "jurisdiction": "UK",
+        "area": "personal_data",
+        "instrument": "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)",
+        "ref": "Art. 13(2)(a)",
+        "title": "Retention period must be stated",
+        "summary": "The controller must state the period for which personal data will be stored or the criteria used to determine that period.",
+        "official_url": "https://www.legislation.gov.uk/eur/2016/679/article/13",
+        "tags": [
+          "retention",
+          "transparency"
+        ],
+        "verified": true
+      },
+      "UK-DMCC-227": {
+        "id": "UK-DMCC-227",
+        "jurisdiction": "UK",
+        "area": "consumer",
+        "instrument": "Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1",
+        "ref": "s. 227",
+        "title": "Misleading omissions",
+        "summary": "A practice involves a misleading omission if it omits or hides material information the average consumer needs to take an informed transactional decision.",
+        "official_url": "https://www.legislation.gov.uk/ukpga/2024/13/section/227",
+        "tags": [
+          "misleading",
+          "information",
+          "erasure",
+          "omission"
+        ],
+        "verified": true
+      },
+      "EU-GDPR-13-1-c": {
+        "id": "EU-GDPR-13-1-c",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 13(1)(c)",
+        "title": "Purposes and legal basis must be disclosed",
+        "summary": "When collecting data from the person, the controller must state the purposes of the processing and its legal basis.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "purposes",
+          "transparency",
+          "data_categories",
+          "ai"
+        ],
+        "verified": true
+      },
+      "EU-GDPR-5-1-a": {
+        "id": "EU-GDPR-5-1-a",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 5(1)(a)",
+        "title": "Lawfulness, fairness and transparency",
+        "summary": "Personal data must be processed lawfully, fairly and in a transparent manner in relation to the data subject.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "fairness",
+          "transparency",
+          "sharing",
+          "data_categories"
+        ],
+        "verified": true
+      },
+      "EU-GDPR-13-1-f": {
+        "id": "EU-GDPR-13-1-f",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 13(1)(f)",
+        "title": "Third-country transfers must be disclosed",
+        "summary": "The controller must tell the person if it intends to transfer personal data to a third country, and reference the adequacy decision or safeguards relied on.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "transfers",
+          "transparency"
+        ],
+        "verified": true
+      },
+      "EU-GDPR-44": {
+        "id": "EU-GDPR-44",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 44",
+        "title": "General principle for transfers",
+        "summary": "Personal data may be transferred to a third country only if the conditions of Chapter V (adequacy decision, appropriate safeguards or a specific derogation) are met.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "transfers"
+        ],
+        "verified": true
+      },
+      "EU-GDPR-17": {
+        "id": "EU-GDPR-17",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 17",
+        "title": "Right to erasure",
+        "summary": "The person has the right to have personal data erased without undue delay in listed cases, for example when it is no longer necessary or consent is withdrawn.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "erasure",
+          "deletion",
+          "rights"
+        ],
+        "verified": true
+      },
+      "EU-GDPR-13-2-b": {
+        "id": "EU-GDPR-13-2-b",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 13(2)(b)",
+        "title": "Data subject rights must be listed",
+        "summary": "The controller must inform the person of the rights to access, rectification, erasure, restriction, objection and data portability.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "erasure",
+          "rights",
+          "transparency"
+        ],
+        "verified": true
+      },
+      "EU-GDPR-5-1-f": {
+        "id": "EU-GDPR-5-1-f",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 5(1)(f)",
+        "title": "Integrity and confidentiality",
+        "summary": "Personal data must be processed with appropriate security, including protection against unauthorised access.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "security",
+          "logs"
+        ],
+        "verified": true
+      },
+      "EU-GDPR-5-1-e": {
+        "id": "EU-GDPR-5-1-e",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 5(1)(e)",
+        "title": "Storage limitation",
+        "summary": "Personal data must be kept in identifiable form no longer than necessary for the purposes for which it is processed.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "retention"
+        ],
+        "verified": true
+      },
+      "EU-GDPR-13-2-a": {
+        "id": "EU-GDPR-13-2-a",
+        "jurisdiction": "EU",
+        "area": "personal_data",
+        "instrument": "Regulation (EU) 2016/679 (GDPR)",
+        "ref": "Art. 13(2)(a)",
+        "title": "Retention period must be stated",
+        "summary": "The controller must state the period for which personal data will be stored or, if that is not possible, the criteria used to determine that period.",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "tags": [
+          "retention",
+          "transparency"
+        ],
+        "verified": true
+      },
+      "EU-UCPD-7": {
+        "id": "EU-UCPD-7",
+        "jurisdiction": "EU",
+        "area": "consumer",
+        "instrument": "Directive 2005/29/EC (Unfair Commercial Practices Directive)",
+        "ref": "Art. 7",
+        "title": "Misleading omissions",
+        "summary": "A practice is misleading if it omits or hides material information that the average consumer needs to take an informed transactional decision.",
+        "official_url": "https://eur-lex.europa.eu/eli/dir/2005/29/oj",
+        "tags": [
+          "misleading",
+          "information",
+          "erasure",
+          "omission"
+        ],
+        "verified": true
+      },
+      "KZ-PD-12-2": {
+        "id": "KZ-PD-12-2",
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "instrument": "Law of the Republic of Kazakhstan No. 94-V 'On Personal Data and their Protection' (21 May 2013)",
+        "ref": "Art. 12(2)",
+        "title": "Storage in Kazakhstan and retention period",
+        "summary": "Personal data must be stored in a database or digital facility located in the territory of Kazakhstan. The retention period is set by the date the purposes of collection and processing are achieved.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z1300000094",
+        "tags": [
+          "localisation",
+          "transfers",
+          "retention"
+        ],
+        "verified": true
+      },
+      "KZ-PD-16": {
+        "id": "KZ-PD-16",
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "instrument": "Law of the Republic of Kazakhstan No. 94-V 'On Personal Data and their Protection' (21 May 2013)",
+        "ref": "Art. 16",
+        "title": "Cross-border transfer",
+        "summary": "Cross-border transfer is allowed only to states that ensure protection of personal data, or otherwise on limited grounds such as the subject's consent to the cross-border transfer.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z1300000094",
+        "tags": [
+          "transfers"
+        ],
+        "verified": true
+      },
+      "KZ-PD-8": {
+        "id": "KZ-PD-8",
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "instrument": "Law of the Republic of Kazakhstan No. 94-V 'On Personal Data and their Protection' (21 May 2013)",
+        "ref": "Art. 8(4)",
+        "title": "Required content of consent",
+        "summary": "Consent must state, among other things, its validity period, whether data may be transferred to third parties, whether cross-border transfer takes place, and the list of data collected.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z1300000094",
+        "tags": [
+          "consent",
+          "recipients",
+          "processors",
+          "transfers",
+          "data_categories",
+          "retention",
+          "transparency",
+          "sharing"
+        ],
+        "verified": true
+      },
+      "KZ-PD-25": {
+        "id": "KZ-PD-25",
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "instrument": "Law of the Republic of Kazakhstan No. 94-V 'On Personal Data and their Protection' (21 May 2013)",
+        "ref": "Art. 25",
+        "title": "Duties of the owner and operator",
+        "summary": "The owner or operator must take legal, organisational and technical measures to protect personal data, be able to evidence consent, give the subject access to their data, and destroy data in the cases set by law.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z1300000094",
+        "tags": [
+          "security",
+          "logs",
+          "erasure",
+          "deletion",
+          "consent"
+        ],
+        "verified": true
+      },
+      "KZ-PD-24": {
+        "id": "KZ-PD-24",
+        "jurisdiction": "KZ",
+        "area": "personal_data",
+        "instrument": "Law of the Republic of Kazakhstan No. 94-V 'On Personal Data and their Protection' (21 May 2013)",
+        "ref": "Art. 24",
+        "title": "Rights of the subject",
+        "summary": "The subject has rights including to know what personal data the owner or operator holds, to require changes, blocking and destruction of data in cases set by law, and to withdraw consent.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z1300000094",
+        "tags": [
+          "erasure",
+          "deletion",
+          "rights"
+        ],
+        "verified": true
+      },
+      "KZ-CP-10": {
+        "id": "KZ-CP-10",
+        "jurisdiction": "KZ",
+        "area": "consumer",
+        "instrument": "Law of the Republic of Kazakhstan No. 274-IV 'On Protection of Consumer Rights' (4 May 2010)",
+        "ref": "Art. 10",
+        "title": "Consumer right to information",
+        "summary": "The consumer has the right to receive full, reliable and timely information about goods, works and services and about the seller or provider.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z100000274_",
+        "tags": [
+          "information",
+          "misleading",
+          "sharing",
+          "fairness",
+          "erasure",
+          "omission",
+          "consent",
+          "tracking"
+        ],
+        "verified": true
+      },
+      "KZ-CP-25": {
+        "id": "KZ-CP-25",
+        "jurisdiction": "KZ",
+        "area": "consumer",
+        "instrument": "Law of the Republic of Kazakhstan No. 274-IV 'On Protection of Consumer Rights' (4 May 2010)",
+        "ref": "Art. 25",
+        "title": "Seller's duty to provide information",
+        "summary": "The seller or provider must give the consumer the mandatory information about the goods, works or services, including their main consumer properties.",
+        "official_url": "https://adilet.zan.kz/eng/docs/Z100000274_",
+        "tags": [
+          "information",
+          "misleading",
+          "omission"
+        ],
+        "verified": true
+      }
+    },
+    "stats": {
+      "files_total": 1689,
+      "files_scanned": 1687,
+      "bearer": false,
+      "requests_pre_consent": 26,
+      "site_passes": {
+        "reject": "no banner found",
+        "accept": "no banner found"
+      },
+      "vendors_found": 3,
+      "effort": "fast",
+      "claims_method": "llm",
+      "verdict_method": "llm",
+      "verdict_fallbacks": 0,
+      "duration_s": 29.9
+    },
+    "disclaimer": "ProveryAI is a first-pass engineering check. It reports possible inconsistencies between observed product behaviour and the published privacy policy. It is not legal advice."
+  },
+  "error": null
+}

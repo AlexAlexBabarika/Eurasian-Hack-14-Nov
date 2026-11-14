@@ -5,7 +5,9 @@ export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:800
 export const DEMO_ID = "demo-fixture";
 // The same product audited again after the policy was corrected. Also bundled.
 export const DEMO_FIXED_ID = "demo-fixture-fixed";
-export const BUNDLED_AUDIT_IDS: readonly string[] = [DEMO_ID, DEMO_FIXED_ID];
+// A recorded audit of a real product, The Portfolio App (staging). Also bundled; the form's first preset replays it.
+export const DEMO_PORTFOLIO_ID = "demo-portfolio";
+export const BUNDLED_AUDIT_IDS: readonly string[] = [DEMO_PORTFOLIO_ID, DEMO_ID, DEMO_FIXED_ID];
 
 export function isBundledAudit(id: string): boolean {
   return BUNDLED_AUDIT_IDS.includes(id);

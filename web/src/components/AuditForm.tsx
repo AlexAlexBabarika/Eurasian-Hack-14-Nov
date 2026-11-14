@@ -8,7 +8,7 @@ import { cn } from "cn";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ApiError, createAudit, DEMO_ID } from "@/lib/api";
+import { ApiError, createAudit, DEMO_PORTFOLIO_ID } from "@/lib/api";
 import { JURISDICTION_LABEL } from "@/lib/labels";
 import type { Effort, Jurisdiction } from "@/lib/types";
 import { JURISDICTIONS } from "@/lib/types";
@@ -56,9 +56,17 @@ const DEMO_VALUES: Values = {
   policy_url: "http://localhost:4100/privacy.html",
 };
 
+// A real product. Its repository is private, so this runs as a replay (DEMO_MODE=cached) or with GITHUB_TOKEN set.
+const PORTFOLIO_VALUES: Values = {
+  repo_url: "https://github.com/AlexAlexBabarika/portfolio-app",
+  site_url: "https://staging.the-portfolio.app",
+  policy_url: "https://staging.the-portfolio.app/privacy",
+};
+
 const PRESETS: { label: string; values: Values }[] = [
-  { label: "Use demo fixture", values: DEMO_VALUES },
-  { label: "Demo, fixed policy", values: { ...DEMO_VALUES, policy_url: "http://localhost:4100/privacy-fixed.html" } },
+  { label: "Use The Portfolio App", values: PORTFOLIO_VALUES },
+  { label: "Test fixture", values: DEMO_VALUES },
+  { label: "Fixture, fixed policy", values: { ...DEMO_VALUES, policy_url: "http://localhost:4100/privacy-fixed.html" } },
 ];
 
 function validate(field: Field, raw: string): string | null {
@@ -273,10 +281,10 @@ export function AuditForm() {
                 already running, add this page&apos;s address to{" "}
                 <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">WEB_ORIGINS</code> in{" "}
                 <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">.env</code> and restart it. Or look at a
-                recorded audit of the demo project.
+                recorded audit of The Portfolio App.
               </p>
             )}
-            <Button type="button" variant="outline" size="sm" onClick={() => router.push(`/audit/${DEMO_ID}`)}>
+            <Button type="button" variant="outline" size="sm" onClick={() => router.push(`/audit/${DEMO_PORTFOLIO_ID}`)}>
               Open the recorded demo audit
             </Button>
           </div>
