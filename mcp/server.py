@@ -14,6 +14,7 @@ from mcp.server.mcpserver.exceptions import ToolError  # noqa: E402
 
 from app import store  # noqa: E402
 from app.models import (  # noqa: E402
+    AREAS,
     JURISDICTIONS,
     AuditReport,
     AuditRequest,
@@ -27,19 +28,25 @@ from app.report.markdown import render  # noqa: E402
 
 server = MCPServer("proveryai")
 
-# Every step reports "running" and then its outcome, except the last, which reports once.
+# Every step reports "running" and then its outcome, except the last, which reports once. With an LLM the verdict
+# step also reports each finished matrix cell; those move the progress by a fraction, not by a whole event.
 PROGRESS_TOTAL = 2 * len(get_args(Step)) - 1
 
 
 async def _audit_with_progress(req: AuditRequest, ctx: Context) -> AuditReport:
     """Run a live audit, sending each pipeline event to the client as a progress notification."""
     events: asyncio.Queue[ProgressEvent | None] = asyncio.Queue()
+    cells = len(req.jurisdictions or JURISDICTIONS) * len(AREAS)
 
     async def forward() -> None:
         sent = 0
         while (event := await events.get()) is not None:
-            sent += 1
-            await ctx.report_progress(PROGRESS_TOTAL if event.step == "done" else sent, PROGRESS_TOTAL, event.message)
+            if event.step == "verdict" and event.status == "running" and event.count:
+                progress = sent + event.count / (cells + 1)  # stays below the next whole event
+            else:
+                sent += 1
+                progress = PROGRESS_TOTAL if event.step == "done" else sent
+            await ctx.report_progress(progress, PROGRESS_TOTAL, event.message)
 
     forwarder = asyncio.create_task(forward())
     try:
