@@ -1,7 +1,9 @@
 # vendor → aliases (company names a policy may use), packages (any ecosystem), network domains, cookie name prefixes, default data categories,
 # purpose, country of the vendor's HQ, is_ai, essential (true = not a tracker for R5 purposes).
 # `categories` are what the SDK receives by default; code_signals adds more (email, name, user_content).
-- {name: Google Analytics, aliases: [Google], packages: [react-ga, react-ga4, "@next/third-parties", ga-4-react, vue-gtag], domains: [google-analytics.com, analytics.google.com], cookies: [_ga, _gid, _gat], categories: [usage, device_id, ip], purpose: analytics, country: US}
+- {name: Google Analytics, aliases: [Google], packages: [react-ga, react-ga4, ga-4-react, vue-gtag], domains: [google-analytics.com, analytics.google.com, "googletagmanager.com/gtag/js?id=g-"], cookies: [_ga, _gid, _gat], categories: [usage, device_id, ip], purpose: analytics, country: US}
+# gtag.js is served from googletagmanager.com for both products; the id prefix tells them apart (G- analytics, AW- ads).
+- {name: Google Ads, aliases: [Google], packages: [], domains: ["googletagmanager.com/gtag/js?id=aw-", googleadservices.com, doubleclick.net, googlesyndication.com], cookies: [_gcl_], categories: [usage, device_id, ip], purpose: ads, country: US}
 - {name: Google Tag Manager, aliases: [Google], packages: [react-gtm-module, "@gtm-support/vue-gtm"], domains: [googletagmanager.com], cookies: [], categories: [usage, device_id, ip], purpose: analytics, country: US}
 - {name: Meta Pixel, aliases: [Meta, Facebook], packages: [react-facebook-pixel, facebook-pixel], domains: [connect.facebook.net, facebook.com/tr], cookies: [_fbp, _fbc], categories: [usage, device_id, ip], purpose: ads, country: US}
 - {name: Mixpanel, packages: [mixpanel-browser, mixpanel, mixpanel-react-native], domains: [mixpanel.com, mxpnl.com], cookies: [mp_], categories: [usage, device_id, ip], purpose: analytics, country: US}
