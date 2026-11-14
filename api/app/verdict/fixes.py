@@ -5,7 +5,8 @@ from app.models import Finding, Fix, Jurisdiction, Observation
 REGION = {"UK": "the UK", "EU": "the European Economic Area", "KZ": "Kazakhstan"}
 PURPOSE = {"analytics": "product analytics", "error_monitoring": "error monitoring", "ai_processing": "AI features",
            "payments": "payments", "ads": "advertising", "session_replay": "session recording",
-           "support": "customer support", "auth": "sign-in", "infrastructure": "hosting"}  # fmt: skip
+           "support": "customer support", "auth": "sign-in", "infrastructure": "hosting", "maps": "embedded maps",
+           "personalisation": "personalised recommendations"}  # fmt: skip
 
 
 def _describe(o: Observation) -> str:
