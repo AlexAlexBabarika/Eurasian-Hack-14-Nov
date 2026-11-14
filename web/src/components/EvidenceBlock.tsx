@@ -1,72 +1,62 @@
-"use client";
+import { Cookie, FileCode2, Globe, Package, Quote, ScanSearch } from "lucide-react";
+import type { ReactNode } from "react";
 
-import { useEffect, useState } from "react";
-import type { Evidence } from "@/lib/api";
+import { CodeSnippet } from "@/components/CodeSnippet";
+import { EVIDENCE_KIND_LABEL } from "@/lib/labels";
+import type { Evidence, EvidenceKind } from "@/lib/types";
 
-const LANG: Record<string, string> = {
-  ts: "typescript", tsx: "tsx", js: "javascript", jsx: "jsx", mjs: "javascript", cjs: "javascript",
-  py: "python", go: "go", rb: "ruby", json: "json", kt: "kotlin", java: "java", dart: "dart", html: "html",
-  yaml: "yaml", yml: "yaml", toml: "toml",
+const ICON: Record<EvidenceKind, typeof Globe> = {
+  code: FileCode2,
+  manifest: Package,
+  network: Globe,
+  cookie: Cookie,
+  policy_quote: Quote,
+  bearer: ScanSearch,
 };
-const KIND: Record<Evidence["kind"], string> = {
-  code: "Code", manifest: "Dependency", network: "Network", cookie: "Cookie", policy_quote: "Policy", bearer: "Bearer",
-};
 
-function Snippet({ code, file }: { code: string; file?: string | null }) {
-  const [html, setHtml] = useState<string | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    const lang = LANG[file?.split(".").pop() ?? ""] ?? "text";
-    import("shiki")
-      .then(({ codeToHtml }) => codeToHtml(code, { lang, theme: "github-dark-default" }))
-      .then((out) => !cancelled && setHtml(out))
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, [code, file]);
-  const cls = "overflow-x-auto rounded-md border bg-[#0d1117] p-3 font-mono text-xs leading-relaxed [&_pre]:!bg-transparent";
-  // shiki escapes the source it highlights, so its HTML output is safe to inject.
-  return html ? (
-    <div className={cls} dangerouslySetInnerHTML={{ __html: html }} />
-  ) : (
-    <pre className={cls}>{code}</pre>
+// Renders `backticked` fragments as inline code.
+export function InlineText({ text }: { text: string }): ReactNode {
+  return text.split(/(`[^`]+`)/g).map((part, i) =>
+    part.startsWith("`") && part.endsWith("`") && part.length > 2 ? (
+      <code key={i} className="rounded bg-muted px-1 py-0.5 font-mono text-[0.85em]">
+        {part.slice(1, -1)}
+      </code>
+    ) : (
+      part
+    ),
   );
 }
 
 export function EvidenceBlock({ evidence }: { evidence: Evidence }) {
-  const e = evidence;
-  const isHttp = e.url?.startsWith("http");
+  const Icon = ICON[evidence.kind];
+  const location = evidence.file ? `${evidence.file}${evidence.line ? `:${evidence.line}` : ""}` : null;
+
   return (
-    <div className="space-y-1.5">
-      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs">
-        <span className="rounded border px-1.5 py-0.5 font-mono uppercase tracking-wide text-muted-foreground">
-          {KIND[e.kind]}
-        </span>
-        {e.file && (
-          <code className="font-mono text-foreground">
-            {e.file}
-            {e.line ? `:${e.line}` : ""}
-          </code>
-        )}
-        <span className="text-muted-foreground">{e.summary}</span>
+    <div className="space-y-2">
+      <div className="flex items-start gap-2.5">
+        <Icon aria-hidden className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+        <div className="min-w-0 space-y-0.5">
+          <p className="text-sm text-foreground">
+            <InlineText text={evidence.summary} />
+          </p>
+          <p className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
+            <span>{EVIDENCE_KIND_LABEL[evidence.kind]}</span>
+            {location && <span className="font-mono text-foreground/80">{location}</span>}
+            {!location && evidence.url && (
+              <span className="font-mono break-all text-foreground/80">{evidence.url}</span>
+            )}
+          </p>
+        </div>
       </div>
-      {e.snippet && <Snippet code={e.snippet} file={e.file} />}
-      {e.quote && (
-        <blockquote className="border-l-2 border-amber-500/60 pl-3 text-sm italic text-foreground/90">
-          &ldquo;{e.quote}&rdquo;
-        </blockquote>
+      {evidence.snippet && (
+        <div className="pl-[26px]">
+          <CodeSnippet code={evidence.snippet} file={evidence.file} line={evidence.line} />
+        </div>
       )}
-      {e.url && !e.file && (
-        <p className="break-all font-mono text-xs text-muted-foreground">
-          {isHttp ? (
-            <a href={e.url} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:underline">
-              {e.url}
-            </a>
-          ) : (
-            e.url
-          )}
-        </p>
+      {evidence.quote && (
+        <blockquote className="ml-[26px] border-l-2 border-border pl-3 text-sm text-foreground/90">
+          &ldquo;{evidence.quote}&rdquo;
+        </blockquote>
       )}
     </div>
   );
