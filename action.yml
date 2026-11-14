@@ -17,6 +17,12 @@ inputs:
   jurisdictions:
     description: Comma-separated jurisdictions.
     default: UK,EU,KZ
+  comment:
+    description: "On pull requests, post the report as a comment and update that comment on later runs (true or false). Needs the pull-requests: write permission."
+    default: "true"
+  github-token:
+    description: Token used to post the comment.
+    default: ${{ github.token }}
 
 runs:
   using: composite
@@ -38,6 +44,9 @@ runs:
         GT_SITE: ${{ inputs.site }}
         GT_FAIL_ON: ${{ inputs.fail-on }}
         GT_JURISDICTIONS: ${{ inputs.jurisdictions }}
+        GT_COMMENT: ${{ inputs.comment }}
+        GT_PR: ${{ github.event.pull_request.number }}
+        GH_TOKEN: ${{ inputs.github-token }}
       run: |
         # URLs and absolute paths pass through; anything else is relative to the caller's workspace.
         resolve() {
@@ -55,4 +64,20 @@ runs:
         code=0
         uv run --no-dev python -m app.cli "${args[@]}" || code=$?
         if [ -f "$report" ]; then cat "$report" >> "$GITHUB_STEP_SUMMARY"; fi
+        # One comment per pull request, found again by its marker and updated in place.
+        post_comment() {
+          local marker='<!-- groundtruth-privacy-audit -->' body="$RUNNER_TEMP/groundtruth-comment.md" comments id
+          comments="repos/$GITHUB_REPOSITORY/issues/$GT_PR/comments"
+          # GitHub rejects comments over 65536 characters; cut at a line break below that.
+          { printf '%s\n' "$marker"; awk '{ n += length($0) + 1 } n > 60000 { print "\n_Report shortened to fit a comment. The full report is in the job summary._"; exit } { print }' "$report"; } > "$body"
+          id="$(gh api --paginate "$comments" --jq ".[] | select(.body | startswith(\"$marker\")) | .id" | head -n 1)"
+          if [ -n "$id" ]; then
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -F "body=@$body" > /dev/null
+          else
+            gh api --method POST "$comments" -F "body=@$body" > /dev/null
+          fi
+        }
+        if [ "$GT_COMMENT" = "true" ] && [ -n "$GT_PR" ] && [ -f "$report" ]; then
+          post_comment || echo "::warning::Groundtruth could not post the report as a pull request comment. The job needs 'pull-requests: write'; pull requests from forks get a read-only token."
+        fi
         exit "$code"

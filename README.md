@@ -66,13 +66,14 @@ make audit repo=. policy=docs/privacy.html        # same thing; paths are relati
 
 Exit codes: `0` clean, `1` at least one matrix cell is `--fail-on` (`red`, `amber`) or worse, `2` a step failed (for example the policy could not be read), so the result is incomplete. `--fail-on never` only reports. Without `--site`, cells with no findings are grey (not assessed), not green.
 
-As a GitHub Action (the report is added to the job summary):
+As a GitHub Action (the report is added to the job summary and, on pull requests, posted as a comment that later runs update in place):
 
 ```yaml
 name: Privacy audit
 on: pull_request
 permissions:
   contents: read
+  pull-requests: write   # for the report comment
 jobs:
   audit:
     runs-on: ubuntu-latest
@@ -84,7 +85,7 @@ jobs:
           fail-on: red
 ```
 
-Other inputs: `repo` (default `.`), `site`, `jurisdictions` (default `UK,EU,KZ`). This repository runs it on its own fixture in `.github/workflows/privacy-audit.yml`.
+Other inputs: `repo` (default `.`), `site`, `jurisdictions` (default `UK,EU,KZ`), `comment` (default `true`; set `false` to keep the report in the job summary only). The comment is skipped with a warning when the token cannot write to the pull request, as on pull requests from forks. This repository runs it on its own fixture in `.github/workflows/privacy-audit.yml`.
 
 ### LLM provider
 
