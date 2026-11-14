@@ -26,6 +26,23 @@ Then open http://localhost:3000 and click "Use demo fixture".
 
 Without `LLM_API_KEY` the pipeline still runs end to end: policy claims come from keyword heuristics and verdict text from templates. With a key, the model extracts the claims and writes the verdict prose and fixes. Cell statuses are decided by deterministic rules either way.
 
+### Docker
+
+```sh
+cp .env.example .env      # required: docker-compose.yml reads it via env_file
+docker compose up api     # API on :8000 with Chromium, git and Bearer; run the web app with `make web`
+```
+
+Inside the container `localhost` is the container itself. To audit something served on your machine (for example `make fixture`), use `http://host.docker.internal:4100/...` as the site and policy URLs.
+
+### MCP server
+
+`mcp/server.py` exposes the audit as one tool, `audit_product(repo_url, site_url, policy_url)`, over stdio and returns the Markdown report. Needs `mcp` 2.x (installed by `make setup`).
+
+```sh
+uv run --project api python mcp/server.py
+```
+
 ### LLM provider
 
 `api/app/llm.py` talks to any OpenAI-compatible chat-completions API. Set `LLM_API_KEY`, `LLM_BASE_URL` (default: OpenRouter) and `MODEL_FAST` in `.env`. The model must support forced tool calls; if a call fails twice, that step falls back to the heuristic or template output. If only `ANTHROPIC_API_KEY` is set, Anthropic's OpenAI-compatible endpoint is used.
