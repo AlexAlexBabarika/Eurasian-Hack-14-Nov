@@ -25,7 +25,12 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   try {
     res = await fetch(`${API_URL}${path}`, init);
   } catch {
-    throw new ApiError(`Cannot reach the audit service at ${API_URL}.`, "network");
+    throw new ApiError(
+      `Cannot reach the audit service at ${API_URL}. Either it is not running, or it refuses requests from this page${
+        typeof window === "undefined" ? "" : ` (${window.location.origin})`
+      }.`,
+      "network",
+    );
   }
   if (!res.ok) {
     let detail = "";

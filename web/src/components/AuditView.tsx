@@ -11,11 +11,10 @@ import { CountUp } from "@/components/CountUp";
 import { DataFlow } from "@/components/DataFlow";
 import { FindingsList } from "@/components/FindingsList";
 import type { CellKey } from "@/components/Matrix";
-import { Matrix } from "@/components/Matrix";
-import { latestByStep, progressPercent, ProgressTimeline } from "@/components/ProgressTimeline";
+import { Matrix, matrixSummary } from "@/components/Matrix";
+import { currentStep, ProgressTimeline, useProgressPercent } from "@/components/ProgressTimeline";
 import { RecheckForm } from "@/components/RecheckForm";
 import { ReportInputs } from "@/components/ReportInputs";
-import LetterGlitch from "@/components/reactbits/LetterGlitch";
 import SpotlightCard from "@/components/reactbits/SpotlightCard";
 import { ObservationsPanel, PolicyClaimsPanel } from "@/components/SaysVsDoes";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -24,10 +23,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DEMO_ID, isBundledAudit, markdownUrl } from "@/lib/api";
 import type { Comparison } from "@/lib/compare";
 import { compareReports } from "@/lib/compare";
-import { STEP_LABEL } from "@/lib/labels";
 import { SPOTLIGHT_COLOR, spotlightSurface, STATUS_STYLE } from "@/lib/status";
 import type { AuditReport, Status } from "@/lib/types";
-import { STEPS } from "@/lib/types";
 import { useAudit } from "@/lib/useAudit";
 
 // `stats` is an untyped dict in the API schema.
@@ -78,83 +75,36 @@ function Shell({ children, actions }: { children: React.ReactNode; actions?: Rea
 
 type Events = Parameters<typeof ProgressTimeline>[0]["events"];
 
-// What the pipeline has reported so far, printed like a terminal session.
-function ScanConsole({ events }: { events: Events }) {
-  const latest = latestByStep(events);
-  const lines = STEPS.filter((step) => latest[step]).map((step) => latest[step]!);
-  return (
-    <div className="relative min-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-ink">
-      <LetterGlitch
-        aria-hidden
-        glitchColors={["#5db8ff", "#f4efe2"]}
-        baseOpacity={0.2}
-        glitchAmount={0.5}
-        centerFade={0.2}
-        interactive={false}
-        clickEffect="none"
-        className="absolute inset-0 size-full"
-      />
-      <ol aria-hidden className="relative space-y-2 p-5 font-mono text-[13px] leading-5 sm:p-6">
-        {lines.map((event) => (
-          <li key={event.step} className="animate-rise flex gap-3">
-            <span
-              className={cn(
-                "w-4 shrink-0",
-                event.status === "done" && "text-status-green",
-                event.status === "running" && "text-signal",
-                event.status === "error" && "text-status-red",
-                event.status === "skipped" && "text-muted-foreground",
-              )}
-            >
-              {event.status === "done" ? "✓" : event.status === "error" ? "×" : event.status === "skipped" ? "–" : ">"}
-            </span>
-            <span className="min-w-0">
-              <span className="text-muted-foreground">{STEP_LABEL[event.step].toLowerCase()}</span>
-              <span className="block break-words text-foreground">{event.message}</span>
-            </span>
-          </li>
-        ))}
-        <li className="flex gap-3 text-signal">
-          <span className="w-4 shrink-0">{">"}</span>
-          <span className="animate-caret inline-block h-5 w-2 bg-signal" />
-        </li>
-      </ol>
-    </div>
-  );
-}
-
 function Running({ id, events, skip }: { id: string; events: Events; skip?: () => void }) {
-  const { percent } = progressPercent(events);
+  const { percent } = useProgressPercent(events);
+  const { title, detail } = currentStep(events);
   return (
     <Shell>
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:gap-12">
-        <section className="space-y-6">
-          <div className="space-y-2">
-            <p aria-hidden className="text-7xl leading-none font-semibold tracking-tighter text-signal tabular-nums">
-              {percent}
-              <span className="text-3xl text-signal/60">%</span>
-            </p>
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-              Audit in progress…
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {isBundledAudit(id)
-                ? "Replaying a recorded audit of the demo project."
-                : "This usually takes about a minute. You can keep this tab open in the background."}
-            </p>
-          </div>
-          <ProgressTimeline events={events} />
+      <section className="mx-auto max-w-2xl space-y-6">
+        <div className="space-y-3">
+          <h1 className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-2xl font-semibold tracking-tight text-foreground">
+            {title}
+            {detail && <span className="text-sm font-normal tracking-normal text-muted-foreground tabular-nums">{detail}</span>}
+          </h1>
+          <p aria-hidden className="text-[40px] leading-none font-semibold tracking-tight text-signal tabular-nums">
+            {percent}
+            <span className="ml-0.5 text-[0.7em] tracking-normal">%</span>
+          </p>
+        </div>
+        <ProgressTimeline events={events} percent={percent} />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-muted-foreground">
+            {isBundledAudit(id)
+              ? "Replaying a recorded audit of the demo project."
+              : "This usually takes about a minute. You can keep this tab open in the background."}
+          </p>
           {skip && (
             <Button variant="outline" size="sm" onClick={skip}>
               Skip to the report
             </Button>
           )}
-        </section>
-        <section className="hidden space-y-3 lg:block">
-          <ScanConsole events={events} />
-          <p className="text-xs text-muted-foreground">The results matrix appears here when the audit finishes.</p>
-        </section>
-      </div>
+        </div>
+      </section>
     </Shell>
   );
 }
@@ -271,7 +221,7 @@ function Report({
             <div className="space-y-1">
               <h2 className="text-2xl font-semibold tracking-tight text-foreground">Result by country and area of law</h2>
               <p className="text-sm text-muted-foreground">
-                Select a cell to see the evidence, the provision it relates to, and how to fix it.
+                {matrixSummary(report.matrix)} Select a cell to see the evidence, the provision and the fix.
               </p>
             </div>
             <RecheckForm id={id} report={report} />

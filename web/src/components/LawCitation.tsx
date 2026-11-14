@@ -12,8 +12,8 @@ export function LawCitation({ provision }: { provision: Provision }) {
           <span className="font-normal text-muted-foreground"> · {provision.title}</span>
         </p>
         {provision.verified ? (
-          <span className="inline-flex items-center gap-1 text-xs text-status-green">
-            <BadgeCheck aria-hidden className="size-3.5" />
+          <span className="inline-flex shrink-0 items-center gap-1 rounded border border-border px-1.5 py-0.5 text-xs text-muted-foreground">
+            <BadgeCheck aria-hidden className="size-3 text-status-green" />
             Checked against official text
           </span>
         ) : (
@@ -22,7 +22,7 @@ export function LawCitation({ provision }: { provision: Provision }) {
               render={
                 <span
                   tabIndex={0}
-                  className="inline-flex cursor-help items-center gap-1 rounded border border-status-amber/35 bg-status-amber/10 px-1.5 py-0.5 text-xs text-status-amber"
+                  className="inline-flex shrink-0 cursor-help items-center gap-1 rounded border border-status-amber/35 bg-status-amber/10 px-1.5 py-0.5 text-xs text-status-amber"
                 />
               }
             >

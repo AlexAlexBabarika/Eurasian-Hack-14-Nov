@@ -231,8 +231,11 @@ export function AuditForm() {
             <p className="text-foreground">{submitError.message}</p>
             {submitError instanceof ApiError && submitError.kind === "network" && (
               <p className="text-muted-foreground">
-                Start the API with <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">make api</code> and try
-                again, or look at a recorded audit of the demo project.
+                Start the API with <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">make api</code>. If it is
+                already running, add this page&apos;s address to{" "}
+                <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">WEB_ORIGINS</code> in{" "}
+                <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">.env</code> and restart it. Or look at a
+                recorded audit of the demo project.
               </p>
             )}
             <Button type="button" variant="outline" size="sm" onClick={() => router.push(`/audit/${DEMO_ID}`)}>

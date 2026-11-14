@@ -50,6 +50,24 @@ function Column({ title, height, children }: { title: string; height: number; ch
   );
 }
 
+function VendorBadges({ isAi, preConsent }: { isAi: boolean; preConsent: boolean }) {
+  return (
+    <>
+      {isAi && (
+        <span className="inline-flex items-center gap-1 rounded border border-status-amber/35 bg-status-amber/10 px-1.5 py-0.5 text-[11px] text-status-amber">
+          <Sparkles aria-hidden className="size-3" />
+          AI
+        </span>
+      )}
+      {preConsent && (
+        <span className="rounded border border-status-red/35 bg-status-red/10 px-1.5 py-0.5 text-[11px] text-status-red">
+          Before consent
+        </span>
+      )}
+    </>
+  );
+}
+
 const NODE = "min-w-0 rounded-lg border bg-card px-3 transition-opacity flex flex-col justify-center";
 
 export function DataFlow({ report }: { report: AuditReport }) {
@@ -103,7 +121,38 @@ export function DataFlow({ report }: { report: AuditReport }) {
         {crossBorder && !report.claims.international_transfers && " The policy does not mention international transfers."}
       </p>
 
-      <div className="overflow-x-auto rounded-xl border p-4">
+      <ul className="space-y-2 md:hidden">
+        {flow.vendors.map((vendor) => {
+          const country = flow.countries.find((item) => item.key === vendor.country);
+          return (
+            <li key={vendor.key} className="space-y-1.5 rounded-xl border bg-card p-3">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-sm font-medium text-foreground">{vendor.name}</span>
+                <VendorBadges isAi={vendor.isAi} preConsent={vendor.preConsent} />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {vendor.purpose || "Purpose unknown"} ·{" "}
+                {vendor.named ? "Named in policy" : <span className="text-status-amber">Not named in policy</span>}
+              </p>
+              <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
+                <dt className="text-muted-foreground">Receives</dt>
+                <dd className="text-foreground/90">
+                  {vendor.categories.map((key) => flow.categories.find((c) => c.key === key)?.label ?? key).join(", ")}
+                </dd>
+                <dt className="text-muted-foreground">Located in</dt>
+                <dd className="text-foreground/90">
+                  {country?.known ? country.name : "Could not be determined"}
+                  {country && country.crossBorder.length > 0 && (
+                    <span className="text-status-amber"> · cross-border for {country.crossBorder.join(", ")}</span>
+                  )}
+                </dd>
+              </dl>
+            </li>
+          );
+        })}
+      </ul>
+
+      <div className="hidden overflow-x-auto rounded-xl border p-4 md:block">
         <div className="grid min-w-[760px] grid-cols-[minmax(140px,1fr)_minmax(56px,0.7fr)_minmax(270px,1.7fr)_minmax(56px,0.7fr)_minmax(200px,1.2fr)]">
           <Column title="Data" height={flow.height}>
             {flow.categories.map((category) => (
@@ -137,18 +186,8 @@ export function DataFlow({ report }: { report: AuditReport }) {
               >
                 <div className="flex items-center gap-1.5">
                   <span className="truncate text-sm font-medium text-foreground">{vendor.name}</span>
-                  <span className="ml-auto flex shrink-0 gap-1 text-[11px]">
-                    {vendor.isAi && (
-                      <span className="inline-flex items-center gap-1 rounded border border-status-amber/35 bg-status-amber/10 px-1.5 py-0.5 text-status-amber">
-                        <Sparkles aria-hidden className="size-3" />
-                        AI
-                      </span>
-                    )}
-                    {vendor.preConsent && (
-                      <span className="rounded border border-status-red/35 bg-status-red/10 px-1.5 py-0.5 text-status-red">
-                        Before consent
-                      </span>
-                    )}
+                  <span className="ml-auto flex shrink-0 gap-1">
+                    <VendorBadges isAi={vendor.isAi} preConsent={vendor.preConsent} />
                   </span>
                 </div>
                 <p className="flex items-center gap-1 truncate text-xs text-muted-foreground">

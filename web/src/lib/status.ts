@@ -86,3 +86,6 @@ export function spotlightSurface(status: Status | undefined, padding: number | s
     "--spotlight-card-shadow": "none",
   } as CSSProperties;
 }
+
+// Red and amber cells ask for attention; green and grey cells stay neutral so the problems stand out.
+export const LOUD_STATUS: Record<Status, boolean> = { red: true, amber: true, green: false, grey: false };
