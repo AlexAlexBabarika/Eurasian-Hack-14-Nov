@@ -92,6 +92,7 @@ class CellVerdict(BaseModel):
     provision_ids: list[str]
     fixes: list[Fix]
     unverified_notes: list[str] = []
+    finding_statuses: dict[str, Status] = {}  # finding id → status of that finding in this jurisdiction
 
 
 class AuditReport(BaseModel):

@@ -1,4 +1,4 @@
-.PHONY: setup dev api web types test sample demo
+.PHONY: setup dev api web types test sample demo fixture
 
 setup:
 	cd api && uv sync && uv run playwright install chromium
@@ -8,7 +8,7 @@ dev:
 	$(MAKE) -j2 api web
 
 api:
-	cd api && uv run uvicorn app.main:app --reload --port 8000
+	cd api && ALLOW_LOCAL_INPUTS=$${ALLOW_LOCAL_INPUTS:-0} uv run uvicorn app.main:app --reload --port 8000
 
 web:
 	cd web && pnpm dev
@@ -26,3 +26,6 @@ sample:
 
 demo:
 	DEMO_MODE=cached $(MAKE) dev
+
+fixture:
+	cd demo/fixture-app && python3 -m http.server 4100

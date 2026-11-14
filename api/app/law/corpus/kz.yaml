@@ -88,7 +88,7 @@
   title: "User rights when interacting with AI systems"
   summary: "Users have the right to read the user agreement of the AI system, to protection of their personal data processed by it, to explanations of results affecting their rights, and to refuse to interact with an AI system where interaction is not mandatory by law."
   official_url: "https://adilet.zan.kz/eng/docs/Z2500000230"
-  tags: [ai, transparency, rights]
+  tags: [ai, transparency, rights, chatbot]
   verified: false
 - id: KZ-CP-10
   jurisdiction: KZ

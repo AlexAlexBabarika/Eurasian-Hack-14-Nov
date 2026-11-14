@@ -1,0 +1,133 @@
+"""Orchestrates the audit steps and emits progress events. A failed step emits status=error and the audit continues."""
+
+import time
+from collections.abc import Callable
+
+from app.claims import extract as claims_extract
+from app.detect import bearer, code_signals, manifests, trackers
+from app.detect.code_signals import CodeSignals
+from app.diff.rules import run_rules
+from app.ingest import policy, repo, site
+from app.ingest.repo import RepoFile
+from app.models import (
+    DISCLAIMER,
+    JURISDICTIONS,
+    AuditReport,
+    AuditRequest,
+    Observation,
+    PolicyClaims,
+    ProgressEvent,
+    Step,
+)
+from app.verdict.engine import build_matrix
+
+Emit = Callable[[ProgressEvent], None]
+
+EMPTY_CLAIMS = PolicyClaims(
+    data_categories=[], named_processors=[], sharing_statement="unclear", mentions_ai=False,
+    international_transfers=False, retention_stated=False, rights_listed=[], deletion_method=None,
+    cookie_consent_described=False, quotes={},
+)  # fmt: skip
+
+
+async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool = True) -> AuditReport:
+    t0 = time.monotonic()
+    stats: dict = {}
+
+    def ev(step: Step, status: str, message: str, count: int | None = None) -> None:
+        emit(ProgressEvent(step=step, status=status, message=message, count=count))
+
+    # clone
+    files: list[RepoFile] = []
+    repo_dir = None
+    ev("clone", "running", "Fetching repository")
+    try:
+        repo_dir = await repo.fetch(req.repo_url)
+        files = repo.walk(repo_dir)
+        ev("clone", "done", f"{len(files)} files ready to scan", len(files))
+    except Exception as e:  # noqa: BLE001
+        ev("clone", "error", f"Could not fetch repository: {str(e)[:160]}")
+    stats["files_scanned"] = len(files)
+
+    # manifests + SDK catalog + code signals
+    ev("manifests", "running", "Matching dependencies and imports against the SDK catalog")
+    code_obs: list[Observation] = []
+    signals = CodeSignals()
+    try:
+        code_obs = manifests.detect(files)
+        signals = code_signals.detect(files)
+        names = ", ".join(o.vendor or "" for o in code_obs) or "none"
+        ev("manifests", "done", f"Vendors in code: {names}", len(code_obs))
+    except Exception as e:  # noqa: BLE001
+        ev("manifests", "error", f"Manifest detector failed: {str(e)[:160]}")
+
+    # bearer (optional)
+    ev("bearer", "running", "Running Bearer data-flow scan")
+    result = await bearer.run(repo_dir) if repo_dir else bearer.BearerResult(message="No repository to scan")
+    stats["bearer"] = result.ran
+    signals.pii_logs.extend(result.pii_logs)
+    for cat, evidence in result.data_types.items():
+        code_obs.append(Observation(
+            id=f"bearer-{cat}", vendor=None, vendor_country=None, data_categories=[cat], purpose_guess=None,
+            evidence=evidence[:4],
+        ))  # fmt: skip
+    ev("bearer", "done" if result.ran else "skipped", result.message, len(result.data_types) if result.ran else None)
+
+    # site scan
+    ev("site_scan", "running", "Loading the site in a clean browser, clicking nothing")
+    scan = await site.scan(req.site_url)
+    net_obs = trackers.detect(scan)
+    stats["requests_pre_consent"] = len(scan.requests)
+    if scan.error and not scan.requests:
+        ev("site_scan", "error", f"Site scan failed: {scan.error[:160]}")
+    else:
+        names = ", ".join(o.vendor or "" for o in net_obs) or "none"
+        ev("site_scan", "done", f"{len(scan.requests)} requests before consent; trackers: {names}", len(net_obs))
+    observations = trackers.merge(code_obs, net_obs)
+    stats["vendors_found"] = len([o for o in observations if o.vendor])
+
+    # policy
+    ev("policy_fetch", "running", "Fetching the privacy policy")
+    policy_text = ""
+    try:
+        policy_text = await policy.fetch(req.policy_url)
+        ev("policy_fetch", "done", f"Policy text extracted ({len(policy_text):,} characters)", len(policy_text))
+    except Exception as e:  # noqa: BLE001
+        ev("policy_fetch", "error", f"Could not fetch policy: {str(e)[:160]}")
+
+    # claims
+    findings = []
+    claims = EMPTY_CLAIMS
+    if policy_text:
+        ev("claims", "running", "Extracting what the policy claims")
+        if use_llm:
+            claims, method = await claims_extract.extract(policy_text)
+        else:
+            claims, method = claims_extract.validate_quotes(claims_extract.heuristic(policy_text), policy_text), "heuristic"
+        stats["claims_method"] = method
+        ev("claims", "done", f"Claims extracted ({method}); sharing statement: {claims.sharing_statement}")
+
+        # diff: only meaningful when we have a policy to compare against
+        ev("diff", "running", "Comparing observed behaviour with policy claims")
+        findings = run_rules(observations, claims, signals, req.policy_url, len(files))
+        ev("diff", "done", f"{len(findings)} possible inconsistencies", len(findings))
+    else:
+        ev("claims", "skipped", "No policy text, so nothing to compare against")
+        ev("diff", "skipped", "No policy text; no findings can be evidenced")
+
+    # law + verdict
+    jurisdictions = req.jurisdictions or JURISDICTIONS
+    ev("law", "running", "Retrieving provisions from the curated corpus")
+    ev("verdict", "running", "Writing verdicts per jurisdiction")
+    matrix, provisions, method = await build_matrix(findings, observations, jurisdictions, use_llm=use_llm)
+    stats["verdict_method"] = method
+    ev("law", "done", f"{len(provisions)} provisions cited", len(provisions))
+    ev("verdict", "done", f"{len(matrix)} matrix cells ({method})", len(matrix))
+
+    stats["duration_s"] = round(time.monotonic() - t0, 1)
+    report = AuditReport(
+        id=audit_id, inputs=req.model_dump(), observations=observations, claims=claims, findings=findings,
+        matrix=matrix, provisions=provisions, stats=stats, disclaimer=DISCLAIMER,
+    )  # fmt: skip
+    ev("done", "done", f"Audit finished in {stats['duration_s']}s")
+    return report
