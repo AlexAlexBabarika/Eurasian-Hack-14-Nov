@@ -34,7 +34,7 @@ Positioning: "Website GDPR scanners read your policy. Enterprise code scanners c
 | Backend | **Python 3.12 + FastAPI + Pydantic v2 + uvicorn** | best ecosystem for LLM, scraping and scanners; Pydantic = typed contracts |
 | Python tooling | **uv** (deps + venv), **ruff** | install in seconds |
 | JS tooling | **pnpm** | |
-| LLM | **Anthropic API**: `claude-sonnet-5-5` for extraction/verdicts (fast), `claude-opus-5-5` optional for the final verdict pass | structured output via forced tool use + Pydantic validation + 1 retry |
+| LLM | **Any OpenAI-compatible chat-completions API** (OpenRouter by default): `MODEL_FAST` for claims extraction and verdict prose, `MODEL_STRONG` when the audit is started with effort `strong`. Optional: with no key the claims and verdict steps fall back to deterministic heuristics | structured output via forced tool call + Pydantic validation + 1 retry; no provider lock-in |
 | Code scanning | **Bearer CLI** (`bearer scan --report privacy --format json`) + our own **manifest/SDK detector** (always runs) | Bearer gives data types + third parties; our detector is the fallback if Bearer fails |
 | Site scanning | **Playwright (Chromium, headless)** | record requests/cookies **before** any consent click = hard evidence |
 | Policy text | **httpx + trafilatura** | clean main-text extraction from the policy page |
@@ -45,7 +45,7 @@ Positioning: "Website GDPR scanners read your policy. Enterprise code scanners c
 | Types FE↔BE | FastAPI OpenAPI → **`openapi-typescript`** → `web/src/lib/api-types.ts` | one source of truth (Pydantic) |
 | Run/demo | `docker compose` (api image includes Chromium + git + bearer) + local `pnpm dev` | demo runs locally; Vercel deploy of `web/` is optional |
 
-Env vars (`.env.example`): `ANTHROPIC_API_KEY`, `MODEL_FAST=claude-sonnet-5-5`, `MODEL_STRONG=claude-opus-5-5`, `DEMO_MODE=live|cached`, `GITHUB_TOKEN` (optional, avoids rate limits).
+Env vars (`.env.example`), all optional: `LLM_API_KEY`, `LLM_BASE_URL` (default `https://openrouter.ai/api/v1`), `MODEL_FAST` and `MODEL_STRONG` (default `anthropic/claude-sonnet-4.5`; `MODEL_STRONG` is used for effort `strong` and falls back to `MODEL_FAST`), `ANTHROPIC_API_KEY` (alternative to `LLM_API_KEY`: if only this is set, Anthropic's OpenAI-compatible endpoint is used), `GITHUB_TOKEN` (avoids rate limits), `DEMO_MODE=live|cached`, `ALLOW_LOCAL_INPUTS`, `PUBLIC_MODE`, `WEB_ORIGINS`.
 
 ---
 
@@ -69,7 +69,7 @@ groundtruth/
 │   │   ├── main.py             # FastAPI app, routes, SSE                    (C, H0.5–1.5)
 │   │   ├── models.py           # Pydantic contracts (§4)                     (ALL, H0–0.5)
 │   │   ├── pipeline.py         # orchestrates the steps, emits events        (A)
-│   │   ├── llm.py              # Anthropic client, structured calls, retry   (B)
+│   │   ├── llm.py              # OpenAI-compatible client, structured calls, retry (B)
 │   │   ├── ingest/
 │   │   │   ├── repo.py         # shallow clone, file walk, size limits       (A)
 │   │   │   ├── site.py         # Playwright: requests, cookies, pre-consent  (A)
@@ -302,7 +302,7 @@ Fallback: `DEMO_MODE=cached`. Also record a 60-second screen video at H6 in case
 - [ ] H4.5–5.5 `code_signals.py` (delete-account route, PII in logs), `pipeline.py` events, robustness (timeouts, big repos).
 
 ### Person B: Law + LLM (claims, corpus, verdicts)
-- [ ] H0.5–1.5 `llm.py` (Anthropic client, forced tool use → Pydantic, 1 retry, response cache). `claims/extract.py`. ✅ fixture privacy.html → `sharing_statement=no_sharing`, `mentions_ai=False`, quotes are exact substrings.
+- [ ] H0.5–1.5 `llm.py` (OpenAI-compatible client, forced tool call → Pydantic, 1 retry, response cache). `claims/extract.py`. ✅ fixture privacy.html → `sharing_statement=no_sharing`, `mentions_ai=False`, quotes are exact substrings.
 - [ ] H1.5–3.5 Corpus `eu.yaml`, `uk.yaml`, `kz.yaml` (~12–15 each). Open each official URL, set `verified: true` only after checking. ✅ `tests/test_citations.py` passes; ≥80% verified.
 - [ ] H3.5–4.5 `law/retrieve.py` + `verdict/engine.py` + prompts. ✅ fixture → EU×personal_data RED, UK×personal_data AMBER/RED with the cookie nuance, KZ×ai RED.
 - [ ] H4.5–5.5 Fix generation quality (paste-ready clauses naming vendors), post-validation, AMBER cap for UK AI, grey for financial.

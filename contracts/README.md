@@ -16,7 +16,7 @@ Changing a field: edit `models.py`, run `make sample` and `make types`, then tel
   - `provision_ids`: all exist in `provisions` and in `api/app/law/corpus/`.
   - `unverified_notes`: reasons to show a warning on the cell (unverified provisions, dropped citations).
 - `provisions`: only the provisions cited by the matrix, keyed by id. `verified: false` must render with a warning.
-- `stats`: `files_scanned`, `vendors_found`, `requests_pre_consent`, `duration_s`, plus `bearer` (did it run), `claims_method` (`llm` | `heuristic`), `verdict_method` (`llm` | `deterministic`), `effort` (`fast` | `strong`: which model the request asked for).
+- `stats`: `files_total` (candidate files in the repository, after skipping dependency directories and binary files; absent when no repository was read), `files_scanned` (files actually read, after the size and count caps), `vendors_found`, `requests_pre_consent`, `duration_s`, plus `bearer` (did it run), `claims_method` (`llm` | `heuristic`), `verdict_method` (`llm` | `deterministic`), `verdict_fallbacks` (only when `verdict_method` is `llm`: cells that kept the template text because the LLM call failed or its prose was rejected), `effort` (`fast` | `strong`: which model the request asked for).
 
 ## SSE events (`GET /audits/{id}/events`)
 
