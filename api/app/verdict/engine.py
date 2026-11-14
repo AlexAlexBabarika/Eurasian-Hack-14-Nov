@@ -15,6 +15,7 @@ from app.verdict.fixes import template_fixes
 PROMPTS = Path(__file__).parent / "prompts"
 SYSTEM = (PROMPTS / "verdict.md").read_text() + "\n" + (PROMPTS / "fix.md").read_text()
 BANNED = re.compile(r"\bviolat|\billegal|\bunlawful|\bbreach(?:es|ed)? (?:of )?(?:the )?(?:law|gdpr|act)", re.I)
+MAX_TOKENS = 1500  # a cell is a headline, 2-4 sentences and up to three fixes
 RANK: dict[Status, int] = {"grey": 0, "green": 1, "amber": 2, "red": 3}
 EU_EEA = {"AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU",
           "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "IS", "LI", "NO"}  # fmt: skip
@@ -174,7 +175,9 @@ async def build_matrix(findings: list[Finding], observations: list[Observation],
         if not cell.finding_ids or not cell.provision_ids:
             return cell
         try:
-            prose = await llm.structured(SYSTEM, _prompt(cell, findings, observations), CellProse)
+            # Status and citations are decided in code; the model only writes prose, so it needs no reasoning pass.
+            prose = await llm.structured(SYSTEM, _prompt(cell, findings, observations), CellProse,
+                                         max_tokens=MAX_TOKENS, reasoning=False)  # fmt: skip
             return post_validate(cell, prose, cell.provision_ids)
         except Exception:  # noqa: BLE001 - deterministic cell is always a valid answer
             return cell

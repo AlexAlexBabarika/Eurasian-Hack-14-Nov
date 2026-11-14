@@ -66,3 +66,9 @@ def test_each_finished_cell_emits_a_verdict_progress_event(llm_audit):
     assert [e.count for e in verdict[1:13]] == list(range(1, 13))
     assert "12 of 12" in verdict[12].message
     assert verdict[-1].count == len(report.matrix) == 12
+
+
+def test_verdict_calls_skip_reasoning_and_cap_output(llm_audit, monkeypatch):
+    monkeypatch.setenv("LLM_BASE_URL", "https://openrouter.ai/api/v1")
+    _, _, bodies = llm_audit(lambda body: tool_reply(prose()))
+    assert all(b["reasoning"] == {"enabled": False} and b["max_tokens"] <= 1500 for b in bodies)
