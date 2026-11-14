@@ -1,9 +1,11 @@
-api/.venv
-api/data/llm_cache
+.git
+.env
+web
+**/.venv
+**/node_modules
 **/__pycache__
 **/.pytest_cache
 **/.ruff_cache
-web/node_modules
-web/.next
-.git
-.env
+api/data/llm_cache
+api/data/audits/*
+!api/data/audits/demo-*.json
