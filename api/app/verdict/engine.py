@@ -2,6 +2,7 @@
 
 import asyncio
 import re
+from collections.abc import Callable
 from pathlib import Path
 
 from pydantic import BaseModel
@@ -160,8 +161,12 @@ def _prompt(cell: CellVerdict, findings: list[Finding], observations: list[Obser
 
 async def build_matrix(findings: list[Finding], observations: list[Observation], jurisdictions: list[Jurisdiction],
                        use_llm: bool = True, gaps: list[str] | None = None,
+                       on_cell: Callable[[int, int], None] | None = None,
                        ) -> tuple[list[CellVerdict], dict[str, Provision], str]:  # fmt: skip
-    """Returns (matrix, cited provisions, method) where method is 'llm' or 'deterministic'."""
+    """Returns (matrix, cited provisions, method) where method is 'llm' or 'deterministic'.
+
+    With an LLM, `on_cell(finished, total)` is called each time a cell is finished.
+    """
     cells = [deterministic_cell(j, a, findings, observations, gaps) for j in jurisdictions for a in AREAS]
     method = "deterministic"
 
@@ -174,8 +179,18 @@ async def build_matrix(findings: list[Finding], observations: list[Observation],
         except Exception:  # noqa: BLE001 - deterministic cell is always a valid answer
             return cell
 
+    finished = 0
+
+    async def tracked(cell: CellVerdict) -> CellVerdict:
+        nonlocal finished
+        out = await refine(cell)
+        finished += 1
+        if on_cell:
+            on_cell(finished, len(cells))
+        return out
+
     if use_llm and llm.available():
-        cells = list(await asyncio.gather(*(refine(c) for c in cells)))
+        cells = list(await asyncio.gather(*(tracked(c) for c in cells)))
         method = "llm"
     corpus = load_corpus()
     cited = {pid: corpus[pid] for c in cells for pid in c.provision_ids}

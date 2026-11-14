@@ -144,7 +144,10 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
         gaps.append("no live site was given")
     if not policy_text:
         gaps.append("the policy could not be read")
-    matrix, provisions, method = await build_matrix(findings, observations, jurisdictions, use_llm=use_llm, gaps=gaps)
+    matrix, provisions, method = await build_matrix(
+        findings, observations, jurisdictions, use_llm=use_llm, gaps=gaps,
+        on_cell=lambda n, total: ev("verdict", "running", f"Writing verdicts: {n} of {total} cells", n),
+    )
     stats["verdict_method"] = method
     ev("law", "done", f"{len(provisions)} provisions cited", len(provisions))
     ev("verdict", "done", f"{len(matrix)} matrix cells ({method})", len(matrix))
