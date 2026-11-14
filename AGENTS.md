@@ -1,7 +1,7 @@
 - Contracts live in api/app/models.py. Do not change field names without updating contracts/sample_report.json and running `make types`.
 - Every Finding must have ≥1 Evidence. Every CellVerdict.provision_ids entry must exist in law/corpus. Enforce in code, not only in prompts.
 - Never write "violates" or "illegal" in generated text; use "possible inconsistency with".
-- Timeouts everywhere: clone 30s, Bearer 90s, Playwright 15s, LLM 60s. A failed step emits an SSE event with status=error and the pipeline continues.
+- Timeouts everywhere: clone 30s, Bearer 90s, Playwright 15s per pass (25s for the whole site scan), LLM 60s. A failed step emits an SSE event with status=error and the pipeline continues.
 - Python: uv, ruff, type hints, Pydantic v2. JS: pnpm, strict TS, shadcn/ui components, no new UI libraries.
 - Keep files small; one module per responsibility as in PLAN.md §3. Do not add databases, queues, or auth.
 - Tests: `make test` must pass before merging to main.
