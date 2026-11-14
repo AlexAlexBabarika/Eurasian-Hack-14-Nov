@@ -29,7 +29,7 @@ const FIELDS: Field[] = [
   {
     name: "site_url",
     label: "Live site",
-    hint: "Opened once in a clean browser, without clicking anything, to see what loads before consent.",
+    hint: "Opened in a clean browser: first without clicking anything, then after refusing and after accepting cookies.",
     placeholder: "https://app.acme.com",
     icon: Globe,
   },

@@ -39,11 +39,12 @@ def load(audit_id: str) -> AuditState | None:
 
 
 def _key(inputs: dict) -> tuple[str, ...]:
-    return tuple((inputs.get(name) or "").rstrip("/") for name in ("repo_url", "site_url", "policy_url"))
+    urls = [(inputs.get(name) or "").rstrip("/") for name in ("repo_url", "site_url", "policy_url")]
+    return (*urls, inputs.get("effort") or "fast")
 
 
 def find_cached(req: AuditRequest) -> AuditState | None:
-    """DEMO_MODE=cached: a finished audit with the same three URLs."""
+    """DEMO_MODE=cached: a finished audit with the same URLs and effort."""
     key = _key(req.model_dump())
     for path in sorted(AUDIT_DIR.glob("*.json")):
         try:

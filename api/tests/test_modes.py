@@ -1,6 +1,7 @@
 """Input modes (repo only, site only), the fixed-policy fixture, the CLI gate and the examples list."""
 
 import asyncio
+import json
 from unittest.mock import patch
 
 import pytest
@@ -130,3 +131,17 @@ def test_examples_route_and_request_validation():
     assert listed.status_code == 200
     assert isinstance(listed.json(), list)
     assert client.post("/audits", json={"policy_url": "https://x.test/privacy"}).status_code == 422
+
+
+def test_blank_urls_count_as_not_given():
+    req = AuditRequest(repo_url="https://github.com/acme/app", site_url=" ", policy_url="")
+    assert req.site_url is None and req.policy_url is None
+    with pytest.raises(ValueError):
+        AuditRequest(repo_url="", site_url="  ")
+
+
+def test_cached_replay_matches_the_effort_the_audit_was_recorded_with():
+    inputs = json.loads((store.AUDIT_DIR / "demo-fixture.json").read_text())["report"]["inputs"]
+    urls = {k: inputs[k] for k in ("repo_url", "site_url", "policy_url")}
+    assert store.find_cached(AuditRequest(**urls, effort=inputs["effort"])) is not None
+    assert store.find_cached(AuditRequest(**urls, effort="strong")) is None

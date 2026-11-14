@@ -66,7 +66,7 @@ To use it from Claude Code, Cursor or Claude Desktop, see [mcp/README.md](mcp/RE
 
 Example prompt: "Audit https://github.com/acme/app and https://acme.example against https://acme.example/privacy with the proveryai tool, then list the findings that need a code change."
 
-With `DEMO_MODE=cached` (in `.env` or the server's environment), inputs that match a saved audit in `api/data/audits/` return that report at once, without cloning or scanning. Other inputs still run a live audit.
+With `DEMO_MODE=cached` (in `.env` or the server's environment), inputs that match a saved audit (same URLs and effort) in `api/data/audits/` return that report at once, without cloning or scanning. Other inputs still run a live audit.
 
 If the API is reachable by other people (a public deploy, judges pasting their own URLs), set `PUBLIC_MODE=1`. Local paths are then refused, and so is any URL that points at a private or local address (`localhost`, `10.x`, cloud metadata `169.254.169.254`), including after redirects. Leave it off for the local demo, which audits `localhost:4100`.
 
@@ -119,7 +119,7 @@ Other inputs: `repo` (default `.`), `site`, `jurisdictions` (default `UK,EU,KZ`)
 
 ## How it works
 
-1. **Ingest**: shallow clone, Playwright site load with no clicks (requests and cookies before consent), policy text via trafilatura.
+1. **Ingest**: shallow clone, Playwright site load in three passes (requests and cookies before consent, after refusing, after accepting), policy text via trafilatura.
 2. **Detect**: dependency manifests and imports matched against `sdk_catalog.yaml` (49 vendors, including services common on Kazakhstan products such as Yandex Metrica, VK, 2GIS and Halyk ePay), optional Bearer CLI scan, grep signals for delete-account routes and personal data in logs.
 3. **Claims**: policy text to `PolicyClaims`; quotes must be exact substrings of the policy.
 4. **Diff**: deterministic rules R1-R10 produce findings.

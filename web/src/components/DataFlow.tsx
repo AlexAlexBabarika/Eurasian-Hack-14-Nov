@@ -111,7 +111,7 @@ export function DataFlow({ report }: { report: AuditReport }) {
     onMouseEnter: () => setActive(next),
     onMouseLeave: () => setActive(null),
   });
-  const hasPolicy = Boolean(report.inputs.policy_url);
+  const hasPolicy = Boolean(report.stats.claims_method);
   const crossBorder = flow.countries.some((country) => country.crossBorder.length > 0);
 
   return (
