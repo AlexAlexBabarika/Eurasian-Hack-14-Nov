@@ -1,10 +1,21 @@
 # Proveryai
 
-Privacy policy vs. code auditor. Give it a GitHub repo, a live site URL and a privacy policy URL; it finds what the product actually collects and sends, compares that with what the policy claims, and maps each possible inconsistency to official law in the UK, EU and Kazakhstan.
+**Checks what your privacy policy says against what your code and live site actually do, under UK, EU and Kazakhstan law.**
+
+Give it a GitHub repo, a live site URL and a privacy policy URL. It finds what the product actually collects and sends, compares that with what the policy claims, and maps each possible inconsistency to official law in the UK, EU and Kazakhstan. The result is a 3 x 4 traffic-light matrix (jurisdiction x legal area); every cell has evidence, a link to the official text and a fix you can paste.
+
+The name is the second half of the proverb *doveryai, no proveryai*: trust, but verify.
 
 Not legal advice. Every finding carries evidence; every legal reference comes from the curated corpus in `api/app/law/corpus/`.
 
-Full plan: [PLAN.md](PLAN.md). Rules for coding agents: [AGENTS.md](AGENTS.md).
+| | |
+|---|---|
+| Live | https://proveryai.babarika.dev (see [docs/DEPLOY.md](docs/DEPLOY.md)) |
+| Demo video | [demo/SCRIPT.md](demo/SCRIPT.md) (script and recording steps) |
+| Pitch deck | [docs/pitch.pdf](docs/pitch.pdf), source in [docs/PITCH.md](docs/PITCH.md) |
+| Submission, tools and how AI was used | [SUBMISSION.md](SUBMISSION.md) |
+| Original build plan | [PLAN.md](PLAN.md) (written under the working name Groundtruth) |
+| Rules for coding agents | [AGENTS.md](AGENTS.md) |
 
 ## Quick start
 
@@ -104,7 +115,7 @@ Other inputs: `repo` (default `.`), `site`, `jurisdictions` (default `UK,EU,KZ`)
 ## How it works
 
 1. **Ingest**: shallow clone, Playwright site load with no clicks (requests and cookies before consent), policy text via trafilatura.
-2. **Detect**: dependency manifests and imports matched against `sdk_catalog.yaml` (30 vendors), optional Bearer CLI scan, grep signals for delete-account routes and personal data in logs.
+2. **Detect**: dependency manifests and imports matched against `sdk_catalog.yaml` (31 vendors), optional Bearer CLI scan, grep signals for delete-account routes and personal data in logs.
 3. **Claims**: policy text to `PolicyClaims`; quotes must be exact substrings of the policy.
 4. **Diff**: deterministic rules R1-R9 produce findings.
 5. **Law**: tag filter + BM25 over the curated corpus.
@@ -112,4 +123,8 @@ Other inputs: `repo` (default `.`), `site`, `jurisdictions` (default `UK,EU,KZ`)
 
 ## Status of the law corpus
 
-All provisions currently have `verified: false`. A human must open each `official_url`, confirm the reference and summary, and only then set `verified: true`.
+54 provisions, each with its `official_url`. 50 were checked against the official text and have `verified: true`. Four were corrected during that check and stay `verified: false` until a second person confirms them (`EU-EPRIVACY-5-3`, `UK-GDPR-22`, `UK-GDPR-44A`, `UK-DPA-2018`); the UI marks them with a warning.
+
+## Team
+
+Boris Sheryakov, Alex Babarika, Gor Vardanyan. Built at the Eurasian Hack, 14 November 2026.
