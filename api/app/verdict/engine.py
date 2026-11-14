@@ -9,7 +9,8 @@ from typing import Annotated, NamedTuple
 from pydantic import BaseModel, StringConstraints, model_validator
 
 from app import llm
-from app.law.retrieve import load_corpus, retrieve
+from app.detect.trackers import AFTER_REJECT, seen
+from app.law.retrieve import RULE_TAGS, load_corpus, retrieve
 from app.models import AREAS, Area, CellVerdict, Finding, Fix, Jurisdiction, Observation, Provision, Status
 from app.verdict.fixes import PURPOSE, template_fixes
 
@@ -117,10 +118,27 @@ def finding_status(f: Finding, j: Jurisdiction, area: Area, observations: list[O
         elif j == "KZ":
             status = "amber"
             note = "Kazakhstan has no cookie-specific rule; general consent requirements for collection apply."
+    if rule == "R10":
+        if j == "UK":
+            note = ("UK: the statistical-purposes exception in the Data (Use and Access) Act 2025 still requires a "
+                    "simple way to object, so it does not cover trackers that keep firing after a refusal.")  # fmt: skip
+        elif j == "EU":
+            note = "EU: non-essential cookies or trackers need consent, and here consent was refused."
+        elif j == "KZ":
+            status = "amber"
+            note = ("Kazakhstan has no cookie-specific rule; general consent requirements for collection apply, "
+                    "and here consent was refused.")  # fmt: skip
     if area == "ai_transparency" and j == "UK":
         status = "amber" if RANK[status] > RANK["amber"] else status
         note = "UK has no AI-specific statute; this cell relies on ICO guidance, so status is capped at amber."
     return status, note
+
+
+def _provisions(f: Finding, j: Jurisdiction, area: Area) -> list[Provision]:
+    """law/retrieve.py has no tags for R10 yet; until it does, R10 is looked up under the R5 cookie and tracking tags."""
+    if f.rule == "R10_TRACKING_AFTER_REJECT" and f.rule not in RULE_TAGS:
+        f = f.model_copy(update={"rule": "R5_TRACKING_BEFORE_CONSENT"})
+    return retrieve(f, j, area)
 
 
 def _dedupe(items: list[Provision]) -> list[Provision]:
@@ -139,7 +157,7 @@ def deterministic_cell(j: Jurisdiction, area: Area, findings: list[Finding], obs
     rows = []
     for f in findings:
         if area in f.areas and (res := finding_status(f, j, area, observations)):
-            rows.append((f, res[0], res[1], retrieve(f, j, area)))
+            rows.append((f, res[0], res[1], _provisions(f, j, area)))
     if not rows and gaps:
         return CellVerdict(
             jurisdiction=j, area=area, status="grey", finding_ids=[], provision_ids=[], fixes=[],
@@ -151,7 +169,7 @@ def deterministic_cell(j: Jurisdiction, area: Area, findings: list[Finding], obs
         return CellVerdict(
             jurisdiction=j, area=area, status="green", finding_ids=[], provision_ids=[], fixes=[],
             headline=f"No possible inconsistencies detected for {AREA_LABEL[area]}",
-            reasoning="None of the checks we ran (R1-R9) produced a finding for this cell. This reflects only what "
+            reasoning="None of the checks we ran (R1-R10) produced a finding for this cell. This reflects only what "
             "was visible in the repository, the public site and the policy text.",
         )  # fmt: skip
     rows.sort(key=lambda r: -RANK[r[1]])
@@ -205,10 +223,11 @@ def _prompt(cell: CellVerdict, findings: list[Finding], observations: list[Obser
         parts.append(f"- {humanize(f.title)} (status here: {cell.finding_statuses.get(f.id)})")
         for o in observations:
             if o.id in f.observation_ids:
-                seen = "; requests or cookies seen on the site before any consent interaction" if o.pre_consent else ""
+                when = "; requests or cookies seen on the site before any consent interaction" if o.pre_consent else ""
+                when += "; still seen after the visitor rejected cookies" if seen(o, AFTER_REJECT) else ""
                 purpose = PURPOSE.get(o.purpose_guess or "", "service provider")
                 data = ", ".join(DATA_LABEL.get(c, c.replace("_", " ")) for c in o.data_categories) or "not known"
-                parts.append(f"  vendor: {o.vendor} ({o.vendor_country}), used for {purpose}, receives: {data}{seen}")  # fmt: skip
+                parts.append(f"  vendor: {o.vendor} ({o.vendor_country}), used for {purpose}, receives: {data}{when}")
         for e in f.evidence[:6]:
             loc = f"{e.file}:{e.line}" if e.file else (e.url or "")
             parts.append(f"  evidence ({e.kind}) {loc}: {e.summary}" + (f' | quote: "{e.quote}"' if e.quote else ""))

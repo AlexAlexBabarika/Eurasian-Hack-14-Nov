@@ -1,9 +1,10 @@
-"""Deterministic diff rules R1–R9: observations (what the product does) vs claims (what the policy says)."""
+"""Deterministic diff rules R1–R10: observations (what the product does) vs claims (what the policy says)."""
 
 import re
 
 from app.detect.catalog import policy_names, vendor_by_name
 from app.detect.code_signals import CodeSignals
+from app.detect.trackers import AFTER_REJECT, BEFORE, is_tracker, seen
 from app.models import Area, Evidence, Finding, Observation, PolicyClaims
 
 PERSONAL = {"email", "name", "phone", "usage", "device_id", "ip", "user_content", "payment", "location", "health"}
@@ -108,11 +109,12 @@ def run_rules(observations: list[Observation], claims: PolicyClaims, signals: Co
                                                                     "machine learning or automated processing")])  # fmt: skip
 
     # R5: non-essential tracker fired before consent.
-    trackers = [o for o in observations if o.pre_consent and not getattr(vendor_by_name(o.vendor), "essential", False)]
+    trackers = [o for o in observations if o.pre_consent and is_tracker(o)]
     if trackers:
         add("R5_TRACKING_BEFORE_CONSENT",
             f"{_names(trackers)} {'fires' if len(trackers) == 1 else 'fire'} before any consent interaction on the site",
-            "high", ["personal_data", "consumer"], trackers, _pick(trackers, kinds=("network", "cookie")),
+            "high", ["personal_data", "consumer"], trackers,
+            _pick(trackers, kinds=("network", "cookie"), contains=BEFORE),
             "cookie_consent_described")  # fmt: skip
 
     # R6: vendor based abroad, policy silent on international transfers. Per-jurisdiction filtering is in the verdict.
@@ -143,5 +145,15 @@ def run_rules(observations: list[Observation], claims: PolicyClaims, signals: Co
     if not claims.retention_stated:
         add("R9_NO_RETENTION_PERIOD", "Policy states no retention period or criteria", "low", ["personal_data"], [],
             [_absence(policy_url, "Policy text does not state how long personal data is kept")])  # fmt: skip
+
+    # R10: non-essential tracker still fires after the visitor clicked reject. Last, so earlier finding ids are stable.
+    ignored = [o for o in observations if seen(o, AFTER_REJECT) and is_tracker(o)]
+    if ignored:
+        add("R10_TRACKING_AFTER_REJECT",
+            f"{_names(ignored)} still {'fires' if len(ignored) == 1 else 'fire'} after the visitor rejects cookies "
+            "in the consent banner",
+            "high", ["personal_data", "consumer"], ignored,
+            _pick(ignored, kinds=("network", "cookie"), contains=AFTER_REJECT),
+            "cookie_consent_described")  # fmt: skip
 
     return findings
