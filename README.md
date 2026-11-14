@@ -45,6 +45,8 @@ uv run --project api python mcp/server.py
 
 With `DEMO_MODE=cached` (in `.env` or the server's environment), inputs that match a saved audit in `api/data/audits/` return that report at once, without cloning or scanning. Other inputs still run a live audit.
 
+If the API is reachable by other people (a public deploy, judges pasting their own URLs), set `PUBLIC_MODE=1`. Local paths are then refused, and so is any URL that points at a private or local address (`localhost`, `10.x`, cloud metadata `169.254.169.254`), including after redirects. Leave it off for the local demo, which audits `localhost:4100`.
+
 ### LLM provider
 
 `api/app/llm.py` talks to any OpenAI-compatible chat-completions API. Set `LLM_API_KEY`, `LLM_BASE_URL` (default: OpenRouter) and `MODEL_FAST` in `.env`. The model must support forced tool calls; if a call fails twice, that step falls back to the heuristic or template output. If only `ANTHROPIC_API_KEY` is set, Anthropic's OpenAI-compatible endpoint is used.
