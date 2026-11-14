@@ -54,7 +54,7 @@ export function EvidenceBlock({ evidence }: { evidence: Evidence }) {
         </div>
       )}
       {evidence.quote && (
-        <blockquote className="ml-[26px] border-l-2 border-border pl-3 text-sm text-foreground/90">
+        <blockquote className="ml-[26px] border-l-2 border-paper/50 pl-3 font-serif text-[17px] leading-6 text-paper">
           &ldquo;{evidence.quote}&rdquo;
         </blockquote>
       )}

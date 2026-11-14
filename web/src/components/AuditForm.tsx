@@ -111,14 +111,18 @@ export function AuditForm() {
   }
 
   return (
-    <form onSubmit={submit} noValidate className="rounded-2xl border bg-card p-5 shadow-2xl shadow-black/20 sm:p-6">
+    <form
+      onSubmit={submit}
+      noValidate
+      className="rounded-[20px] border border-white/15 bg-card p-5 shadow-2xl shadow-black/60 sm:p-6"
+    >
       <div className="mb-5 flex items-center justify-between gap-3">
-        <h2 className="text-base font-medium text-foreground">Start an audit</h2>
+        <h2 className="text-xl font-semibold tracking-tight text-foreground">Start an audit</h2>
         <Button
           type="button"
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className="text-muted-foreground"
+          className="rounded-full"
           onClick={() => {
             setValues(DEMO_VALUES);
             setTouched({});
@@ -151,7 +155,7 @@ export function AuditForm() {
                   value={values[field.name]}
                   aria-invalid={Boolean(error)}
                   aria-describedby={`${id}-hint`}
-                  className="h-10 pr-9 pl-9"
+                  className="h-11 bg-ink/60 pr-9 pl-9 font-mono text-[13px]"
                   onChange={(event) => setValues((current) => ({ ...current, [field.name]: event.target.value }))}
                   onBlur={() => values[field.name] && setTouched((current) => ({ ...current, [field.name]: true }))}
                 />
@@ -184,7 +188,7 @@ export function AuditForm() {
                     aria-hidden
                     className={cn(
                       "flex size-4 shrink-0 items-center justify-center rounded border",
-                      checked ? "border-foreground bg-foreground text-background" : "border-input",
+                      checked ? "border-primary bg-primary text-primary-foreground" : "border-input",
                     )}
                   >
                     {checked && <Check className="size-3" strokeWidth={3} />}
@@ -219,13 +223,18 @@ export function AuditForm() {
         </div>
       )}
 
-      <div className="mt-6 flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-muted-foreground">Takes about a minute.</p>
-        <Button type="submit" size="lg" className="h-10 px-4" disabled={submitting || jurisdictions.length === 0}>
+      <div className="mt-6 space-y-2.5">
+        <Button
+          type="submit"
+          size="lg"
+          className="group/run arc-border tone-signal h-12 w-full rounded-xl text-base font-semibold hover:bg-primary hover:brightness-110"
+          disabled={submitting || jurisdictions.length === 0}
+        >
           {submitting ? <LoaderCircle aria-hidden className="animate-spin" /> : null}
-          {submitting ? "Starting" : isDemo ? "Run demo audit" : "Run audit"}
-          {!submitting && <ArrowRight aria-hidden />}
+          {submitting ? "Starting…" : isDemo ? "Run demo audit" : "Run audit"}
+          {!submitting && <ArrowRight aria-hidden className="transition-transform group-hover/run:translate-x-1" />}
         </Button>
+        <p className="text-center text-xs text-muted-foreground">Takes about a minute.</p>
       </div>
     </form>
   );
