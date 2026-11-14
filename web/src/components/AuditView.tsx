@@ -67,7 +67,8 @@ function Shell({ children, actions }: { children: React.ReactNode; actions?: Rea
         {actions}
         <Link href="/" className={buttonVariants({ variant: "outline", size: "sm" })}>
           <Plus aria-hidden />
-          New audit
+          {/* Icon only on phones, so the header never grows wider than the screen. */}
+          <span className="sr-only sm:not-sr-only">New audit</span>
         </Link>
       </SiteHeader>
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">{children}</main>
@@ -216,7 +217,7 @@ function Report({
         !isBundledAudit(id) && (
           <a href={markdownUrl(id)} download className={buttonVariants({ variant: "ghost", size: "sm" })}>
             <Download aria-hidden />
-            Download report
+            <span className="sr-only sm:not-sr-only">Download report</span>
           </a>
         )
       }

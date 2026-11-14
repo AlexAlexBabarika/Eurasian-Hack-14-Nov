@@ -27,7 +27,7 @@ export function SiteHeader({ children }: { children?: React.ReactNode }) {
     <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Wordmark />
-        <div className="flex items-center gap-2">{children}</div>
+        <div className="flex min-w-0 items-center gap-2">{children}</div>
       </div>
     </header>
   );
