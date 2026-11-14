@@ -20,7 +20,7 @@ import { ObservationsPanel, PolicyClaimsPanel } from "@/components/SaysVsDoes";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DEMO_ID, isBundledAudit, markdownUrl } from "@/lib/api";
+import { DEMO_ID, DEMO_PORTFOLIO_ID, isBundledAudit, markdownUrl } from "@/lib/api";
 import type { Comparison } from "@/lib/compare";
 import { compareReports } from "@/lib/compare";
 import { SPOTLIGHT_COLOR, spotlightSurface, STATUS_STYLE } from "@/lib/status";
@@ -95,7 +95,7 @@ function Running({ id, events, skip }: { id: string; events: Events; skip?: () =
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">
             {isBundledAudit(id)
-              ? "Replaying a recorded audit of the demo project."
+              ? `Replaying a recorded audit of ${id === DEMO_PORTFOLIO_ID ? "The Portfolio App" : "the demo project"}.`
               : "This usually takes about a minute. You can keep this tab open in the background."}
           </p>
           {skip && (
@@ -177,7 +177,7 @@ function Report({
           <div className="min-w-0 space-y-4">
             {isBundledAudit(id) && (
               <p className="inline-flex rounded-full border border-white/15 px-2.5 py-0.5 text-xs text-muted-foreground">
-                Recorded audit of the demo project
+                Recorded audit of {id === DEMO_PORTFOLIO_ID ? "The Portfolio App" : "the demo project"}
               </p>
             )}
             <h1

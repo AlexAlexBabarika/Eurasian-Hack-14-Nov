@@ -1,11 +1,16 @@
-import { DEMO_FIXED_ID, DEMO_ID } from "@/lib/api";
+import { BUNDLED_AUDIT_IDS, DEMO_FIXED_ID, DEMO_ID, DEMO_PORTFOLIO_ID } from "@/lib/api";
 import type { AuditReport, AuditSummary, ProgressEvent, Status } from "@/lib/types";
 import demoAudit from "../../../api/data/audits/demo-fixture.json";
 import demoFixedAudit from "../../../api/data/audits/demo-fixture-fixed.json";
+import demoPortfolioAudit from "../../../api/data/audits/demo-portfolio.json";
 
 export type BundledAudit = { report: AuditReport; events: ProgressEvent[] };
 
 export const BUNDLED_AUDITS: Record<string, BundledAudit | undefined> = {
+  [DEMO_PORTFOLIO_ID]: {
+    report: demoPortfolioAudit.report as AuditReport,
+    events: demoPortfolioAudit.events as ProgressEvent[],
+  },
   [DEMO_ID]: { report: demoAudit.report as AuditReport, events: demoAudit.events as ProgressEvent[] },
   [DEMO_FIXED_ID]: { report: demoFixedAudit.report as AuditReport, events: demoFixedAudit.events as ProgressEvent[] },
 };
@@ -28,7 +33,7 @@ function summarize(id: string, report: AuditReport): AuditSummary {
   };
 }
 
-export const BUNDLED_SUMMARIES: AuditSummary[] = [DEMO_ID, DEMO_FIXED_ID].flatMap((id) => {
+export const BUNDLED_SUMMARIES: AuditSummary[] = BUNDLED_AUDIT_IDS.flatMap((id) => {
   const audit = BUNDLED_AUDITS[id];
   return audit ? [summarize(id, audit.report)] : [];
 });
@@ -55,6 +60,7 @@ export function exampleSite(audit: AuditSummary): string | null {
 }
 
 export function exampleName(audit: AuditSummary): string {
+  if (audit.id === DEMO_PORTFOLIO_ID) return "The Portfolio App";
   if (isFixture(audit.id)) return "Notely (demo product)";
   if (audit.repo_url) {
     try {
