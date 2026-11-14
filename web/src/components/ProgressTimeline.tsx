@@ -23,7 +23,7 @@ function StepIcon({ state }: { state: StepState }) {
     );
   if (state === "running")
     return (
-      <span className={cn(base, "border-foreground/40 text-foreground")}>
+      <span className={cn(base, "tone-signal animate-pulse-dot border-signal/60 bg-signal/15 text-signal")}>
         <LoaderCircle aria-hidden className="size-3.5 animate-spin" />
       </span>
     );
@@ -54,13 +54,18 @@ const STATE_TEXT: Record<StepState, string> = {
   skipped: "Skipped",
 };
 
-export function ProgressTimeline({ events }: { events: ProgressEvent[] }) {
+export function progressPercent(events: ProgressEvent[]): { finished: number; percent: number } {
   const latest = latestByStep(events);
   const finished = STEPS.filter((step) => {
     const status = latest[step]?.status;
     return status === "done" || status === "skipped" || status === "error";
   }).length;
-  const percent = Math.round((finished / STEPS.length) * 100);
+  return { finished, percent: Math.round((finished / STEPS.length) * 100) };
+}
+
+export function ProgressTimeline({ events }: { events: ProgressEvent[] }) {
+  const latest = latestByStep(events);
+  const { finished, percent } = progressPercent(events);
 
   return (
     <div className="space-y-5">
@@ -69,7 +74,7 @@ export function ProgressTimeline({ events }: { events: ProgressEvent[] }) {
           <span>
             Step {Math.min(finished + 1, STEPS.length)} of {STEPS.length}
           </span>
-          <span>{percent}%</span>
+          <span className="tabular-nums">{percent}%</span>
         </div>
         <div
           role="progressbar"
@@ -77,9 +82,12 @@ export function ProgressTimeline({ events }: { events: ProgressEvent[] }) {
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={percent}
-          className="h-1 overflow-hidden rounded-full bg-muted"
+          className="h-1.5 overflow-hidden rounded-full bg-muted"
         >
-          <div className="h-full rounded-full bg-foreground transition-[width] duration-500" style={{ width: `${percent}%` }} />
+          <div
+            className="h-full rounded-full bg-signal transition-[width] duration-500"
+            style={{ width: `${percent}%` }}
+          />
         </div>
       </div>
 
@@ -92,12 +100,18 @@ export function ProgressTimeline({ events }: { events: ProgressEvent[] }) {
               {i < STEPS.length - 1 && <span aria-hidden className="absolute top-6 bottom-0 left-3 w-px bg-border" />}
               <StepIcon state={state} />
               <div className="min-w-0 pt-0.5">
-                <p className={cn("text-sm", state === "pending" ? "text-muted-foreground" : "font-medium text-foreground")}>
+                <p
+                  className={cn(
+                    "text-sm",
+                    state === "pending" ? "text-muted-foreground/70" : "font-medium text-foreground",
+                    state === "running" && "text-signal",
+                  )}
+                >
                   {STEP_LABEL[step]}
                   <span className="sr-only">: {STATE_TEXT[state]}</span>
                 </p>
                 {event && (
-                  <p className={cn("text-xs", state === "error" ? "text-status-red" : "text-muted-foreground")}>
+                  <p className={cn("font-mono text-xs", state === "error" ? "text-status-red" : "text-muted-foreground")}>
                     {event.message}
                     {state === "error" && " The audit continues without this step."}
                   </p>

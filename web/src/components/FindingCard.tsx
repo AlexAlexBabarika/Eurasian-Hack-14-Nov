@@ -8,6 +8,7 @@ import { EvidenceBlock } from "@/components/EvidenceBlock";
 import { SeverityBadge, StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { AREA_LABEL, ruleCode, ruleLabel } from "@/lib/labels";
+import { SEVERITY_STATUS } from "@/lib/status";
 import type { Finding, Status } from "@/lib/types";
 
 const VISIBLE_EVIDENCE = 2;
@@ -33,7 +34,14 @@ export function FindingCard({
   const evidence = expanded ? product : product.slice(0, VISIBLE_EVIDENCE);
 
   return (
-    <article className="@container rounded-xl border bg-card p-4">
+    <article
+      className={cn(
+        "@container rounded-2xl p-5",
+        (status ?? SEVERITY_STATUS[finding.severity]) === "red"
+          ? "tone-red tone-wash tone-edge"
+          : "border bg-card",
+      )}
+    >
       <header className="space-y-2">
         <div className="flex flex-wrap items-center gap-2">
           {status ? <StatusBadge status={status} className="px-1.5 py-0.5 text-[11px]" /> : <SeverityBadge severity={finding.severity} />}
@@ -51,7 +59,7 @@ export function FindingCard({
             </span>
           )}
         </div>
-        <h3 className="text-[15px] leading-snug font-medium text-foreground">{finding.title}</h3>
+        <h3 className="text-lg leading-snug font-semibold tracking-tight text-foreground">{finding.title}</h3>
       </header>
 
       <div
@@ -62,10 +70,10 @@ export function FindingCard({
       >
         {hasPolicy && (
           <section className="space-y-2">
-            <h4 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">The policy says</h4>
+            <h4 className="font-serif text-lg leading-none text-paper">The policy says</h4>
             {finding.policy_quote && (
-              <blockquote className="rounded-md border-l-2 border-foreground/40 bg-muted/40 px-3 py-2 text-sm leading-relaxed text-foreground">
-                &ldquo;{finding.policy_quote}&rdquo;
+              <blockquote className="paper rounded-lg px-4 py-3 font-serif text-[17px] leading-7 shadow-lg shadow-black/30">
+                <span className="marker">&ldquo;{finding.policy_quote}&rdquo;</span>
               </blockquote>
             )}
             {policyNotes.map((item, i) =>
@@ -84,9 +92,7 @@ export function FindingCard({
         )}
         {product.length > 0 && (
           <section className="min-w-0">
-            <h4 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-              The product does
-            </h4>
+            <h4 className="mb-2 font-mono text-sm leading-none font-medium text-foreground">The product does</h4>
             <div className="space-y-3">
               {evidence.map((item, i) => (
                 <EvidenceBlock key={i} evidence={item} />
