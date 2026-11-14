@@ -38,6 +38,8 @@ def test_rule_engine_failure_emits_diff_error_and_the_audit_finishes(monkeypatch
     assert last(events, "diff").status == "error" and "boom" in last(events, "diff").message
     assert not [e for e in events if e.step == "diff" and e.status == "done"]
     assert last(events, "verdict").status == "done" and report.matrix
+    assert all(c.status == "grey" for c in report.matrix)
+    assert all("could not be run" in c.headline for c in report.matrix if c.area != "financial")
     assert events[-1].step == "done" and events[-1].status == "done"
 
 
@@ -47,6 +49,8 @@ def test_claims_failure_emits_claims_error_and_the_audit_finishes(monkeypatch: p
     assert report.claims == pipeline.EMPTY_CLAIMS
     assert last(events, "claims").status == "error"
     assert last(events, "diff").status == "done"
+    assert {f.rule.split("_")[0] for f in report.findings} <= {"R5", "R8", "R10"}  # nothing is compared with empty claims
+    assert not [c for c in report.matrix if c.status == "green"]
     assert events[-1].step == "done"
 
 

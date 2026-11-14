@@ -146,6 +146,7 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
 
     # claims
     claims = EMPTY_CLAIMS
+    failed: list[str] = []  # steps that raised: their areas must read "not assessed", never green
     model = llm.model_for(req.effort)
     stats["effort"] = req.effort
     if policy_text:
@@ -158,6 +159,7 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
             stats["claims_method"] = method
             ev("claims", "done", f"Claims extracted ({method}); sharing statement: {claims.sharing_statement}")
         except Exception as e:  # noqa: BLE001
+            failed.append("the policy claims could not be extracted")
             ev("claims", "error", f"Claims extraction failed: {str(e)[:160]}")
         ev("diff", "running", "Comparing observed behaviour with policy claims")
     else:
@@ -166,9 +168,10 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
     # diff: without policy text only the rules that need none (consent, logs) can be evidenced
     findings: list[Finding] = []
     try:
-        findings = run_rules(observations, claims, signals, req.policy_url if policy_text else None, len(files))
+        findings = run_rules(observations, claims, signals, req.policy_url if policy_text and not failed else None, len(files))
         ev("diff", "done", f"{len(findings)} possible inconsistencies", len(findings))
     except Exception as e:  # noqa: BLE001
+        failed.append("the checks could not be run")
         ev("diff", "error", f"Rule engine failed: {str(e)[:160]}")
 
     # law + verdict
@@ -184,6 +187,7 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
         gaps.append("no live site was given")
     if not policy_text:
         gaps.append("the policy could not be read" if req.policy_url else "no privacy policy was given")
+    gaps += failed
     failure = ""
     try:
         built = await build_matrix(
@@ -194,7 +198,8 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
         failure = str(e)[:160]
         try:
             built = await build_matrix(findings, observations, jurisdictions, use_llm=False, gaps=gaps)
-        except Exception:  # noqa: BLE001
+        except Exception as e2:  # noqa: BLE001
+            failure = str(e2)[:160]
             built = Matrix([], {}, "error")
     matrix, provisions, method, llm_cells, fallbacks = built
     stats["verdict_method"] = method
@@ -206,10 +211,10 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
         ev("verdict", "error", f"Could not write verdicts: {failure}")
     else:
         ev("law", "done", f"{len(provisions)} provisions cited", len(provisions))
-    if failure and method != "error":
-        ev("verdict", "error", f"Verdict step failed, so all cells fell back to template text: {failure}", len(matrix))
-    elif not failure:
-        ev("verdict", "done", f"{len(matrix)} matrix cells ({method}{fell_back})", len(matrix))
+        if failure:
+            ev("verdict", "error", f"Verdict step failed once, so all cells use template text: {failure}", len(matrix))
+        else:
+            ev("verdict", "done", f"{len(matrix)} matrix cells ({method}{fell_back})", len(matrix))
 
     stats["duration_s"] = round(time.monotonic() - t0, 1)
     report = AuditReport(
