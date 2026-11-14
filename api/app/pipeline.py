@@ -15,12 +15,13 @@ from app.models import (
     JURISDICTIONS,
     AuditReport,
     AuditRequest,
+    Finding,
     Observation,
     PolicyClaims,
     ProgressEvent,
     Step,
 )
-from app.verdict.engine import build_matrix
+from app.verdict.engine import Matrix, build_matrix
 
 Emit = Callable[[ProgressEvent], None]
 
@@ -145,23 +146,33 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
 
     # claims
     claims = EMPTY_CLAIMS
+    failed: list[str] = []  # steps that raised: their areas must read "not assessed", never green
     model = llm.model_for(req.effort)
     stats["effort"] = req.effort
     if policy_text:
         ev("claims", "running", "Extracting what the policy claims")
-        if use_llm:
-            claims, method = await claims_extract.extract(policy_text, model)
-        else:
-            claims, method = claims_extract.validate_quotes(claims_extract.heuristic(policy_text), policy_text), "heuristic"
-        stats["claims_method"] = method
-        ev("claims", "done", f"Claims extracted ({method}); sharing statement: {claims.sharing_statement}")
+        try:
+            if use_llm:
+                claims, method = await claims_extract.extract(policy_text, model)
+            else:
+                claims, method = claims_extract.validate_quotes(claims_extract.heuristic(policy_text), policy_text), "heuristic"
+            stats["claims_method"] = method
+            ev("claims", "done", f"Claims extracted ({method}); sharing statement: {claims.sharing_statement}")
+        except Exception as e:  # noqa: BLE001
+            failed.append("the policy claims could not be extracted")
+            ev("claims", "error", f"Claims extraction failed: {str(e)[:160]}")
         ev("diff", "running", "Comparing observed behaviour with policy claims")
     else:
         ev("claims", "skipped", "No policy text, so nothing to compare against")
         ev("diff", "running", "Running the checks that need no policy text")
     # diff: without policy text only the rules that need none (consent, logs) can be evidenced
-    findings = run_rules(observations, claims, signals, req.policy_url if policy_text else None, len(files))
-    ev("diff", "done", f"{len(findings)} possible inconsistencies", len(findings))
+    findings: list[Finding] = []
+    try:
+        findings = run_rules(observations, claims, signals, req.policy_url if policy_text and not failed else None, len(files))
+        ev("diff", "done", f"{len(findings)} possible inconsistencies", len(findings))
+    except Exception as e:  # noqa: BLE001
+        failed.append("the checks could not be run")
+        ev("diff", "error", f"Rule engine failed: {str(e)[:160]}")
 
     # law + verdict
     jurisdictions = req.jurisdictions or JURISDICTIONS
@@ -176,16 +187,34 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
         gaps.append("no live site was given")
     if not policy_text:
         gaps.append("the policy could not be read" if req.policy_url else "no privacy policy was given")
-    matrix, provisions, method, llm_cells, fallbacks = await build_matrix(
-        findings, observations, jurisdictions, use_llm=use_llm, gaps=gaps,
-        on_cell=lambda n, total: ev("verdict", "running", f"Writing verdicts: {n} of {total} cells", n), model=model,
-    )
+    gaps += failed
+    failure = ""
+    try:
+        built = await build_matrix(
+            findings, observations, jurisdictions, use_llm=use_llm, gaps=gaps,
+            on_cell=lambda n, total: ev("verdict", "running", f"Writing verdicts: {n} of {total} cells", n), model=model,
+        )
+    except Exception as e:  # noqa: BLE001
+        failure = str(e)[:160]
+        try:
+            built = await build_matrix(findings, observations, jurisdictions, use_llm=False, gaps=gaps)
+        except Exception as e2:  # noqa: BLE001
+            failure = str(e2)[:160]
+            built = Matrix([], {}, "error")
+    matrix, provisions, method, llm_cells, fallbacks = built
     stats["verdict_method"] = method
     if method == "llm":
         stats["verdict_fallbacks"] = fallbacks
     fell_back = f"; {fallbacks} of {llm_cells} LLM cells fell back to template text" if fallbacks else ""
-    ev("law", "done", f"{len(provisions)} provisions cited", len(provisions))
-    ev("verdict", "done", f"{len(matrix)} matrix cells ({method}{fell_back})", len(matrix))
+    if method == "error":
+        ev("law", "error", f"No provisions retrieved: {failure}")
+        ev("verdict", "error", f"Could not write verdicts: {failure}")
+    else:
+        ev("law", "done", f"{len(provisions)} provisions cited", len(provisions))
+        if failure:
+            ev("verdict", "error", f"Verdict step failed once, so all cells use template text: {failure}", len(matrix))
+        else:
+            ev("verdict", "done", f"{len(matrix)} matrix cells ({method}{fell_back})", len(matrix))
 
     stats["duration_s"] = round(time.monotonic() - t0, 1)
     report = AuditReport(
