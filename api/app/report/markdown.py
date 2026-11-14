@@ -31,7 +31,8 @@ def render(r: AuditReport) -> str:
     out += [f"- Repository: {r.inputs.get('repo_url') or 'not given'}", f"- Site: {r.inputs.get('site_url') or 'not given'}",
             f"- Policy: {r.inputs.get('policy_url')}",
             f"- Files scanned: {r.stats.get('files_scanned')}, vendors found: {r.stats.get('vendors_found')}, "
-            f"requests before consent: {r.stats.get('requests_pre_consent')}", ""]  # fmt: skip
+            f"requests before consent: {r.stats.get('requests_pre_consent')}" + "".join(
+                f", after {p}: {r.stats[k]}" for p in ("reject", "accept") if (k := f"requests_after_{p}") in r.stats), ""]  # fmt: skip
 
     jurisdictions = list(dict.fromkeys(c.jurisdiction for c in r.matrix))
     cell = {(c.jurisdiction, c.area): c for c in r.matrix}
