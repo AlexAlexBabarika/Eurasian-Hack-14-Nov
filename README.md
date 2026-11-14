@@ -122,7 +122,7 @@ Other inputs: `repo` (default `.`), `site`, `jurisdictions` (default `UK,EU,KZ`)
 1. **Ingest**: shallow clone, Playwright site load with no clicks (requests and cookies before consent), policy text via trafilatura.
 2. **Detect**: dependency manifests and imports matched against `sdk_catalog.yaml` (49 vendors, including services common on Kazakhstan products such as Yandex Metrica, VK, 2GIS and Halyk ePay), optional Bearer CLI scan, grep signals for delete-account routes and personal data in logs.
 3. **Claims**: policy text to `PolicyClaims`; quotes must be exact substrings of the policy.
-4. **Diff**: deterministic rules R1-R9 produce findings.
+4. **Diff**: deterministic rules R1-R10 produce findings.
 5. **Law**: tag filter + BM25 over the curated corpus.
 6. **Verdict**: a 3 x 4 matrix (jurisdiction x legal area) with reasoning, citations and paste-ready fixes.
 

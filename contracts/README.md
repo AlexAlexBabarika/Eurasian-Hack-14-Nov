@@ -9,7 +9,7 @@ Changing a field: edit `models.py`, run `make sample` and `make types`, then tel
 - `observations[]`: what the product does. One per vendor, merged from code and network evidence. `pre_consent` is true when the vendor was seen on the site before any consent click. `vendor: null` means first-party processing found by Bearer.
 - `inputs`: the request as sent. `policy_url` is null when no policy was given; then `claims` is empty and only R5, R8 and R10 can produce findings.
 - `claims`: what the policy says. Every entry in `claims.quotes` is an exact substring of the policy text (enforced in code).
-- `findings[]`: output of rules R1-R9. `evidence` is never empty. Findings are jurisdiction-neutral.
+- `findings[]`: output of rules R1-R10. `evidence` is never empty. Findings are jurisdiction-neutral.
 - `matrix[]`: one `CellVerdict` per jurisdiction x area (3 x 4). `financial` is always `grey`.
   - `status`: worst status among the cell's findings, after caps (UK `ai_transparency` is at most `amber`).
   - `finding_statuses`: finding id -> status of that finding in this jurisdiction. This is how the same evidence shows as amber in UK and red in EU (R5, cookies). Addition to the PLAN.md §4 contract.

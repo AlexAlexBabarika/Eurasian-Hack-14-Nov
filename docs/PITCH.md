@@ -125,7 +125,7 @@ Back to slides.
 |---|---|
 | What the product does: SDK catalog, code signals, network requests before consent | **Code** |
 | What the policy claims: quotes must be exact substrings of the policy | LLM, checked by code |
-| Findings: 9 rules (undisclosed processor, tracking before consent, AI not disclosed ...) | **Code** |
+| Findings: 10 rules (undisclosed processor, tracking before consent, AI not disclosed ...) | **Code** |
 | Red / amber / green and which provisions are cited | **Code** |
 | The explanation and the suggested clause | LLM |
 
@@ -133,7 +133,7 @@ No finding without evidence. No citation from outside our corpus. Works with no 
 
 <!--
 ALEX (25s)
-"What matters is who decides what. The facts come from the code and from real network requests. The findings come from nine deterministic rules. The colour of a cell and the provisions it cites are decided in code. The model does two things: it extracts claims from the policy, and every quote must be an exact substring or it is dropped, and it writes the explanation. Without an API key the whole thing still runs on heuristics. We ran it on 17 real open-source products and fixed the false positives we found by hand-checking."
+"What matters is who decides what. The facts come from the code and from real network requests. The findings come from ten deterministic rules. The colour of a cell and the provisions it cites are decided in code. The model does two things: it extracts claims from the policy, and every quote must be an exact substring or it is dropped, and it writes the explanation. Without an API key the whole thing still runs on heuristics. We ran it on 17 real open-source products and fixed the false positives we found by hand-checking."
 Hand-over: "The legal side is Gor's."
 -->
 
@@ -148,12 +148,12 @@ Hand-over: "The legal side is Gor's."
 | Analytics fires before consent | <span class="amber">AMBER</span> PECR Sch. A1 para. 5: statistical-purposes exception (2025) | <span class="red">RED</span> ePrivacy Art. 5(3) | <span class="amber">AMBER</span> Personal Data Law |
 | Chat text sent to OpenAI, AI not mentioned | <span class="amber">AMBER</span> no AI statute, ICO guidance | <span class="red">RED</span> AI Act Art. 50 | <span class="red">RED</span> AI Law No. 230-VIII, in force Jan 2026 |
 
-54 provisions in the corpus, each with its official URL. 50 checked against the official text by a person; the other 4 carry a warning badge.
+51 provisions in the corpus, each with its official URL. 47 checked against the official text (AI-assisted; human confirmation pending); the other 4 carry a warning badge.
 
 <!--
 GOR (30s)
 "The same evidence gets a different answer in each jurisdiction. Analytics before consent: red under the EU ePrivacy rules, amber in the UK, because a 2025 amendment added an exception for statistical cookies, with conditions. Chat text going to OpenAI: the UK has no AI statute, so amber at most. Kazakhstan has an AI law that came into force this January, and almost no tool covers it.
-A model cannot invent a citation here. There are 54 provisions, each with a link to the official text. We checked them against those texts: the first AI-written draft had four wrong, including two UK GDPR articles that changed this February. Those four are corrected and still flagged until a second person confirms them."
+A model cannot invent a citation here. There are 51 provisions, each with a link to the official text. We checked them against those texts: the first AI-written draft had four wrong, including two UK GDPR articles that changed this February. Those four are corrected and still flagged until a second person confirms them."
 -->
 
 ---

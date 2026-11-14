@@ -37,7 +37,7 @@ Boris Sheryakov (web app, public-deployment safety, Russian and Kazakh policies)
 
 ### In the product
 
-The model has two narrow jobs: extract structured claims from the policy text, and write the explanation and the suggested clause for each matrix cell. Everything that decides the result is ordinary code: vendor detection, the nine diff rules, the red/amber/green status, and which provisions are cited. Quotes from the policy must be exact substrings or they are dropped; provision ids that are not in the corpus are dropped. With no API key the pipeline still runs end to end on keyword heuristics and template text.
+The model has two narrow jobs: extract structured claims from the policy text, and write the explanation and the suggested clause for each matrix cell. Everything that decides the result is ordinary code: vendor detection, the ten diff rules, the red/amber/green status, and which provisions are cited. Quotes from the policy must be exact substrings or they are dropped; provision ids that are not in the corpus are dropped. With no API key the pipeline still runs end to end on keyword heuristics and template text.
 
 ### In building it
 
