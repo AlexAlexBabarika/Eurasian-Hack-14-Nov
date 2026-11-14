@@ -2,7 +2,7 @@ import { CircleAlert, CircleCheck, CircleDashed, TriangleAlert } from "lucide-re
 import { cn } from "cn";
 
 import { SEVERITY_LABEL, STATUS_LABEL } from "@/lib/labels";
-import { SEVERITY_STATUS, STATUS_STYLE } from "@/lib/status";
+import { LOUD_STATUS, SEVERITY_STATUS, STATUS_STYLE } from "@/lib/status";
 import type { Severity, Status } from "@/lib/types";
 
 const ICON = { red: CircleAlert, amber: TriangleAlert, green: CircleCheck, grey: CircleDashed };
@@ -10,6 +10,17 @@ const ICON = { red: CircleAlert, amber: TriangleAlert, green: CircleCheck, grey:
 export function StatusIcon({ status, className }: { status: Status; className?: string }) {
   const Icon = ICON[status];
   return <Icon aria-hidden className={cn("size-4 shrink-0", STATUS_STYLE[status].text, className)} />;
+}
+
+// Icon for the statuses that ask for attention, a quiet dot or ring for the rest.
+export function StatusMark({ status, className }: { status: Status; className?: string }) {
+  if (LOUD_STATUS[status]) return <StatusIcon status={status} className={className} />;
+  return (
+    <span
+      aria-hidden
+      className={cn("mx-[3px] size-2 shrink-0 rounded-full", status === "grey" ? "border border-status-grey/70" : STATUS_STYLE[status].dot)}
+    />
+  );
 }
 
 export function StatusBadge({ status, className }: { status: Status; className?: string }) {

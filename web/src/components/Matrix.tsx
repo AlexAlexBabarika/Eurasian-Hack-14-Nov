@@ -3,7 +3,7 @@
 import { ChevronRight } from "lucide-react";
 import { cn } from "cn";
 
-import { StatusIcon } from "@/components/StatusBadge";
+import { StatusMark } from "@/components/StatusBadge";
 import { AREA_LABEL, JURISDICTION_LABEL, STATUS_LABEL } from "@/lib/labels";
 import { previousStatus } from "@/lib/compare";
 import { LOUD_STATUS, STATUS_STYLE } from "@/lib/status";
@@ -32,16 +32,6 @@ const CELL_TONE: Record<Status, string> = {
   green: "border-border bg-card hover:border-white/25",
   grey: "border-dashed border-white/12 hover:border-white/25",
 };
-
-function StatusMark({ status, className }: { status: Status; className?: string }) {
-  if (LOUD_STATUS[status]) return <StatusIcon status={status} className={className} />;
-  return (
-    <span
-      aria-hidden
-      className={cn("mx-[3px] size-2 shrink-0 rounded-full", status === "grey" ? "border border-status-grey/70" : STATUS_STYLE[status].dot)}
-    />
-  );
-}
 
 function Cell({
   cell,
