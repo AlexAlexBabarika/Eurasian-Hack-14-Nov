@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { cn } from "cn";
 
 import { AuditForm } from "@/components/AuditForm";
 import { ExampleAudits } from "@/components/ExampleAudits";
@@ -7,9 +8,10 @@ import { HeroExhibit } from "@/components/HeroExhibit";
 import { ScrambleText } from "@/components/ScrambleText";
 import LetterGlitch from "@/components/reactbits/LetterGlitch";
 import { SiteHeader } from "@/components/SiteHeader";
-import { StatusIcon } from "@/components/StatusBadge";
+import { StatusMark } from "@/components/StatusBadge";
 import { DEMO_ID } from "@/lib/api";
 import { STATUS_LABEL } from "@/lib/labels";
+import { LOUD_STATUS, STATUS_STYLE } from "@/lib/status";
 import type { Status } from "@/lib/types";
 
 const HOW = [
@@ -110,11 +112,16 @@ export default function Home() {
 
           <div className="mt-12 space-y-3">
             <p className="text-sm text-muted-foreground">You get one verdict per country and area of law:</p>
-            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <ul className="grid gap-x-8 sm:grid-cols-2 lg:grid-cols-4">
               {LEGEND.map((status) => (
-                <li key={status} className={`tone-${status} tone-wash tone-edge space-y-1 rounded-xl p-4`}>
-                  <p className="flex items-center gap-2 text-sm font-medium text-foreground">
-                    <StatusIcon status={status} /> {STATUS_LABEL[status].name}
+                <li key={status} className="space-y-1 border-t py-4">
+                  <p
+                    className={cn(
+                      "flex items-center gap-2 text-sm font-medium",
+                      LOUD_STATUS[status] ? STATUS_STYLE[status].text : "text-foreground",
+                    )}
+                  >
+                    <StatusMark status={status} /> {STATUS_LABEL[status].name}
                   </p>
                   <p className="text-xs leading-relaxed text-muted-foreground">{STATUS_LABEL[status].description}</p>
                 </li>
