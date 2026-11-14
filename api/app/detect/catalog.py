@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 class Vendor(BaseModel):
     name: str
+    aliases: list[str] = []  # company names a policy may use instead of the product name
     packages: list[str] = []
     domains: list[str] = []
     cookies: list[str] = []
@@ -30,3 +31,8 @@ def package_index() -> dict[str, Vendor]:
 
 def vendor_by_name(name: str | None) -> Vendor | None:
     return next((v for v in load_catalog() if v.name == name), None)
+
+
+def policy_names(v: Vendor) -> list[str]:
+    """Every name under which a policy may disclose this vendor."""
+    return [v.name, *v.aliases]

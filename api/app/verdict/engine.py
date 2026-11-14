@@ -67,8 +67,9 @@ def _dedupe(items: list[Provision]) -> list[Provision]:
     return list({p.id: p for p in items}.values())
 
 
-def deterministic_cell(j: Jurisdiction, area: Area, findings: list[Finding],
-                       observations: list[Observation]) -> CellVerdict:  # fmt: skip
+def deterministic_cell(j: Jurisdiction, area: Area, findings: list[Finding], observations: list[Observation],
+                       gaps: list[str] | None = None) -> CellVerdict:  # fmt: skip
+    """`gaps` lists inputs that could not be read (repository, policy); a cell with gaps is never green."""
     if area == "financial":
         return CellVerdict(
             jurisdiction=j, area=area, status="grey", headline="Needs questionnaire",
@@ -79,6 +80,13 @@ def deterministic_cell(j: Jurisdiction, area: Area, findings: list[Finding],
     for f in findings:
         if area in f.areas and (res := finding_status(f, j, area, observations)):
             rows.append((f, res[0], res[1], retrieve(f, j, area)))
+    if not rows and gaps:
+        return CellVerdict(
+            jurisdiction=j, area=area, status="grey", finding_ids=[], provision_ids=[], fixes=[],
+            headline=f"Not assessed: {' and '.join(gaps)} could not be read",
+            reasoning="No findings, but the scan was incomplete, so this is not a clean result. Fix the input and "
+            "run the audit again.",
+        )  # fmt: skip
     if not rows:
         return CellVerdict(
             jurisdiction=j, area=area, status="green", finding_ids=[], provision_ids=[], fixes=[],
@@ -150,9 +158,10 @@ def _prompt(cell: CellVerdict, findings: list[Finding], observations: list[Obser
 
 
 async def build_matrix(findings: list[Finding], observations: list[Observation], jurisdictions: list[Jurisdiction],
-                       use_llm: bool = True) -> tuple[list[CellVerdict], dict[str, Provision], str]:  # fmt: skip
+                       use_llm: bool = True, gaps: list[str] | None = None,
+                       ) -> tuple[list[CellVerdict], dict[str, Provision], str]:  # fmt: skip
     """Returns (matrix, cited provisions, method) where method is 'llm' or 'deterministic'."""
-    cells = [deterministic_cell(j, a, findings, observations) for j in jurisdictions for a in AREAS]
+    cells = [deterministic_cell(j, a, findings, observations, gaps) for j in jurisdictions for a in AREAS]
     method = "deterministic"
 
     async def refine(cell: CellVerdict) -> CellVerdict:

@@ -5,7 +5,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from app.detect.manifests import SOURCE_EXT, _snippet
+from app.detect.manifests import SOURCE_EXT, _snippet, code_lines
 from app.ingest.repo import RepoFile
 from app.models import Evidence
 
@@ -29,6 +29,7 @@ def detect(files: list[RepoFile]) -> CodeSignals:
         if Path(f.path).suffix not in SOURCE_EXT:
             continue
         lines = f.text.splitlines()
+        code = code_lines(lines)
         if _DELETE.search(f.path) and len(out.delete_route) < 3:
             out.delete_route.append(Evidence(kind="code", summary="Delete-account route file", file=f.path))
         for i, line in enumerate(lines):
@@ -37,7 +38,8 @@ def detect(files: list[RepoFile]) -> CodeSignals:
                     kind="code", summary="Delete-account code path", file=f.path, line=i + 1,
                     snippet=_snippet(lines, i),
                 ))  # fmt: skip
-            if _LOG.search(line) and (m := _PII.search(line)) and len(out.pii_logs) < 5:
+            # The identifier must be in code: "Queued email delivery failed" logs no personal data.
+            if _LOG.search(line) and (m := _PII.search(code[i])) and len(out.pii_logs) < 5:
                 out.pii_logs.append(Evidence(
                     kind="code", summary=f"`{m.group(0)}` written to application logs", file=f.path,
                     line=i + 1, snippet=_snippet(lines, i),

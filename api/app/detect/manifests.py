@@ -30,6 +30,46 @@ _PII = {
 _USER_CONTENT = re.compile(r"\b(?:messages|prompt|content|input)\b\s*[:=,}]", re.I)
 
 
+_STRING = re.compile(r"""(?P<f>\b[fF])?(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)""")
+
+
+def code_only(line: str) -> str:
+    """The line without the text of string literals; interpolated expressions (`${x}`, f"{x}") are kept."""
+
+    def repl(m: re.Match) -> str:
+        s = m.group(0)
+        if m.group("f"):
+            return " ".join(re.findall(r"\{([^{}]*)\}", s))
+        if s.startswith("`"):
+            return " ".join(re.findall(r"\$\{([^{}]*)\}", s))
+        return '""'
+
+    return _STRING.sub(repl, line)
+
+
+def code_lines(lines: list[str]) -> list[str]:
+    """`code_only` for a whole file, also blanking the inside of multi-line template literals and docstrings."""
+    out: list[str] = []
+    open_delim: str | None = None  # "`", '"""' or "'''" while inside a multi-line string
+    for line in lines:
+        if open_delim:
+            before, closed, rest = line.partition(open_delim)
+            interpolated = " ".join(re.findall(r"\$\{([^{}]*)\}", before)) if open_delim == "`" else ""
+            if not closed:
+                out.append(interpolated)
+                continue
+            open_delim, line, prefix = None, rest, interpolated + " "
+        else:
+            prefix = ""
+        text = code_only(re.sub(r'"""(?:[^"\\]|\\.|"(?!""))*"""|\'\'\'(?:[^\'\\]|\\.|\'(?!\'\'))*\'\'\'', '""', line))
+        for delim in ('"""', "'''", "`"):
+            if delim in text:  # an opener that code_only could not pair on this line
+                text, open_delim = text.partition(delim)[0], delim
+                break
+        out.append(prefix + text)
+    return out
+
+
 def _snippet(lines: list[str], idx: int, radius: int = 2) -> str:
     lo, hi = max(0, idx - radius), min(len(lines), idx + radius + 1)
     return "\n".join(line[:200] for line in lines[lo:hi])
@@ -101,9 +141,13 @@ def detect(files: list[RepoFile]) -> list[Observation]:
             ))  # fmt: skip
             # Heuristic: PII identifiers in a file that talks to a vendor are treated as sent to that vendor.
             seen: set[str] = set()
-            for j, line in enumerate(lines):
+            code = code_lines(lines)  # words inside prompts and messages are not data being sent
+            for j, raw in enumerate(lines):
+                if raw.lstrip().startswith(("import", "//", "#", "*", "/*")):
+                    continue
+                line = code[j]
                 for cat, rx in _PII.items():
-                    if cat not in seen and rx.search(line) and not line.lstrip().startswith(("import", "//", "#")):
+                    if cat not in seen and rx.search(line):
                         seen.add(cat)
                         add_category(o, cat)
                         o.evidence.append(Evidence(
