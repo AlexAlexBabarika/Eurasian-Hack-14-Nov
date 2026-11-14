@@ -1,26 +1,49 @@
 """MCP server exposing the audit as a tool. Run: uv run --project api python mcp/server.py"""
 
+import asyncio
 import os
 import sys
 import uuid
 from pathlib import Path
+from typing import get_args
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "api"))
 
-from mcp.server.mcpserver import MCPServer  # noqa: E402
+from mcp.server.mcpserver import Context, MCPServer  # noqa: E402
 from mcp.server.mcpserver.exceptions import ToolError  # noqa: E402
 
 from app import store  # noqa: E402
-from app.models import JURISDICTIONS, AuditRequest, Jurisdiction  # noqa: E402
+from app.models import JURISDICTIONS, AuditReport, AuditRequest, Jurisdiction, ProgressEvent, Step  # noqa: E402
 from app.pipeline import run_audit  # noqa: E402
 from app.report.markdown import render  # noqa: E402
 
 server = MCPServer("groundtruth")
 
+# Every step reports "running" and then its outcome, except the last, which reports once.
+PROGRESS_TOTAL = 2 * len(get_args(Step)) - 1
+
+
+async def _audit_with_progress(req: AuditRequest, ctx: Context) -> AuditReport:
+    """Run a live audit, sending each pipeline event to the client as a progress notification."""
+    events: asyncio.Queue[ProgressEvent | None] = asyncio.Queue()
+
+    async def forward() -> None:
+        sent = 0
+        while (event := await events.get()) is not None:
+            sent += 1
+            await ctx.report_progress(PROGRESS_TOTAL if event.step == "done" else sent, PROGRESS_TOTAL, event.message)
+
+    forwarder = asyncio.create_task(forward())
+    try:
+        return await run_audit(uuid.uuid4().hex[:12], req, events.put_nowait)
+    finally:
+        events.put_nowait(None)
+        await forwarder
+
 
 @server.tool()
 async def audit_product(
-    repo_url: str, site_url: str, policy_url: str, jurisdictions: list[Jurisdiction] | None = None
+    repo_url: str, site_url: str, policy_url: str, ctx: Context, jurisdictions: list[Jurisdiction] | None = None
 ) -> str:
     """Compare what a product does (public GitHub repo + live site) with what its privacy policy says.
 
@@ -39,8 +62,7 @@ async def audit_product(
         if selected:
             report = report.model_copy(update={"matrix": [c for c in report.matrix if c.jurisdiction in selected]})
         return render(report)
-    report = await run_audit(uuid.uuid4().hex[:12], req, lambda event: None)
-    return render(report)
+    return render(await _audit_with_progress(req, ctx))
 
 
 if __name__ == "__main__":

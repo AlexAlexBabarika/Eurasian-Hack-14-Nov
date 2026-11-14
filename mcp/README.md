@@ -48,4 +48,4 @@ That is the built-in demo product. Either run `make fixture` so those URLs are l
 ## Notes
 
 - Settings come from `.env` in the repo root (`LLM_API_KEY`, `DEMO_MODE`, ...). Assistants pass only a few environment variables to the server, so put them there, not in your shell.
-- A live audit of a real repository can take a minute or more. If the assistant gives up early, raise its tool timeout (Claude Code: add `"timeout": 600000` to the server entry in `.mcp.json`).
+- A live audit of a real repository can take a minute or more. While it runs, the server sends a progress notification for each pipeline step ("Fetching repository", "Loading the site in a clean browser", ...); assistants that support MCP progress show these. If the assistant gives up early, raise its tool timeout (Claude Code: add `"timeout": 600000` to the server entry in `.mcp.json`).

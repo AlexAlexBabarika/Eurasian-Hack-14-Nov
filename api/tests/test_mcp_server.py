@@ -4,10 +4,11 @@ import json
 from pathlib import Path
 
 import pytest
+from mcp import Client
 from mcp.server.mcpserver.exceptions import ToolError
 
 from app import store
-from app.models import AuditRequest
+from app.models import AuditRequest, ProgressEvent
 
 SERVER = Path(__file__).resolve().parents[2] / "mcp" / "server.py"
 
@@ -135,3 +136,46 @@ def test_shipped_client_config_starts_this_server(config: str, root_placeholder:
     args = [a.replace(root_placeholder, str(root)) for a in entry["args"]]
     assert entry["command"] == "uv"
     assert args == ["run", "--project", str(root / "api"), "python", str(SERVER)]
+
+
+def _call_with_progress(module, arguments: dict) -> tuple[str, list[tuple[float, float | None, str | None]]]:
+    """Call the tool the way an assistant does, over an MCP session, and collect its progress notifications."""
+    seen: list[tuple[float, float | None, str | None]] = []
+
+    async def on_progress(progress: float, total: float | None, message: str | None) -> None:
+        seen.append((progress, total, message))
+
+    async def call() -> str:
+        async with Client(module.server) as client:
+            return _text(await client.call_tool("audit_product", arguments, progress_callback=on_progress))
+
+    return asyncio.run(call()), seen
+
+
+def test_live_audit_reports_each_pipeline_event_as_progress(monkeypatch) -> None:
+    module = _load()
+
+    async def fake_run_audit(audit_id, req, emit, use_llm=True):
+        emit(ProgressEvent(step="clone", status="running", message="Fetching repository"))
+        emit(ProgressEvent(step="clone", status="error", message="Could not fetch repository: boom"))
+        emit(ProgressEvent(step="done", status="done", message="Audit finished in 1s"))
+        return store.find_cached(AuditRequest(**DEMO)).report
+
+    monkeypatch.setattr(module, "run_audit", fake_run_audit)
+    monkeypatch.setenv("DEMO_MODE", "live")
+    text, seen = _call_with_progress(module, DEMO)
+    assert text.startswith("# Groundtruth audit")
+    assert seen == [
+        (1, 19, "Fetching repository"),
+        (2, 19, "Could not fetch repository: boom"),
+        (19, 19, "Audit finished in 1s"),
+    ]
+
+
+def test_saved_report_is_returned_without_progress(monkeypatch) -> None:
+    module = _load()
+    _no_live_audit(module, monkeypatch)
+    monkeypatch.setenv("DEMO_MODE", "cached")
+    text, seen = _call_with_progress(module, DEMO)
+    assert text.startswith("# Groundtruth audit")
+    assert seen == []
