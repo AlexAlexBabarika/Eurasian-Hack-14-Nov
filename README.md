@@ -11,7 +11,7 @@ Full plan: [PLAN.md](PLAN.md). Rules for coding agents: [AGENTS.md](AGENTS.md).
 Requires `uv`, `pnpm` and Node 20+.
 
 ```sh
-cp .env.example .env      # add ANTHROPIC_API_KEY (optional, see below)
+cp .env.example .env      # add LLM_API_KEY (optional, see below)
 make setup                # uv sync, Playwright Chromium, pnpm install
 make dev                  # API on :8000, web on :3000
 ```
@@ -24,7 +24,11 @@ make fixture              # serves demo/fixture-app on :4100
 
 Then open http://localhost:3000 and click "Use demo fixture".
 
-Without `ANTHROPIC_API_KEY` the pipeline still runs end to end: policy claims come from keyword heuristics and verdict text from templates. With a key, Claude extracts the claims and writes the verdict prose and fixes. Cell statuses are decided by deterministic rules either way.
+Without `LLM_API_KEY` the pipeline still runs end to end: policy claims come from keyword heuristics and verdict text from templates. With a key, the model extracts the claims and writes the verdict prose and fixes. Cell statuses are decided by deterministic rules either way.
+
+### LLM provider
+
+`api/app/llm.py` talks to any OpenAI-compatible chat-completions API. Set `LLM_API_KEY`, `LLM_BASE_URL` (default: OpenRouter) and `MODEL_FAST` in `.env`. The model must support forced tool calls; if a call fails twice, that step falls back to the heuristic or template output. If only `ANTHROPIC_API_KEY` is set, Anthropic's OpenAI-compatible endpoint is used.
 
 ## Commands
 

@@ -12,4 +12,4 @@
 - `make test` runs ruff + pytest (api) and tsc + eslint (web). Tests need no API key or network.
 - `make types` regenerates web/src/lib/api-types.ts from the FastAPI OpenAPI schema.
 - `make sample` regenerates contracts/sample_report.json from demo/fixture-app (offline, no LLM).
-- Without ANTHROPIC_API_KEY the claims and verdict steps fall back to deterministic heuristics, so the pipeline still runs end-to-end.
+- LLM calls go through `api/app/llm.py` only (OpenAI-compatible API; `LLM_API_KEY`, `LLM_BASE_URL`, `MODEL_FAST`). Without a key the claims and verdict steps fall back to deterministic heuristics, so the pipeline still runs end-to-end.
