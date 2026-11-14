@@ -2069,6 +2069,7 @@
     }
   },
   "stats": {
+    "files_total": 8,
     "files_scanned": 8,
     "bearer": false,
     "requests_pre_consent": 4,

@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 
 from app import llm
-from app.detect.catalog import load_catalog
+from app.detect.catalog import load_catalog, policy_names
 from app.models import PolicyClaims
 
 PROMPT = (Path(__file__).parents[1] / "verdict" / "prompts" / "claims.md").read_text()
@@ -44,14 +44,28 @@ def heuristic(policy_text: str) -> PolicyClaims:
         "payment": r"\bpayment|billing|card details", "location": r"\blocation\b", "health": r"\bhealth\b",
     }  # fmt: skip
     data_categories = [c for c, rx in cats.items() if find("data_categories" if c == "email" else f"data_{c}", rx)]
-    named = [v.name for v in load_catalog() if re.search(rf"\b{re.escape(v.name)}\b", policy_text, re.I)]
+    # Company names are matched case-sensitively so "Meta" does not match "metadata".
+    named = list(dict.fromkeys(
+        n for v in load_catalog() for n in policy_names(v)
+        if re.search(rf"\b{re.escape(n)}\b", policy_text, 0 if n in v.aliases else re.I)
+    ))  # fmt: skip
 
-    if find("sharing_statement", r"(?:never|do(?:es)? not|don't|will not|won't) (?:sell or )?shar"):
+    # "We do not share ... for marketing purposes" limits a purpose; it is not a claim that nothing is shared.
+    no_share = re.compile(r"(?:never|do(?:es)? not|don't|will not|won't) (?:sell(?:,| or| nor) )?(?:rent or )?shar", re.I)
+    qualified = re.compile(
+        r"\bfor (?:[\w-]+,? ){0,4}(?:marketing|commercial|advertising|promotional)|\bexcept\b|\bunless\b|other than"
+        r"|\bwithout your (?:consent|permission)|\bonly (?:with|when|where|as)\b", re.I,
+    )  # fmt: skip
+    sells_rx = re.compile(r"\bwe (?:may )?sell\b|share .{0,60}advertis", re.I)
+    blanket = next((s for s in sents if no_share.search(s) and not qualified.search(s)), None)
+    if blanket:
         sharing = "no_sharing"
-    elif find("sharing_statement", r"\bsell\b(?!.{0,20}\bnot\b)|share .{0,60}advertis"):
-        sharing = "sells_or_shares"
-    elif find("sharing_statement", r"service providers|processors|sub-?processors|third[- ]part(?:y|ies) (?:who|that|to)"):
+        quotes["sharing_statement"] = blanket
+    elif find("sharing_statement", r"service providers|\bprocessors\b|sub-?processors|third[- ]part(?:y|ies) (?:who|that|to)"):
         sharing = "processors_only"
+    elif sells := next((s for s in sents if sells_rx.search(s) and not no_share.search(s)), None):
+        sharing = "sells_or_shares"
+        quotes["sharing_statement"] = sells
     else:
         sharing = "unclear"
 
@@ -70,8 +84,10 @@ def heuristic(policy_text: str) -> PolicyClaims:
         mentions_ai=find("mentions_ai", r"artificial intelligence|\bAI\b|machine learning|language model|\bLLM"),
         international_transfers=find(
             "international_transfers",
-            r"international(?:ly)? transfer|transfer.{0,60}(?:outside|abroad|other countries|third countr)"
-            r"|standard contractual clauses|outside (?:the )?(?:UK|EEA|EU|Kazakhstan)",
+            r"international(?:ly)? (?:data )?transfer|cross-border|transfer.{0,60}(?:outside|abroad|other countries|third countr)"
+            r"|standard contractual clauses|outside (?:of )?(?:the )?(?:UK|EEA|EU|Kazakhstan|your country)"
+            r"|(?:stored|hosted|processed|located|servers?|data cent(?:er|re)s?) .{0,60}\b(?:United States|U\.S\.|USA|European Union|EEA)\b"
+            r"|\((?:United States|USA|US)\)",
         ),
         retention_stated=find("retention_stated", r"\bretain|retention|(?:kept|stored|keep|store) .{0,40}for (?:\d|as long)"),
         rights_listed=rights_listed,

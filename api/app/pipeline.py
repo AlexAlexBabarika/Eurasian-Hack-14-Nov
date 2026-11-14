@@ -43,8 +43,10 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
     ev("clone", "running", "Fetching repository")
     try:
         repo_dir = await repo.fetch(req.repo_url)
-        files = repo.walk(repo_dir)
-        ev("clone", "done", f"{len(files)} files ready to scan", len(files))
+        files, total = repo.walk(repo_dir)
+        stats["files_total"] = total
+        capped = f" of {total:,} (file cap; manifests and source files first)" if total > repo.MAX_FILES else ""
+        ev("clone", "done", f"{len(files):,} files ready to scan{capped}", len(files))
     except Exception as e:  # noqa: BLE001
         ev("clone", "error", f"Could not fetch repository: {str(e)[:160]}")
     stats["files_scanned"] = len(files)
@@ -91,7 +93,9 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
     policy_text = ""
     try:
         policy_text = await policy.fetch(req.policy_url)
-        ev("policy_fetch", "done", f"Policy text extracted ({len(policy_text):,} characters)", len(policy_text))
+        linked = policy_text.count(policy.LINKED_PAGE)
+        extra = f", including {linked} linked subprocessor page{'s' if linked > 1 else ''}" if linked else ""
+        ev("policy_fetch", "done", f"Policy text extracted ({len(policy_text):,} characters{extra})", len(policy_text))
     except Exception as e:  # noqa: BLE001
         ev("policy_fetch", "error", f"Could not fetch policy: {str(e)[:160]}")
 
@@ -119,7 +123,8 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
     jurisdictions = req.jurisdictions or JURISDICTIONS
     ev("law", "running", "Retrieving provisions from the curated corpus")
     ev("verdict", "running", "Writing verdicts per jurisdiction")
-    matrix, provisions, method = await build_matrix(findings, observations, jurisdictions, use_llm=use_llm)
+    gaps = [name for name, missing in (("the repository", not files), ("the policy", not policy_text)) if missing]
+    matrix, provisions, method = await build_matrix(findings, observations, jurisdictions, use_llm=use_llm, gaps=gaps)
     stats["verdict_method"] = method
     ev("law", "done", f"{len(provisions)} provisions cited", len(provisions))
     ev("verdict", "done", f"{len(matrix)} matrix cells ({method})", len(matrix))

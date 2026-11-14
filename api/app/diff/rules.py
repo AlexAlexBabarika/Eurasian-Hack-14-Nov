@@ -1,6 +1,8 @@
 """Deterministic diff rules R1–R9: observations (what the product does) vs claims (what the policy says)."""
 
-from app.detect.catalog import vendor_by_name
+import re
+
+from app.detect.catalog import policy_names, vendor_by_name
 from app.detect.code_signals import CodeSignals
 from app.models import Area, Evidence, Finding, Observation, PolicyClaims
 
@@ -41,8 +43,13 @@ def _absence(policy_url: str, summary: str) -> Evidence:
 
 
 def _is_named(vendor: str, claims: PolicyClaims) -> bool:
-    v = vendor.lower()
-    return any(v in p.lower() or p.lower() in v for p in claims.named_processors)
+    """Named if the policy uses the vendor's product name or its company name ("Vercel" covers Vercel Analytics)."""
+    v = vendor_by_name(vendor)
+    names = policy_names(v) if v else [vendor]
+    for named in claims.named_processors:
+        if any(re.search(rf"\b{re.escape(n)}\b", named, re.I) or named.lower() == n.lower() for n in names):
+            return True
+    return False
 
 
 def run_rules(observations: list[Observation], claims: PolicyClaims, signals: CodeSignals, policy_url: str,
@@ -104,7 +111,7 @@ def run_rules(observations: list[Observation], claims: PolicyClaims, signals: Co
     trackers = [o for o in observations if o.pre_consent and not getattr(vendor_by_name(o.vendor), "essential", False)]
     if trackers:
         add("R5_TRACKING_BEFORE_CONSENT",
-            f"{_names(trackers)} fire before any consent interaction on the site",
+            f"{_names(trackers)} {'fires' if len(trackers) == 1 else 'fire'} before any consent interaction on the site",
             "high", ["personal_data", "consumer"], trackers, _pick(trackers, kinds=("network", "cookie")),
             "cookie_consent_described")  # fmt: skip
 
@@ -119,7 +126,9 @@ def run_rules(observations: list[Observation], claims: PolicyClaims, signals: Co
             _pick(abroad)[:6] + [_absence(policy_url, "Policy text does not mention international transfers")])  # fmt: skip
 
     # R7: no erasure right or deletion method in the policy AND no delete-account route in code.
-    if "erasure" not in claims.rights_listed and not claims.deletion_method and not signals.delete_route:
+    # Needs scanned code: "no route found" is not evidence when the repository could not be read.
+    no_route = files_scanned > 0 and not signals.delete_route
+    if "erasure" not in claims.rights_listed and not claims.deletion_method and no_route:
         add("R7_NO_DELETION_PATH", "No way to delete an account or data: not in the policy, no route found in code",
             "medium", ["personal_data", "consumer"], [],
             [_absence(policy_url, "Policy text lists no right to erasure and no deletion method; no delete-account "
