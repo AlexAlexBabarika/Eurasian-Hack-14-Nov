@@ -800,7 +800,7 @@
       "verdict_method": "llm",
       "duration_s": 23.5
     },
-    "disclaimer": "Proveryai is a first-pass engineering check. It reports possible inconsistencies between observed product behaviour and the published privacy policy. It is not legal advice."
+    "disclaimer": "ProveryAI is a first-pass engineering check. It reports possible inconsistencies between observed product behaviour and the published privacy policy. It is not legal advice."
   },
   "error": null
 }

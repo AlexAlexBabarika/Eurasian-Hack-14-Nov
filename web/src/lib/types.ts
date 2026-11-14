@@ -5,6 +5,7 @@ type Schemas = components["schemas"];
 export type AuditCreated = Schemas["AuditCreated"];
 export type AuditReport = Schemas["AuditReport"];
 export type AuditRequest = Schemas["AuditRequest"];
+export type Effort = NonNullable<AuditRequest["effort"]>;
 export type AuditStatus = Schemas["AuditStatus"];
 export type AuditSummary = Schemas["AuditSummary"];
 export type CellVerdict = Schemas["CellVerdict"];

@@ -1,4 +1,4 @@
-# Deploying Proveryai
+# Deploying ProveryAI
 
 Two parts: the web app on Vercel, the API on a Hetzner server. The API cannot run on Vercel: an audit clones a repo, starts Chromium and streams progress for up to a few minutes.
 
@@ -60,7 +60,7 @@ The API has no login and no rate limit. Anyone who finds the address can start a
 
 ```sh
 gh repo edit AlexAlexBabarika/Eurasian-Hack-14-Nov \
-  --description "Proveryai: checks a privacy policy against what the code and live site actually do, under UK, EU and Kazakhstan law" \
+  --description "ProveryAI: checks a privacy policy against what the code and live site actually do, under UK, EU and Kazakhstan law" \
   --homepage https://proveryai.babarika.dev
 ```
 

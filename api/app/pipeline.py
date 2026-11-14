@@ -3,6 +3,7 @@
 import time
 from collections.abc import Callable
 
+from app import llm
 from app.claims import extract as claims_extract
 from app.detect import bearer, code_signals, manifests, trackers
 from app.detect.code_signals import CodeSignals
@@ -28,6 +29,32 @@ EMPTY_CLAIMS = PolicyClaims(
     international_transfers=False, retention_stated=False, rights_listed=[], deletion_method=None,
     cookie_consent_described=False, quotes={},
 )  # fmt: skip
+
+
+def _passes(passes: list[tuple[str, site.ConsentPass]], net_obs: list[Observation], stats: dict) -> str:
+    """Per-pass stats and the tail of the site_scan message. Empty for a scan that only ran the first pass."""
+    if not passes:
+        return ""
+    still = [o.vendor for o in net_obs if trackers.seen(o, trackers.AFTER_REJECT) and trackers.is_tracker(o)]
+    gated = [o.vendor for o in net_obs if trackers.gated(o)]
+    stats["site_passes"] = {}
+    out = []
+    for name, p in passes:
+        failed = f"failed ({p.error[:80]})" if p.error else "no banner found"
+        stats["site_passes"][name] = f"clicked: {p.clicked}" if p.clicked else failed
+        if not p.clicked:
+            out.append(f"{name}: {failed}")
+            continue
+        stats[f"requests_after_{name}"] = len(p.requests)
+        if name == "reject":
+            stats["trackers_after_reject"] = still
+            verb = "still fires" if len(still) == 1 else "still fire"
+            out.append(f"after reject: {', '.join(still)} {verb}" if still else "after reject: no trackers")
+        else:
+            stats["vendors_after_accept_only"] = gated
+            more = f"{len(gated)} more vendor{'s' if len(gated) != 1 else ''}"
+            out.append(f"after accept: {more} ({', '.join(gated)})" if gated else "after accept: no more vendors")
+    return "; " + "; ".join(out)
 
 
 async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool = True) -> AuditReport:
@@ -84,52 +111,57 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
 
     # site scan
     if req.site_url:
-        ev("site_scan", "running", "Loading the site in a clean browser, clicking nothing")
+        ev("site_scan", "running", "Loading the site in clean browsers: clicking nothing, rejecting, accepting")
         scan = await site.scan(req.site_url)
     else:
         scan = site.SiteScan(url="")
     net_obs = trackers.detect(scan)
     stats["requests_pre_consent"] = len(scan.requests)
+    passes = [(name, p) for name in ("reject", "accept") if (p := getattr(scan, name))]
     if not req.site_url:
         ev("site_scan", "skipped", "No live site given; only the code is compared with the policy")
-    elif scan.error and not scan.requests:
+    elif scan.error and not scan.requests and not any(p.clicked for _, p in passes):
         ev("site_scan", "error", f"Site scan failed: {scan.error[:160]}")
     else:
-        names = ", ".join(o.vendor or "" for o in net_obs) or "none"
-        ev("site_scan", "done", f"{len(scan.requests)} requests before consent; trackers: {names}", len(net_obs))
+        names = ", ".join(o.vendor or "" for o in net_obs if o.pre_consent) or "none"
+        message = f"{len(scan.requests)} requests before consent; trackers: {names}"
+        ev("site_scan", "done", message + _passes(passes, net_obs, stats), len(net_obs))
     observations = trackers.merge(code_obs, net_obs)
     stats["vendors_found"] = len([o for o in observations if o.vendor])
 
     # policy
-    ev("policy_fetch", "running", "Fetching the privacy policy")
     policy_text = ""
-    try:
-        policy_text = await policy.fetch(req.policy_url)
-        linked = policy_text.count(policy.LINKED_PAGE)
-        extra = f", including {linked} linked subprocessor page{'s' if linked > 1 else ''}" if linked else ""
-        ev("policy_fetch", "done", f"Policy text extracted ({len(policy_text):,} characters{extra})", len(policy_text))
-    except Exception as e:  # noqa: BLE001
-        ev("policy_fetch", "error", f"Could not fetch policy: {str(e)[:160]}")
+    if req.policy_url:
+        ev("policy_fetch", "running", "Fetching the privacy policy")
+        try:
+            policy_text = await policy.fetch(req.policy_url)
+            linked = policy_text.count(policy.LINKED_PAGE)
+            extra = f", including {linked} linked subprocessor page{'s' if linked > 1 else ''}" if linked else ""
+            ev("policy_fetch", "done", f"Policy text extracted ({len(policy_text):,} characters{extra})", len(policy_text))
+        except Exception as e:  # noqa: BLE001
+            ev("policy_fetch", "error", f"Could not fetch policy: {str(e)[:160]}")
+    else:
+        ev("policy_fetch", "skipped", "No privacy policy given; only the checks that need no policy run")
 
     # claims
-    findings = []
     claims = EMPTY_CLAIMS
+    model = llm.model_for(req.effort)
+    stats["effort"] = req.effort
     if policy_text:
         ev("claims", "running", "Extracting what the policy claims")
         if use_llm:
-            claims, method = await claims_extract.extract(policy_text)
+            claims, method = await claims_extract.extract(policy_text, model)
         else:
             claims, method = claims_extract.validate_quotes(claims_extract.heuristic(policy_text), policy_text), "heuristic"
         stats["claims_method"] = method
         ev("claims", "done", f"Claims extracted ({method}); sharing statement: {claims.sharing_statement}")
-
-        # diff: only meaningful when we have a policy to compare against
         ev("diff", "running", "Comparing observed behaviour with policy claims")
-        findings = run_rules(observations, claims, signals, req.policy_url, len(files))
-        ev("diff", "done", f"{len(findings)} possible inconsistencies", len(findings))
     else:
         ev("claims", "skipped", "No policy text, so nothing to compare against")
-        ev("diff", "skipped", "No policy text; no findings can be evidenced")
+        ev("diff", "running", "Running the checks that need no policy text")
+    # diff: without policy text only the rules that need none (consent, logs) can be evidenced
+    findings = run_rules(observations, claims, signals, req.policy_url if policy_text else None, len(files))
+    ev("diff", "done", f"{len(findings)} possible inconsistencies", len(findings))
 
     # law + verdict
     jurisdictions = req.jurisdictions or JURISDICTIONS
@@ -143,11 +175,17 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
     if not req.site_url:
         gaps.append("no live site was given")
     if not policy_text:
-        gaps.append("the policy could not be read")
-    matrix, provisions, method = await build_matrix(findings, observations, jurisdictions, use_llm=use_llm, gaps=gaps)
+        gaps.append("the policy could not be read" if req.policy_url else "no privacy policy was given")
+    matrix, provisions, method, llm_cells, fallbacks = await build_matrix(
+        findings, observations, jurisdictions, use_llm=use_llm, gaps=gaps,
+        on_cell=lambda n, total: ev("verdict", "running", f"Writing verdicts: {n} of {total} cells", n), model=model,
+    )
     stats["verdict_method"] = method
+    if method == "llm":
+        stats["verdict_fallbacks"] = fallbacks
+    fell_back = f"; {fallbacks} of {llm_cells} LLM cells fell back to template text" if fallbacks else ""
     ev("law", "done", f"{len(provisions)} provisions cited", len(provisions))
-    ev("verdict", "done", f"{len(matrix)} matrix cells ({method})", len(matrix))
+    ev("verdict", "done", f"{len(matrix)} matrix cells ({method}{fell_back})", len(matrix))
 
     stats["duration_s"] = round(time.monotonic() - t0, 1)
     report = AuditReport(

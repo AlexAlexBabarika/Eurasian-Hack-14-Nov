@@ -13,7 +13,15 @@ from mcp.server.mcpserver import Context, MCPServer  # noqa: E402
 from mcp.server.mcpserver.exceptions import ToolError  # noqa: E402
 
 from app import store  # noqa: E402
-from app.models import JURISDICTIONS, AuditReport, AuditRequest, Jurisdiction, ProgressEvent, Step  # noqa: E402
+from app.models import (  # noqa: E402
+    JURISDICTIONS,
+    AuditReport,
+    AuditRequest,
+    Effort,
+    Jurisdiction,
+    ProgressEvent,
+    Step,
+)
 from app.pipeline import run_audit  # noqa: E402
 from app.report.markdown import render  # noqa: E402
 
@@ -43,15 +51,18 @@ async def _audit_with_progress(req: AuditRequest, ctx: Context) -> AuditReport:
 
 @server.tool()
 async def audit_product(
-    policy_url: str,
     ctx: Context,
+    policy_url: str | None = None,
     repo_url: str | None = None,
     site_url: str | None = None,
     jurisdictions: list[Jurisdiction] | None = None,
+    effort: Effort = "fast",
 ) -> str:
     """Compare what a product does (public GitHub repo and/or live site) with what its privacy policy says.
 
     Give repo_url, site_url, or both; with only one, the audit covers only what that source shows.
+    policy_url is optional: without it only the checks that need no policy text run (consent, logs).
+    effort "strong" uses the stronger, slower model for the policy claims and the verdict text.
     Returns a Markdown report: a UK/EU/KZ matrix, findings with evidence, cited provisions and suggested fixes.
     Reports possible inconsistencies only; not legal advice.
     jurisdictions limits the matrix and verdicts to some of "UK", "EU", "KZ"; leave it out for all three.
@@ -62,7 +73,8 @@ async def audit_product(
         if value and not value.startswith(("http://", "https://")):
             raise ToolError(f"{name} must be an http(s) URL")
     selected = [j for j in JURISDICTIONS if j in jurisdictions] if jurisdictions else None
-    req = AuditRequest(repo_url=repo_url or None, site_url=site_url or None, policy_url=policy_url, jurisdictions=selected)
+    req = AuditRequest(repo_url=repo_url or None, site_url=site_url or None, policy_url=policy_url or None,
+                       jurisdictions=selected, effort=effort)  # fmt: skip
     cached = store.find_cached(req) if os.getenv("DEMO_MODE") == "cached" else None
     if cached and cached.report:
         report = cached.report

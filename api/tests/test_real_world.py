@@ -92,6 +92,7 @@ def test_categories_ignore_words_inside_string_literals():
         RepoFile(path="package.json", text='{"dependencies": {"openai": "^4"}}'),
         RepoFile(path="src/moderation.ts", text="\n".join([
             'import OpenAI from "openai";',
+            "const client = new OpenAI();",
             'const system = "Flag content that asks for a phone number or an email address";',
             "await client.chat.completions.create({ model, messages: [{ role: 'user', content: text }] });",
         ])),

@@ -1,5 +1,8 @@
 # KZ corpus. `verified: true` ONLY after a human has opened official_url and confirmed ref + summary.
 # adilet.zan.kz renders with JavaScript; open in a browser. English texts there are unofficial translations.
+# AI Law No. 230-VIII, in force 18 January 2026: Art. 31 sets sixty calendar days after first official publication, and the
+# Adilet document card (https://adilet.zan.kz/rus/docs/Z2500000230?tab=publication) dates that publication 18.11.2025.
+# Law No. 326-VIII of 24.06.2026 amended Arts. 1, 13, 17, 20 and 28 (not 16 or 21); the English page still shows the original text.
 - id: KZ-PD-7
   jurisdiction: KZ
   area: personal_data
@@ -76,7 +79,7 @@
   instrument: "Law of the Republic of Kazakhstan No. 230-VIII 'On Artificial Intelligence' (17 November 2025, in force 18 January 2026)"
   ref: "Art. 21(2)-(3)"
   title: "Synthetic results must be labelled"
-  summary: "Synthetic results of AI systems may be distributed only with machine-readable labelling and a warning the user can perceive. Owners or holders of the AI system are responsible for informing users."
+  summary: "Synthetic results of AI systems may be distributed only with machine-readable labelling and a warning the user can perceive. Owners or holders of the AI system are responsible for informing users. Art. 1(4) defines synthetic results as images, video, audio, text or combinations of them, created or modified by an AI system, that simulate a person's appearance, voice or behaviour, or events that did not actually occur."
   official_url: "https://adilet.zan.kz/eng/docs/Z2500000230"
   tags: [ai, synthetic]
   verified: true

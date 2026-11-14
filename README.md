@@ -1,4 +1,4 @@
-# Proveryai
+# ProveryAI
 
 **Checks what your privacy policy says against what your code and live site actually do, under UK, EU and Kazakhstan law.**
 
@@ -37,6 +37,10 @@ Then open http://localhost:3000 and click "Use demo fixture".
 
 The repository field is optional: with only a site URL and a policy URL the audit compares the live site with the policy and marks what it could not see as not assessed.
 
+The policy field is optional too. Without a policy only the checks that need no policy text run (trackers before consent or after reject, personal data in logs); every other cell is grey, not green.
+
+The form's Effort choice picks the model: Fast uses `MODEL_FAST`, Strong uses `MODEL_STRONG`. It has no effect without `LLM_API_KEY`.
+
 For a before/after rerun, the fixture also serves the same policy with the suggested fixes pasted in: http://localhost:4100/privacy-fixed.html. Run the audit again with that policy URL; only the two findings that need code changes remain.
 
 Without `LLM_API_KEY` the pipeline still runs end to end: policy claims come from keyword heuristics and verdict text from templates. With a key, the model extracts the claims and writes the verdict prose and fixes. Cell statuses are decided by deterministic rules either way.
@@ -52,7 +56,7 @@ Inside the container `localhost` is the container itself. To audit something ser
 
 ### MCP server
 
-`mcp/server.py` exposes the audit as one tool, `audit_product(policy_url, repo_url, site_url, jurisdictions)`, over stdio and returns the Markdown report. `repo_url` and `site_url` are optional, but at least one is required. `jurisdictions` is optional: a list of `UK`, `EU`, `KZ` that limits the matrix and verdicts; leave it out for all three. Needs `mcp` 2.x (installed by `make setup`).
+`mcp/server.py` exposes the audit as one tool, `audit_product(policy_url, repo_url, site_url, jurisdictions, effort)`, over stdio and returns the Markdown report. `repo_url` and `site_url` are optional, but at least one is required. `policy_url` is optional. `effort` is `fast` (default) or `strong`. `jurisdictions` is optional: a list of `UK`, `EU`, `KZ` that limits the matrix and verdicts; leave it out for all three. Needs `mcp` 2.x (installed by `make setup`).
 
 ```sh
 uv run --project api python mcp/server.py
@@ -68,7 +72,7 @@ If the API is reachable by other people (a public deploy, judges pasting their o
 
 ### Run it in CI
 
-The same audit runs from the command line and exits non-zero on a bad result. `--repo` and `--policy` take local paths or URLs; `--site` is optional and without it no browser is started.
+The same audit runs from the command line and exits non-zero on a bad result. `--repo` and `--policy` take local paths or URLs; `--site` is optional and without it no browser is started. `--policy` is optional; without it only the checks that need no policy run. `--effort strong` uses `MODEL_STRONG`.
 
 ```sh
 uv run --project api python -m app.cli --repo . --policy docs/privacy.html --fail-on red --markdown report.md
@@ -77,13 +81,14 @@ make audit repo=. policy=docs/privacy.html        # same thing; paths are relati
 
 Exit codes: `0` clean, `1` at least one matrix cell is `--fail-on` (`red`, `amber`) or worse, `2` a step failed (for example the policy could not be read), so the result is incomplete. `--fail-on never` only reports. Without `--site`, cells with no findings are grey (not assessed), not green.
 
-As a GitHub Action (the report is added to the job summary):
+As a GitHub Action (the report is added to the job summary and, on pull requests, posted as a comment that later runs update in place):
 
 ```yaml
 name: Privacy audit
 on: pull_request
 permissions:
   contents: read
+  pull-requests: write   # for the report comment
 jobs:
   audit:
     runs-on: ubuntu-latest
@@ -95,7 +100,7 @@ jobs:
           fail-on: red
 ```
 
-Other inputs: `repo` (default `.`), `site`, `jurisdictions` (default `UK,EU,KZ`). This repository runs it on its own fixture in `.github/workflows/privacy-audit.yml`.
+Other inputs: `repo` (default `.`), `site`, `jurisdictions` (default `UK,EU,KZ`), `comment` (default `true`; set `false` to keep the report in the job summary only). The comment is skipped with a warning when the token cannot write to the pull request, as on pull requests from forks. This repository runs it on its own fixture in `.github/workflows/privacy-audit.yml`.
 
 ### LLM provider
 
@@ -115,7 +120,7 @@ Other inputs: `repo` (default `.`), `site`, `jurisdictions` (default `UK,EU,KZ`)
 ## How it works
 
 1. **Ingest**: shallow clone, Playwright site load with no clicks (requests and cookies before consent), policy text via trafilatura.
-2. **Detect**: dependency manifests and imports matched against `sdk_catalog.yaml` (31 vendors), optional Bearer CLI scan, grep signals for delete-account routes and personal data in logs.
+2. **Detect**: dependency manifests and imports matched against `sdk_catalog.yaml` (49 vendors, including services common on Kazakhstan products such as Yandex Metrica, VK, 2GIS and Halyk ePay), optional Bearer CLI scan, grep signals for delete-account routes and personal data in logs.
 3. **Claims**: policy text to `PolicyClaims`; quotes must be exact substrings of the policy.
 4. **Diff**: deterministic rules R1-R9 produce findings.
 5. **Law**: tag filter + BM25 over the curated corpus.
@@ -123,7 +128,9 @@ Other inputs: `repo` (default `.`), `site`, `jurisdictions` (default `UK,EU,KZ`)
 
 ## Status of the law corpus
 
-54 provisions, each with its `official_url`. 50 were checked against the official text and have `verified: true`. Four were corrected during that check and stay `verified: false` until a second person confirms them (`EU-EPRIVACY-5-3`, `UK-GDPR-22`, `UK-GDPR-44A`, `UK-DPA-2018`); the UI marks them with a warning.
+The corpus has 51 provisions (EU 20, UK 20, KZ 11). 47 have `verified: true` and 4 have `verified: false` (`EU-EPRIVACY-5-3`, `UK-GDPR-22`, `UK-GDPR-44A`, `UK-DPA-2018`); the report flags citations that are not verified.
+
+The 47 were checked against their `official_url` on 14 November 2026 by an AI agent, not yet by a person. The rule at the top of each corpus file still applies: a human opens each `official_url`, confirms the reference and summary, and only then is `verified: true` final. Entries that nobody confirms go back to `false`. The checklists for that pass, one per corpus file with the sentence to find on each official page, are `api/app/law/corpus/CHECKLIST-eu.md`, `CHECKLIST-uk.md` and `CHECKLIST-kz.md` (the last one against the Russian text).
 
 ## Team
 

@@ -1,7 +1,7 @@
 [project]
 name = "proveryai-api"
 version = "0.1.0"
-description = "Proveryai: privacy policy vs. code auditor"
+description = "ProveryAI: privacy policy vs. code auditor"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.115",

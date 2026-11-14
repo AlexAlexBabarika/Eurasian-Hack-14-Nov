@@ -1,9 +1,10 @@
-"""Deterministic diff rules R1–R9: observations (what the product does) vs claims (what the policy says)."""
+"""Deterministic diff rules R1–R10: observations (what the product does) vs claims (what the policy says)."""
 
 import re
 
 from app.detect.catalog import policy_names, vendor_by_name
 from app.detect.code_signals import CodeSignals
+from app.detect.trackers import AFTER_REJECT, BEFORE, is_tracker, seen
 from app.models import Area, Evidence, Finding, Observation, PolicyClaims
 
 PERSONAL = {"email", "name", "phone", "usage", "device_id", "ip", "user_content", "payment", "location", "health"}
@@ -52,8 +53,10 @@ def _is_named(vendor: str, claims: PolicyClaims) -> bool:
     return False
 
 
-def run_rules(observations: list[Observation], claims: PolicyClaims, signals: CodeSignals, policy_url: str,
-              files_scanned: int = 0) -> list[Finding]:  # fmt: skip
+def run_rules(observations: list[Observation], claims: PolicyClaims, signals: CodeSignals,
+              policy_url: str | None, files_scanned: int = 0) -> list[Finding]:  # fmt: skip
+    """Without a policy (`policy_url` is None) only the rules that need no policy text run: R5, R8 and R10."""
+    has_policy = policy_url is not None
     findings: list[Finding] = []
 
     def add(rule: str, title: str, severity: str, areas: list[Area], obs: list[Observation],
@@ -71,13 +74,13 @@ def run_rules(observations: list[Observation], claims: PolicyClaims, signals: Co
 
     # R1: vendor observed, not named, and the policy gives no category of recipients.
     undisclosed = [o for o in third_party if not _is_named(o.vendor, claims)]
-    if undisclosed and claims.sharing_statement != "processors_only":
+    if has_policy and undisclosed and claims.sharing_statement != "processors_only":
         add("R1_UNDISCLOSED_PROCESSOR",
             f"{_names(undisclosed)} observed in code or network traffic; policy names no such recipients",
             "medium", ["personal_data"], undisclosed, _pick(undisclosed))  # fmt: skip
 
     # R2: policy says no sharing, but third parties receive personal data.
-    if claims.sharing_statement == "no_sharing" and receives_pii:
+    if has_policy and claims.sharing_statement == "no_sharing" and receives_pii:
         cats = sorted({c for o in receives_pii for c in o.data_categories if c in PERSONAL})
         add("R2_SHARING_CONTRADICTION",
             f"Policy says data is not shared, but {_names(receives_pii)} receive personal data ({', '.join(cats)})",
@@ -88,7 +91,7 @@ def run_rules(observations: list[Observation], claims: PolicyClaims, signals: Co
     # R3: observed data category the policy does not mention.
     observed = {c for o in observations for c in o.data_categories}
     missing = sorted(observed - set(claims.data_categories))
-    if missing:
+    if has_policy and missing:
         ev: list[Evidence] = []
         for cat in missing:
             holders = [o for o in observations if cat in o.data_categories]
@@ -100,7 +103,7 @@ def run_rules(observations: list[Observation], claims: PolicyClaims, signals: Co
 
     # R4: AI vendor receives user content, policy does not mention AI.
     ai = [o for o in observations if o.is_ai and "user_content" in o.data_categories]
-    if ai and not claims.mentions_ai:
+    if has_policy and ai and not claims.mentions_ai:
         add("R4_AI_PROCESSING_UNDISCLOSED",
             f"User content is sent to {_names(ai)} (AI provider); policy does not mention AI processing",
             "high", ["ai_transparency", "personal_data"], ai,
@@ -108,16 +111,17 @@ def run_rules(observations: list[Observation], claims: PolicyClaims, signals: Co
                                                                     "machine learning or automated processing")])  # fmt: skip
 
     # R5: non-essential tracker fired before consent.
-    trackers = [o for o in observations if o.pre_consent and not getattr(vendor_by_name(o.vendor), "essential", False)]
+    trackers = [o for o in observations if o.pre_consent and is_tracker(o)]
     if trackers:
         add("R5_TRACKING_BEFORE_CONSENT",
             f"{_names(trackers)} {'fires' if len(trackers) == 1 else 'fire'} before any consent interaction on the site",
-            "high", ["personal_data", "consumer"], trackers, _pick(trackers, kinds=("network", "cookie")),
+            "high", ["personal_data", "consumer"], trackers,
+            _pick(trackers, kinds=("network", "cookie"), contains=BEFORE),
             "cookie_consent_described")  # fmt: skip
 
     # R6: vendor based abroad, policy silent on international transfers. Per-jurisdiction filtering is in the verdict.
     abroad = [o for o in receives_pii if o.vendor_country]
-    if abroad and not claims.international_transfers:
+    if has_policy and abroad and not claims.international_transfers:
         where = sorted({o.vendor_country for o in abroad})
         add("R6_TRANSFER_UNDISCLOSED",
             f"Personal data goes to vendors based in {', '.join(where)} ({_names(abroad)}); "
@@ -128,7 +132,7 @@ def run_rules(observations: list[Observation], claims: PolicyClaims, signals: Co
     # R7: no erasure right or deletion method in the policy AND no delete-account route in code.
     # Needs scanned code: "no route found" is not evidence when the repository could not be read.
     no_route = files_scanned > 0 and not signals.delete_route
-    if "erasure" not in claims.rights_listed and not claims.deletion_method and no_route:
+    if has_policy and "erasure" not in claims.rights_listed and not claims.deletion_method and no_route:
         add("R7_NO_DELETION_PATH", "No way to delete an account or data: not in the policy, no route found in code",
             "medium", ["personal_data", "consumer"], [],
             [_absence(policy_url, "Policy text lists no right to erasure and no deletion method; no delete-account "
@@ -140,8 +144,18 @@ def run_rules(observations: list[Observation], claims: PolicyClaims, signals: Co
             signals.pii_logs[:MAX_EVIDENCE])  # fmt: skip
 
     # R9: no retention period.
-    if not claims.retention_stated:
+    if has_policy and not claims.retention_stated:
         add("R9_NO_RETENTION_PERIOD", "Policy states no retention period or criteria", "low", ["personal_data"], [],
             [_absence(policy_url, "Policy text does not state how long personal data is kept")])  # fmt: skip
+
+    # R10: non-essential tracker still fires after the visitor clicked reject. Last, so earlier finding ids are stable.
+    ignored = [o for o in observations if seen(o, AFTER_REJECT) and is_tracker(o)]
+    if ignored:
+        add("R10_TRACKING_AFTER_REJECT",
+            f"{_names(ignored)} still {'fires' if len(ignored) == 1 else 'fire'} after the visitor rejects cookies "
+            "in the consent banner",
+            "high", ["personal_data", "consumer"], ignored,
+            _pick(ignored, kinds=("network", "cookie"), contains=AFTER_REJECT),
+            "cookie_consent_described")  # fmt: skip
 
     return findings

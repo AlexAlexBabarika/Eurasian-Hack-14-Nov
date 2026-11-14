@@ -62,6 +62,7 @@ export function RecheckForm({ id, report }: { id: string; report: AuditReport })
         site_url: text(report.inputs.site_url),
         policy_url: value,
         jurisdictions: matrixJurisdictions(report.matrix),
+        effort: report.stats.effort === "strong" ? "strong" : "fast",
       });
       router.push(`/audit/${encodeURIComponent(created.id)}?before=${encodeURIComponent(id)}`);
     } catch (caught) {
@@ -73,7 +74,7 @@ export function RecheckForm({ id, report }: { id: string; report: AuditReport })
   return (
     <form onSubmit={submit} noValidate className="w-full space-y-1.5 lg:max-w-md">
       <Label htmlFor={inputId} className="text-xs text-muted-foreground">
-        Re-check with an updated policy
+        {text(report.inputs.policy_url) ? "Re-check with an updated policy" : "Check again with a privacy policy"}
       </Label>
       <div className="flex gap-2">
         <Input
@@ -100,7 +101,9 @@ export function RecheckForm({ id, report }: { id: string; report: AuditReport })
           {error instanceof ApiError && error.kind === "network" && (
             <>
               {" "}
-              Start the API with <code className="rounded bg-muted px-1 py-0.5 font-mono">make api</code> and try again.
+              Start the API with <code className="rounded bg-muted px-1 py-0.5 font-mono">make api</code>, or, if it is
+              running, add this page&apos;s address to <code className="rounded bg-muted px-1 py-0.5 font-mono">WEB_ORIGINS</code>{" "}
+              and restart it.
             </>
           )}
         </p>

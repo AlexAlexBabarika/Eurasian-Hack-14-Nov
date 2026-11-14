@@ -266,6 +266,15 @@
 .animate-power-on { animation: power-on 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; animation-delay: calc(var(--i, 0) * 55ms + 150ms); }
 .animate-marker { animation: marker-sweep 0.9s cubic-bezier(0.6, 0, 0.2, 1) backwards; animation-delay: var(--delay, 0ms); }
 .animate-type { animation: type-in 0.7s steps(34, end) backwards; animation-delay: var(--delay, 0ms); }
+/* A skipped step in the progress bar: hatched, so it does not read as finished. */
+.segment-skipped {
+  background: repeating-linear-gradient(135deg, oklch(1 0 0 / 22%) 0 2px, transparent 2px 5px);
+}
+@keyframes cell-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+.animate-cell-in { animation: cell-in 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; animation-delay: calc(var(--i, 0) * 40ms + 100ms); }
 .animate-fade { animation: fade-in 0.5s ease-out backwards; animation-delay: var(--delay, 0ms); }
 .animate-draw { stroke-dasharray: 1; animation: draw-line 1s cubic-bezier(0.6, 0, 0.2, 1) backwards; animation-delay: var(--delay, 0ms); }
 .animate-caret { animation: caret 1s steps(1) infinite; }
@@ -274,6 +283,7 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-rise,
   .animate-power-on,
+  .animate-cell-in,
   .animate-marker,
   .animate-type,
   .animate-fade,

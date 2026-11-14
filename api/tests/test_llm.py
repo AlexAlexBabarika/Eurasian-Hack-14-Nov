@@ -91,3 +91,20 @@ def test_provider_selection(monkeypatch):
     monkeypatch.delenv("LLM_BASE_URL")
     monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant")
     assert llm.available() and llm.base_url() == "https://api.anthropic.com/v1"
+
+
+def test_openrouter_requests_ask_for_the_fastest_provider_and_can_skip_reasoning(api, monkeypatch):
+    monkeypatch.setenv("LLM_BASE_URL", "https://openrouter.ai/api/v1")
+    seen = api(reply({"city": "A", "population": 1}), reply({"city": "B", "population": 2}))
+    asyncio.run(llm.structured("s", "with reasoning", Answer))
+    asyncio.run(llm.structured("s", "prose only", Answer, reasoning=False, max_tokens=1500))
+    first, second = (json.loads(r.content) for r in seen)
+    assert first["provider"] == second["provider"] == {"sort": "throughput"}
+    assert "reasoning" not in first
+    assert second["reasoning"] == {"enabled": False} and second["max_tokens"] == 1500
+
+
+def test_other_providers_get_no_openrouter_only_fields(api):
+    seen = api(reply({"city": "A", "population": 1}))
+    asyncio.run(llm.structured("s", "u", Answer, reasoning=False))
+    assert not {"provider", "reasoning"} & set(json.loads(seen[0].content))

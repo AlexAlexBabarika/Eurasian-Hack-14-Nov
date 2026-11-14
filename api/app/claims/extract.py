@@ -106,12 +106,12 @@ def heuristic(policy_text: str) -> PolicyClaims:
     return claims
 
 
-async def extract(policy_text: str) -> tuple[PolicyClaims, str]:
+async def extract(policy_text: str, model: str | None = None) -> tuple[PolicyClaims, str]:
     """Returns (claims, method) where method is 'llm' or 'heuristic'."""
     text = policy_text[:MAX_CHARS]
     if llm.available():
         try:
-            claims = await llm.structured(PROMPT, f"<policy>\n{text}\n</policy>", PolicyClaims)
+            claims = await llm.structured(PROMPT, f"<policy>\n{text}\n</policy>", PolicyClaims, model=model)
             return validate_quotes(claims, text), "llm"
         except Exception:  # noqa: BLE001 - fall back rather than fail the audit
             pass

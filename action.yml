@@ -1,10 +1,10 @@
-name: Proveryai privacy audit
+name: ProveryAI privacy audit
 description: Compare a privacy policy with the code (and optionally the live site) and fail the job on possible inconsistencies.
 
 inputs:
   policy:
-    description: Privacy policy, as a URL or a path relative to the workspace.
-    required: true
+    description: Privacy policy, as a URL or a path relative to the workspace. Optional; without it only the checks that need no policy run.
+    default: ""
   repo:
     description: Code to scan, as a path relative to the workspace or a public GitHub URL.
     default: "."
@@ -17,6 +17,12 @@ inputs:
   jurisdictions:
     description: Comma-separated jurisdictions.
     default: UK,EU,KZ
+  comment:
+    description: "On pull requests, post the report as a comment and update that comment on later runs (true or false). Needs the pull-requests: write permission."
+    default: "true"
+  github-token:
+    description: Token used to post the comment.
+    default: ${{ github.token }}
 
 runs:
   using: composite
@@ -38,6 +44,9 @@ runs:
         GT_SITE: ${{ inputs.site }}
         GT_FAIL_ON: ${{ inputs.fail-on }}
         GT_JURISDICTIONS: ${{ inputs.jurisdictions }}
+        GT_COMMENT: ${{ inputs.comment }}
+        GT_PR: ${{ github.event.pull_request.number }}
+        GH_TOKEN: ${{ inputs.github-token }}
       run: |
         # URLs and absolute paths pass through; anything else is relative to the caller's workspace.
         resolve() {
@@ -48,11 +57,28 @@ runs:
         }
         report="$RUNNER_TEMP/proveryai-report.md"
         rm -f "$report"
-        args=(--policy "$(resolve "$GT_POLICY")" --fail-on "$GT_FAIL_ON" --jurisdictions "$GT_JURISDICTIONS" --markdown "$report")
+        args=(--fail-on "$GT_FAIL_ON" --jurisdictions "$GT_JURISDICTIONS" --markdown "$report")
+        if [ -n "$GT_POLICY" ]; then args+=(--policy "$(resolve "$GT_POLICY")"); fi
         if [ -n "$GT_REPO" ]; then args+=(--repo "$(resolve "$GT_REPO")"); fi
         if [ -n "$GT_SITE" ]; then args+=(--site "$GT_SITE"); fi
         cd "$GITHUB_ACTION_PATH/api"
         code=0
         uv run --no-dev python -m app.cli "${args[@]}" || code=$?
         if [ -f "$report" ]; then cat "$report" >> "$GITHUB_STEP_SUMMARY"; fi
+        # One comment per pull request, found again by its marker and updated in place.
+        post_comment() {
+          local marker='<!-- proveryai-privacy-audit -->' body="$RUNNER_TEMP/proveryai-comment.md" comments id
+          comments="repos/$GITHUB_REPOSITORY/issues/$GT_PR/comments"
+          # GitHub rejects comments over 65536 characters; cut at a line break below that.
+          { printf '%s\n' "$marker"; awk '{ n += length($0) + 1 } n > 60000 { print "\n_Report shortened to fit a comment. The full report is in the job summary._"; exit } { print }' "$report"; } > "$body"
+          id="$(gh api --paginate "$comments" --jq ".[] | select(.body | startswith(\"$marker\")) | .id" | head -n 1)"
+          if [ -n "$id" ]; then
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -F "body=@$body" > /dev/null
+          else
+            gh api --method POST "$comments" -F "body=@$body" > /dev/null
+          fi
+        }
+        if [ "$GT_COMMENT" = "true" ] && [ -n "$GT_PR" ] && [ -f "$report" ]; then
+          post_comment || echo "::warning::ProveryAI could not post the report as a pull request comment. The job needs 'pull-requests: write'; pull requests from forks get a read-only token."
+        fi
         exit "$code"

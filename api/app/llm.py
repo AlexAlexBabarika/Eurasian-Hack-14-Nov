@@ -43,11 +43,24 @@ def model_strong() -> str:
     return os.getenv("MODEL_STRONG") or model_fast()
 
 
+def model_for(effort: str) -> str:
+    return model_strong() if effort == "strong" else model_fast()
+
+
 def available() -> bool:
     return bool(_api_key())
 
 
-async def _call(model: str, system: str, prompt: str, schema: type[BaseModel], max_tokens: int) -> dict:
+def _openrouter_options(reasoning: bool) -> dict:
+    """OpenRouter spreads calls over providers of very different speed, and reasoning models spend most of their
+    output on hidden reasoning. Other OpenAI-compatible APIs may reject these fields, so they get none."""
+    if not base_url().startswith(OPENROUTER_URL):
+        return {}
+    return {"provider": {"sort": "throughput"}} | ({} if reasoning else {"reasoning": {"enabled": False}})
+
+
+async def _call(model: str, system: str, prompt: str, schema: type[BaseModel], max_tokens: int,
+                reasoning: bool = True) -> dict:  # fmt: skip
     body = {
         "model": model,
         "max_tokens": max_tokens,
@@ -57,6 +70,7 @@ async def _call(model: str, system: str, prompt: str, schema: type[BaseModel], m
             "parameters": schema.model_json_schema(),
         }}],
         "tool_choice": {"type": "function", "function": {"name": "submit"}},
+        **_openrouter_options(reasoning),
     }  # fmt: skip
     async with httpx.AsyncClient(timeout=TIMEOUT_S, transport=_transport) as client:
         resp = await client.post(
@@ -70,8 +84,11 @@ async def _call(model: str, system: str, prompt: str, schema: type[BaseModel], m
 
 
 async def structured[T: BaseModel](system: str, prompt: str, schema: type[T], *, model: str | None = None,
-                                   max_tokens: int = 4096) -> T:  # fmt: skip
-    """Ask the model to fill `schema` via a forced tool call. Raises if it fails twice."""
+                                   max_tokens: int = 4096, reasoning: bool = True) -> T:  # fmt: skip
+    """Ask the model to fill `schema` via a forced tool call. Raises if it fails twice.
+
+    `reasoning=False` asks for the answer without hidden reasoning: for prose, not for judgement.
+    """
     model = model or model_fast()
     key = hashlib.sha256(
         json.dumps([base_url(), model, system, prompt, schema.model_json_schema()]).encode()
@@ -84,7 +101,7 @@ async def structured[T: BaseModel](system: str, prompt: str, schema: type[T], *,
     last_error: Exception | None = None
     for _ in range(2):
         try:
-            result = schema.model_validate(await _call(model, system, attempt_prompt, schema, max_tokens))
+            result = schema.model_validate(await _call(model, system, attempt_prompt, schema, max_tokens, reasoning))
         except ValidationError as e:
             last_error = e
             attempt_prompt = f"{prompt}\n\nYour previous answer failed validation:\n{e}"

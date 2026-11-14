@@ -13,14 +13,14 @@ The submission allows 2 minutes at most. This script is about 270 spoken words, 
 
 | # | Time | On screen | Voiceover |
 |---|---|---|---|
-| 1 | 0:00-0:14 | Landing page, headline visible. Do not click yet. | "Every startup ships a privacy policy written from a template. Then the code adds Mixpanel, Sentry and OpenAI, and the policy never hears about it. Proveryai checks one against the other." |
+| 1 | 0:00-0:14 | Landing page, headline visible. Do not click yet. | "Every startup ships a privacy policy written from a template. Then the code adds Mixpanel, Sentry and OpenAI, and the policy never hears about it. ProveryAI checks one against the other." |
 | 2 | 0:14-0:30 | Click "Use demo fixture", then Run. The progress timeline fills in. | "Give it a repository, a live site and the policy. It reads the dependencies and matches them against a catalog of vendors, loads the site without clicking anything to see what fires before consent, and extracts what the policy claims." |
 | 3 | 0:30-0:55 | Matrix appears. Click **EU x Personal data** (red). Show the policy quote next to `src/lib/analytics.ts:1`, then the Law tab, then the fix with its copy button. | "The result is a matrix: three jurisdictions, four areas of law. EU, personal data: red. The policy says 'We never share your data with third parties.' The code imports Mixpanel, and five more vendors receive personal data. Every finding links to the official text, here GDPR Article 13, and comes with a clause you can paste into the policy." |
 | 4 | 0:55-1:10 | Close the panel. Scroll to the "Tracking before consent" finding: chips read UK amber, EU red, KZ amber. | "Same evidence, different law. Analytics before consent is red in the EU and amber in the UK, where a 2025 amendment added an exception for statistical cookies. The status comes from rules in code. The model only writes the explanation." |
 | 5 | 1:10-1:20 | Click **KZ x AI transparency** (red). | "Kazakhstan: chat text goes to OpenAI and the policy never mentions AI. That maps to Kazakhstan's AI law, in force since January 2026." |
 | 6 | 1:20-1:33 | Run again with the fixed policy (`http://localhost:4100/privacy-fixed.html`). Before/after view. | "Paste the suggested clauses and run it again. AI transparency turns green. Two findings remain, trackers before consent and an email in the logs. Those need a code change, and the report says so." |
 | 7 | 1:33-1:43 | Terminal: `make audit repo=demo/fixture-app policy=demo/fixture-app/privacy.html` prints the red matrix and "Failed: at least one cell is red". | "The same audit is a command line tool, a GitHub Action that fails the pull request, and an MCP tool for coding agents." |
-| 8 | 1:43-1:50 | Back to the landing page or the matrix. | "Proveryai. Trust the policy, but verify the code. It is not legal advice. It is the evidence you take to your lawyer." |
+| 8 | 1:43-1:50 | Back to the landing page or the matrix. | "ProveryAI. Trust the policy, but verify the code. It is not legal advice. It is the evidence you take to your lawyer." |
 
 Wording rule for anything you ad-lib: say "possible inconsistency with", never "violates" or "illegal".
 

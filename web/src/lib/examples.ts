@@ -21,7 +21,7 @@ function summarize(id: string, report: AuditReport): AuditSummary {
     id,
     repo_url: input("repo_url"),
     site_url: input("site_url"),
-    policy_url: input("policy_url") ?? "",
+    policy_url: input("policy_url"),
     findings: report.findings.length,
     vendors: report.observations.filter((observation) => observation.vendor).length,
     status_counts,

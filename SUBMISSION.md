@@ -4,13 +4,13 @@ Items marked TODO need a person: a link that does not exist yet, or a fact only 
 
 ## Project name and one-liner
 
-**Proveryai**: checks what your privacy policy says against what your code and live site actually do, under UK, EU and Kazakhstan law.
+**ProveryAI**: checks what your privacy policy says against what your code and live site actually do, under UK, EU and Kazakhstan law.
 
 The name is the second half of the proverb *doveryai, no proveryai*: trust, but verify.
 
 ## Project description
 
-Startups copy a privacy policy from a template, then ship Mixpanel, Sentry and OpenAI, and the policy never catches up. Proveryai takes a GitHub repo, a live site and the policy URL, finds what the product really collects and sends, and shows each possible inconsistency with evidence (file and line, network request, policy quote), the official provision it relates to in the UK, EU and Kazakhstan, and a clause you can paste to fix it.
+Startups copy a privacy policy from a template, then ship Mixpanel, Sentry and OpenAI, and the policy never catches up. ProveryAI takes a GitHub repo, a live site and the policy URL, finds what the product really collects and sends, and shows each possible inconsistency with evidence (file and line, network request, policy quote), the official provision it relates to in the UK, EU and Kazakhstan, and a clause you can paste to fix it.
 
 ## Links
 

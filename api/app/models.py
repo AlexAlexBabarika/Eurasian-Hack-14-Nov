@@ -10,7 +10,7 @@ JURISDICTIONS: list[Jurisdiction] = ["UK", "EU", "KZ"]
 AREAS: list[Area] = ["personal_data", "ai_transparency", "consumer", "financial"]
 
 DISCLAIMER = (
-    "Proveryai is a first-pass engineering check. It reports possible inconsistencies between "
+    "ProveryAI is a first-pass engineering check. It reports possible inconsistencies between "
     "observed product behaviour and the published privacy policy. It is not legal advice."
 )
 
@@ -107,13 +107,20 @@ class AuditReport(BaseModel):
     disclaimer: str
 
 
+Effort = Literal["fast", "strong"]
+
+
 class AuditRequest(BaseModel):
-    """repo_url or site_url may be omitted (not both): the audit then covers only what it can observe."""
+    """repo_url or site_url may be omitted (not both): the audit then covers only what it can observe.
+
+    Without policy_url only the checks that need no policy text run. effort picks the LLM: MODEL_FAST or MODEL_STRONG.
+    """
 
     repo_url: str | None = None
     site_url: str | None = None
-    policy_url: str
+    policy_url: str | None = None
     jurisdictions: list[Jurisdiction] | None = None
+    effort: Effort = "fast"
 
     @model_validator(mode="after")
     def _something_to_observe(self) -> "AuditRequest":
@@ -128,7 +135,7 @@ class AuditSummary(BaseModel):
     id: str
     repo_url: str | None
     site_url: str | None
-    policy_url: str
+    policy_url: str | None
     findings: int
     vendors: int
     status_counts: dict[Status, int]

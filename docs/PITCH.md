@@ -21,7 +21,7 @@ style: |
 <!--
 PITCH PLAN (3:00 total). Speaker notes for each slide are in these comments.
 
-  Boris  0:00-0:40  slides 1-3   the problem and what Proveryai is
+  Boris  0:00-0:40  slides 1-3   the problem and what ProveryAI is
   Alex   0:40-2:05  slides 4-5   live demo, then how it works
   Gor    2:05-3:00  slides 6-7   the law, where it runs, what is next
 
@@ -33,7 +33,7 @@ Wording rule: "possible inconsistency with", never "violates" or "illegal".
 
 <div class="who">Boris</div>
 
-# Proveryai
+# ProveryAI
 
 Your privacy policy makes promises.
 **Your code keeps the receipts.**
@@ -80,7 +80,7 @@ Repository + live site + privacy policy. Each cell: evidence, the official provi
 
 <!--
 BORIS (15s)
-"You give Proveryai three links: the repository, the live site and the policy. It works out what the product actually collects and sends, compares that with what the policy claims, and gives you this: three jurisdictions, four areas of law. Website scanners only read the site. Code scanners are built for enterprises. This does both in about two minutes."
+"You give ProveryAI three links: the repository, the live site and the policy. It works out what the product actually collects and sends, compares that with what the policy claims, and gives you this: three jurisdictions, four areas of law. Website scanners only read the site. Code scanners are built for enterprises. This does both in about two minutes."
 Hand-over: "Alex will run it."
 -->
 
@@ -101,7 +101,7 @@ Hand-over: "Alex will run it."
 ALEX (60s) - switch to the browser, http://localhost:3000, started with `make demo` and `make fixture`.
 
 (0:40) Click "Use demo fixture", Run. Over the timeline:
-"This is Notely, a small product we wrote that makes the usual mistakes. Proveryai reads its dependencies, loads the site without clicking anything to see what fires before consent, and extracts the claims from the policy."
+"This is Notely, a small product we wrote that makes the usual mistakes. ProveryAI reads its dependencies, loads the site without clicking anything to see what fires before consent, and extracts the claims from the policy."
 
 (0:55) Matrix appears. Click EU x Personal data.
 "EU, personal data, red. On the left the policy: 'We never share your data with third parties.' On the right the code: Mixpanel imported in analytics.ts, line 1, and five more vendors receive personal data. This is the provision it relates to, GDPR Article 13, with a link to the official text. And this is a clause you can paste into the policy."
@@ -174,7 +174,7 @@ A model cannot invent a citation here. There are 54 provisions, each with a link
 <!--
 GOR (25s)
 "It runs in three places: the web app you saw, in CI as a GitHub Action that fails the pull request when a new undisclosed vendor appears, and as an MCP tool, so a coding agent can check before it ships. The scan is free; the CI gate is what a team would pay for.
-Proveryai is not legal advice. It is the evidence pack you bring to your lawyer. Trust your policy, but verify your code. Thank you."
+ProveryAI is not legal advice. It is the evidence pack you bring to your lawyer. Trust your policy, but verify your code. Thank you."
 
 Q&A - who answers what:
   Boris: product, UI, competitors, business model, PUBLIC_MODE / abuse of a public deployment.

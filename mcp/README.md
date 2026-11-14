@@ -1,8 +1,8 @@
-# Proveryai MCP server
+# ProveryAI MCP server
 
 `mcp/server.py` lets an AI assistant run the audit as a tool. It speaks MCP over stdio and has one tool:
 
-`audit_product(policy_url, repo_url, site_url, jurisdictions)` returns the Markdown report. `repo_url` and `site_url` are optional, but at least one is required. `jurisdictions` is optional: a list of `UK`, `EU`, `KZ`.
+`audit_product(policy_url, repo_url, site_url, jurisdictions, effort)` returns the Markdown report. `repo_url` and `site_url` are optional, but at least one is required. `policy_url` is optional: without it only the checks that need no policy text run. `effort` is `fast` (default) or `strong` (uses `MODEL_STRONG`). `jurisdictions` is optional: a list of `UK`, `EU`, `KZ`.
 
 Run `make setup` first. The assistant starts the server itself; you do not run it by hand.
 

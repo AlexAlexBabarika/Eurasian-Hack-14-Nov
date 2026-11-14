@@ -12,7 +12,7 @@ from app.ingest.site import SiteScan
 from app.main import app
 from app.models import AuditReport, AuditRequest, ProgressEvent
 from app.pipeline import run_audit
-from app.report.markdown import finding_status_by_jurisdiction
+from app.report.markdown import finding_status_by_jurisdiction, render
 
 POLICY = str(sample.FIXTURE / "privacy.html")
 
@@ -62,6 +62,23 @@ def test_repo_only_audit_skips_the_site_scan():
     assert report.findings and all(f.evidence for f in report.findings)
 
 
+def test_audit_without_a_policy_runs_only_the_checks_that_need_none():
+    report, steps = audit(AuditRequest(repo_url=str(sample.FIXTURE), site_url=sample.SITE_URL))
+    assert steps["policy_fetch"] == steps["claims"] == "skipped"
+    assert steps["diff"] == "done"
+    assert rules(report) == {"R5", "R8"}
+    assert all(f.evidence and all(e.kind != "policy_quote" for e in f.evidence) for f in report.findings)
+    assert report.inputs["policy_url"] is None
+    ai = [c for c in report.matrix if c.area == "ai_transparency"]
+    assert ai and all(c.status == "grey" and c.headline == "Not assessed: no privacy policy was given" for c in ai)
+    assert "- Policy: not given" in render(report)
+
+
+def test_cli_runs_without_a_policy(capsys):
+    assert cli.main(["--repo", str(sample.FIXTURE), "--no-llm", "--fail-on", "amber"]) == cli.EXIT_FAILED_GATE
+    assert "F1" in capsys.readouterr().out
+
+
 def test_a_cell_without_findings_is_grey_when_no_site_was_loaded():
     fixed = str(sample.FIXTURE / sample.FIXED_POLICY)
     report, _ = audit(AuditRequest(repo_url=str(sample.FIXTURE), policy_url=fixed))
@@ -82,7 +99,7 @@ def test_cli_exit_codes_and_markdown(tmp_path, capsys):
     base = ["--repo", str(sample.FIXTURE), "--policy", POLICY, "--no-llm"]
     out = tmp_path / "report.md"
     assert cli.main([*base, "--fail-on", "red", "--markdown", str(out)]) == cli.EXIT_FAILED_GATE
-    assert out.read_text().startswith("# Proveryai audit report")
+    assert out.read_text().startswith("# ProveryAI audit report")
     assert "RED" in capsys.readouterr().out
     assert cli.main([*base, "--fail-on", "never"]) == 0
     fixed = ["--repo", str(sample.FIXTURE), "--policy", str(sample.FIXTURE / sample.FIXED_POLICY), "--no-llm"]
