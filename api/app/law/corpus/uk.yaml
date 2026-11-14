@@ -1,0 +1,202 @@
+# UK corpus. `verified: true` ONLY after a human has opened official_url and confirmed ref + summary.
+# UK GDPR article numbers mirror EU GDPR; check each article for amendments made by the Data (Use and Access) Act 2025.
+- id: UK-GDPR-5-1-a
+  jurisdiction: UK
+  area: personal_data
+  instrument: "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)"
+  ref: "Art. 5(1)(a)"
+  title: "Lawfulness, fairness and transparency"
+  summary: "Personal data must be processed lawfully, fairly and in a transparent manner in relation to the data subject."
+  official_url: "https://www.legislation.gov.uk/eur/2016/679/article/5"
+  tags: [fairness, transparency, sharing, data_categories]
+  verified: false
+- id: UK-GDPR-5-1-e
+  jurisdiction: UK
+  area: personal_data
+  instrument: "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)"
+  ref: "Art. 5(1)(e)"
+  title: "Storage limitation"
+  summary: "Personal data must be kept in identifiable form no longer than necessary for the purposes for which it is processed."
+  official_url: "https://www.legislation.gov.uk/eur/2016/679/article/5"
+  tags: [retention]
+  verified: false
+- id: UK-GDPR-5-1-f
+  jurisdiction: UK
+  area: personal_data
+  instrument: "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)"
+  ref: "Art. 5(1)(f)"
+  title: "Integrity and confidentiality"
+  summary: "Personal data must be processed with appropriate security, including protection against unauthorised access."
+  official_url: "https://www.legislation.gov.uk/eur/2016/679/article/5"
+  tags: [security, logs]
+  verified: false
+- id: UK-GDPR-6
+  jurisdiction: UK
+  area: personal_data
+  instrument: "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)"
+  ref: "Art. 6(1)"
+  title: "Lawful basis for processing"
+  summary: "Processing is lawful only if at least one listed legal basis applies, such as consent, contract or legitimate interests."
+  official_url: "https://www.legislation.gov.uk/eur/2016/679/article/6"
+  tags: [lawfulness, consent]
+  verified: false
+- id: UK-GDPR-7
+  jurisdiction: UK
+  area: personal_data
+  instrument: "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)"
+  ref: "Art. 7"
+  title: "Conditions for consent"
+  summary: "Where processing relies on consent, the controller must be able to demonstrate consent, and withdrawal must be as easy as giving it."
+  official_url: "https://www.legislation.gov.uk/eur/2016/679/article/7"
+  tags: [consent]
+  verified: false
+- id: UK-GDPR-13-1-c
+  jurisdiction: UK
+  area: personal_data
+  instrument: "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)"
+  ref: "Art. 13(1)(c)"
+  title: "Purposes and legal basis must be disclosed"
+  summary: "When collecting data from the person, the controller must state the purposes of the processing and its legal basis."
+  official_url: "https://www.legislation.gov.uk/eur/2016/679/article/13"
+  tags: [purposes, transparency, data_categories, ai]
+  verified: false
+- id: UK-GDPR-13-1-e
+  jurisdiction: UK
+  area: personal_data
+  instrument: "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)"
+  ref: "Art. 13(1)(e)"
+  title: "Recipients must be disclosed"
+  summary: "When collecting data, the controller must tell the person the recipients or categories of recipients of the personal data."
+  official_url: "https://www.legislation.gov.uk/eur/2016/679/article/13"
+  tags: [processors, recipients, transparency, sharing]
+  verified: false
+- id: UK-GDPR-13-1-f
+  jurisdiction: UK
+  area: personal_data
+  instrument: "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)"
+  ref: "Art. 13(1)(f)"
+  title: "International transfers must be disclosed"
+  summary: "The controller must tell the person if it intends to transfer personal data to a third country or international organisation, and the safeguards relied on."
+  official_url: "https://www.legislation.gov.uk/eur/2016/679/article/13"
+  tags: [transfers, transparency]
+  verified: false
+- id: UK-GDPR-13-2-a
+  jurisdiction: UK
+  area: personal_data
+  instrument: "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)"
+  ref: "Art. 13(2)(a)"
+  title: "Retention period must be stated"
+  summary: "The controller must state the period for which personal data will be stored or the criteria used to determine that period."
+  official_url: "https://www.legislation.gov.uk/eur/2016/679/article/13"
+  tags: [retention, transparency]
+  verified: false
+- id: UK-GDPR-17
+  jurisdiction: UK
+  area: personal_data
+  instrument: "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)"
+  ref: "Art. 17"
+  title: "Right to erasure"
+  summary: "The person has the right to have personal data erased without undue delay in listed cases."
+  official_url: "https://www.legislation.gov.uk/eur/2016/679/article/17"
+  tags: [erasure, deletion, rights]
+  verified: false
+- id: UK-GDPR-22
+  jurisdiction: UK
+  area: personal_data
+  instrument: "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)"
+  ref: "Art. 22 / Arts. 22A-22D"
+  title: "Automated decision-making"
+  summary: "Restrictions and safeguards apply to significant decisions based solely on automated processing. The Data (Use and Access) Act 2025 replaces Art. 22 with Arts. 22A-22D; confirm the current text and commencement."
+  official_url: "https://www.legislation.gov.uk/eur/2016/679/article/22"
+  tags: [automated_decisions]
+  verified: false
+- id: UK-GDPR-28
+  jurisdiction: UK
+  area: personal_data
+  instrument: "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)"
+  ref: "Art. 28"
+  title: "Processors"
+  summary: "A controller may only use processors that provide sufficient guarantees, under a contract that sets out the processing."
+  official_url: "https://www.legislation.gov.uk/eur/2016/679/article/28"
+  tags: [processors]
+  verified: false
+- id: UK-GDPR-44
+  jurisdiction: UK
+  area: personal_data
+  instrument: "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)"
+  ref: "Art. 44"
+  title: "General principle for transfers"
+  summary: "Personal data may be transferred outside the UK only if the conditions of Chapter V are met."
+  official_url: "https://www.legislation.gov.uk/eur/2016/679/article/44"
+  tags: [transfers]
+  verified: false
+- id: UK-DPA-2018
+  jurisdiction: UK
+  area: personal_data
+  instrument: "Data Protection Act 2018"
+  ref: "Part 2"
+  title: "General processing"
+  summary: "Part 2 supplements the UK GDPR for general processing, including exemptions and the role of the Information Commissioner."
+  official_url: "https://www.legislation.gov.uk/ukpga/2018/12/contents"
+  tags: [lawfulness]
+  verified: false
+- id: UK-PECR-6
+  jurisdiction: UK
+  area: personal_data
+  instrument: "Privacy and Electronic Communications (EC Directive) Regulations 2003 (PECR)"
+  ref: "reg. 6(1), as substituted by Data (Use and Access) Act 2025 s. 112"
+  title: "Storing or accessing information on a user's device"
+  summary: "A person must not store information, or gain access to information stored, in a user's terminal equipment unless an exception in Schedule A1 applies (for example consent, or strict necessity)."
+  official_url: "https://www.legislation.gov.uk/ukpga/2025/18/section/112"
+  tags: [cookies, consent, tracking]
+  verified: false
+- id: UK-PECR-SCHA1-5
+  jurisdiction: UK
+  area: personal_data
+  instrument: "PECR Schedule A1, inserted by Data (Use and Access) Act 2025 Sch. 12"
+  ref: "Sch. A1 para. 5"
+  title: "Statistical-purposes exception for analytics cookies"
+  summary: "Consent is not required where storage or access is solely to collect statistical information about how a service or website is used, with a view to improving it, provided the user is given clear information and a simple means to object. Advertising and cross-site tracking are outside the exception."
+  official_url: "https://www.legislation.gov.uk/ukpga/2025/18/schedule/12"
+  tags: [cookies, consent, tracking, statistical, analytics]
+  verified: false
+- id: UK-ICO-AI-GUIDANCE
+  jurisdiction: UK
+  area: ai_transparency
+  instrument: "ICO Guidance on AI and data protection (regulator guidance, not statute)"
+  ref: "Transparency in AI"
+  title: "Be transparent about AI processing of personal data"
+  summary: "The UK has no AI-specific statute. ICO guidance expects organisations to tell people when and how their personal data is processed by AI systems, as part of UK GDPR transparency. Guidance only, so status is capped at amber."
+  official_url: "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/guidance-on-ai-and-data-protection/"
+  tags: [ai, transparency, chatbot]
+  verified: false
+- id: UK-DMCC-225
+  jurisdiction: UK
+  area: consumer
+  instrument: "Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1"
+  ref: "s. 225"
+  title: "Prohibition of unfair commercial practices"
+  summary: "Unfair commercial practices are prohibited, including misleading actions, misleading omissions and practices that contravene professional diligence."
+  official_url: "https://www.legislation.gov.uk/ukpga/2024/13/section/225"
+  tags: [fairness, dark_patterns, consent, tracking]
+  verified: false
+- id: UK-DMCC-226
+  jurisdiction: UK
+  area: consumer
+  instrument: "Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1"
+  ref: "s. 226"
+  title: "Misleading actions"
+  summary: "A practice involves a misleading action if it provides false or misleading information relating to the product or trader and is likely to cause the average consumer to take a transactional decision they would not otherwise take."
+  official_url: "https://www.legislation.gov.uk/ukpga/2024/13/section/226"
+  tags: [misleading, sharing, fairness]
+  verified: false
+- id: UK-DMCC-227
+  jurisdiction: UK
+  area: consumer
+  instrument: "Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1"
+  ref: "s. 227"
+  title: "Misleading omissions"
+  summary: "A practice involves a misleading omission if it omits or hides material information the average consumer needs to take an informed transactional decision."
+  official_url: "https://www.legislation.gov.uk/ukpga/2024/13/section/227"
+  tags: [misleading, information, erasure, omission]
+  verified: false

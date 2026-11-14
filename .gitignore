@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.ruff_cache/
+.pytest_cache/
+node_modules/
+.next/
+api/data/audits/*
+!api/data/audits/.gitkeep
+!api/data/audits/demo-*.json
+api/data/llm_cache/
+.DS_Store

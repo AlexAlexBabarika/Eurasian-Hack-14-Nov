@@ -1,0 +1,20 @@
+{
+  "name": "notely-fixture",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Deliberately non-compliant demo product for Groundtruth. Do not copy.",
+  "scripts": {
+    "dev": "next dev",
+    "serve": "python3 -m http.server 4100"
+  },
+  "dependencies": {
+    "@sentry/nextjs": "^8.40.0",
+    "mixpanel-browser": "^2.56.0",
+    "next": "15.0.3",
+    "openai": "^4.73.0",
+    "posthog-js": "^1.188.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "stripe": "^17.4.0"
+  }
+}

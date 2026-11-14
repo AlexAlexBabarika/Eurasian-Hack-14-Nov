@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Notely: notes that write themselves</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 720px; margin: 4rem auto; padding: 0 1rem; color: #111; }
+      #cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; background: #111; color: #fff; padding: 1rem; display: flex; gap: 1rem; justify-content: center; align-items: center; }
+      button { padding: 0.5rem 1rem; }
+    </style>
+
+    <!-- Planted issue: analytics load before the visitor touches the consent banner -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DEMO000000"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag("js", new Date());
+      gtag("config", "G-DEMO000000");
+    </script>
+    <script>
+      document.cookie = "_ga=GA1.1.444444444.1700000000; path=/; max-age=63072000";
+      document.cookie = "ph_phc_demo_key_posthog=%7B%22distinct_id%22%3A%22demo%22%7D; path=/; max-age=31536000";
+      fetch("https://eu.i.posthog.com/e/?ip=1&_=" + Date.now(), {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify({ api_key: "phc_demo_key", event: "$pageview", distinct_id: "demo" }),
+      }).catch(function () {});
+      fetch("https://www.google-analytics.com/g/collect?v=2&tid=G-DEMO000000&en=page_view", {
+        method: "POST",
+        mode: "no-cors",
+      }).catch(function () {});
+    </script>
+  </head>
+  <body>
+    <h1>Notely</h1>
+    <p>AI-assisted notes for busy teams. Chat with your notes, share with your team, pay monthly.</p>
+    <p><a href="../privacy.html">Privacy Policy</a></p>
+
+    <div id="cookie-banner">
+      <span>We use cookies to improve your experience.</span>
+      <button onclick="document.getElementById('cookie-banner').remove()">Accept</button>
+    </div>
+  </body>
+</html>
