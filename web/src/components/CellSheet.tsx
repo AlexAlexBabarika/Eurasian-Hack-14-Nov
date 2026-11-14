@@ -80,7 +80,7 @@ export function CellSheet({
       <SheetContent className="gap-0 data-[side=right]:w-full data-[side=right]:sm:max-w-2xl">
         {cell && (
           <>
-            <SheetHeader className="gap-3 border-b p-5 pr-12">
+            <SheetHeader className={cn("tone-wash gap-3 border-b p-5 pr-12", STATUS_STYLE[cell.status].tone)}>
               <div className="space-y-1">
                 <SheetDescription className="text-xs">{AREA_LABEL[cell.area].name} in</SheetDescription>
                 <div role="tablist" aria-label="Jurisdiction" className="flex flex-wrap gap-1.5">
@@ -111,7 +111,7 @@ export function CellSheet({
               </div>
               <div className="space-y-2">
                 <StatusBadge status={cell.status} />
-                <SheetTitle className="text-lg leading-snug">{cell.headline}</SheetTitle>
+                <SheetTitle className="text-xl leading-snug font-semibold tracking-tight">{cell.headline}</SheetTitle>
               </div>
             </SheetHeader>
 

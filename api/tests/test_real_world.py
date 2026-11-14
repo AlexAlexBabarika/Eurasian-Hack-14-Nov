@@ -1,15 +1,17 @@
 """Regressions from running the tool on real open-source products (Rallly, Hoppscotch, Papermark, monorepos)."""
 
 import asyncio
+import time
 
 import httpx
 
 from app.claims.extract import heuristic
-from app.detect import code_signals, manifests
+from app.detect import code_signals, manifests, trackers
 from app.detect.code_signals import CodeSignals
 from app.diff.rules import run_rules
 from app.ingest import policy, repo
 from app.ingest.repo import RepoFile
+from app.ingest.site import SiteScan
 from app.models import AREAS, Evidence, Observation
 from app.verdict.engine import deterministic_cell
 
@@ -39,6 +41,8 @@ def test_qualified_no_sharing_sentence_is_not_no_sharing():
     twenty = ("However, as noted above, Twenty does not sell your personal information to third parties, and we do "
               "not share it for cross-context behavioral advertising.")  # fmt: skip
     assert heuristic(twenty).sharing_statement != "no_sharing"
+    umami = "We will not sell or share personal information in the future belonging to website visitors and users."
+    assert heuristic(umami).sharing_statement != "no_sharing"
 
 
 def test_blanket_no_sharing_sentence_still_counts():
@@ -180,3 +184,53 @@ def test_unreadable_inputs_are_never_green():
         assert cell.status == "grey", area
     assert "repository could not be read" in deterministic_cell("EU", "consumer", [], [], gaps=["the repository could not be read"]).headline
     assert deterministic_cell("EU", "consumer", [], []).status == "green"
+
+
+# Found on Hoppscotch and Papermark: gtag.js is served from googletagmanager.com for Analytics (G-) and Ads (AW-).
+def test_google_tags_are_told_apart_by_id():
+    scan = SiteScan(url="https://acme.test", requests=[
+        "https://www.googletagmanager.com/gtag/js?id=G-LQ01D3PKKN&l=dataLayer",
+        "https://www.googletagmanager.com/gtag/js?id=AW-17198795665&cx=c",
+        "https://www.googletagmanager.com/gtm.js?id=GTM-WH2DMPB6",
+    ])  # fmt: skip
+    found = {o.vendor: o.purpose_guess for o in trackers.detect(scan)}
+    assert found == {"Google Analytics": "analytics", "Google Ads": "ads", "Google Tag Manager": "analytics"}
+
+
+# Found on Papermark: `import Stripe from "@/components/shared/icons/stripe"` was reported as the Stripe SDK.
+def test_js_default_import_of_a_local_file_is_not_an_sdk_import():
+    files = [
+        RepoFile(path="package.json", text='{"dependencies": {"stripe": "^17"}}'),
+        RepoFile(path="components/upgrade.tsx", text='import Stripe from "@/components/shared/icons/stripe";\n'),
+        RepoFile(path="lib/billing.ts", text='import Stripe from "stripe";\n'),
+        RepoFile(path="jobs/sync.py", text="import stripe\n"),
+    ]
+    code = [e.file for e in manifests.detect(files)[0].evidence if e.kind == "code"]
+    assert code == ["lib/billing.ts", "jobs/sync.py"]
+
+
+# Found on the 14-product re-run: most log hits were seed scripts, migrations and CLIs, or `email.subject`.
+def test_logs_rule_skips_dev_tooling_and_message_objects():
+    line = "console.log(`created ${user.email}`);"
+    files = [RepoFile(path=p, text=line) for p in [
+        "scripts/seed-utils.ts", "packages/prisma/seed-pbac-only.ts", "packages/database/src/seed.ts",
+        "apps/api/migrations/normalize/normalize.migration.ts", "docker/box/src/cli/user.ts", "src/auth.test.ts",
+        "apps/web/lib/sync-user-plan.ts",
+    ]]  # fmt: skip
+    files.append(RepoFile(path="packages/emails/src/send.ts", text="\n".join([
+        'console.error(`Error sending email "${email.subject}":`, error);',
+        "logger.warn(message, body.email.toLowerCase(), body.name);",
+    ])))  # fmt: skip
+    hits = [(e.file, e.line) for e in code_signals.detect(files).pii_logs]
+    assert hits == [("apps/web/lib/sync-user-plan.ts", 1), ("packages/emails/src/send.ts", 2)]
+
+
+# Found on Twenty: one audit took 9.5 minutes, all of it in the string-literal regex on minified lines.
+def test_minified_lines_do_not_stall_the_scan():
+    minified = "var a='x" + "\\'y\"z`" * 60_000 + ";console.log(user.email)"
+    files = [RepoFile(path="src/vendor.min.js", text=minified + "\nconsole.log(user.email);")]
+    start = time.monotonic()
+    hits = code_signals.detect(files).pii_logs
+    manifests.code_lines(minified.splitlines())
+    assert time.monotonic() - start < 1.0
+    assert [e.line for e in hits] == [2]

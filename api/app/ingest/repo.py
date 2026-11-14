@@ -8,6 +8,8 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
+from app.ingest import safety
+
 CLONE_TIMEOUT_S = 30
 MAX_FILE_BYTES = 5 * 1024 * 1024
 MAX_FILES = 3000
@@ -35,8 +37,10 @@ class RepoFile(BaseModel):
 async def fetch(repo_url: str) -> Path:
     """Return a local directory containing the code to scan."""
     local = Path(repo_url.removeprefix("file://")).expanduser()
-    if not repo_url.startswith("http") and local.is_dir():
-        return local
+    if not repo_url.startswith("http"):
+        safety.check_local_path()
+        if local.is_dir():
+            return local
     m = _GITHUB.match(repo_url.strip())
     if not m:
         raise ValueError("repo_url must be a public https://github.com/<owner>/<repo> URL")

@@ -35,7 +35,7 @@ function ClaimRow({ label, value, stated, quote }: { label: string; value: strin
         <p className="text-xs text-muted-foreground">{label}</p>
         <p className={cn("text-sm", stated ? "text-foreground" : "text-muted-foreground")}>{value}</p>
         {quote && (
-          <blockquote className="border-l-2 border-border pl-3 text-sm text-foreground/80">&ldquo;{quote}&rdquo;</blockquote>
+          <blockquote className="border-l-2 border-paper/50 pl-3 font-serif text-[17px] leading-6 text-paper">&ldquo;{quote}&rdquo;</blockquote>
         )}
       </div>
     </li>

@@ -41,26 +41,19 @@ Inside the container `localhost` is the container itself. To audit something ser
 
 ### MCP server
 
-`mcp/server.py` exposes the audit as one tool, `audit_product(policy_url, repo_url, site_url)`, over stdio and returns the Markdown report. `repo_url` and `site_url` are optional, but at least one is required. Needs `mcp` 2.x (installed by `make setup`).
+`mcp/server.py` exposes the audit as one tool, `audit_product(policy_url, repo_url, site_url, jurisdictions)`, over stdio and returns the Markdown report. `repo_url` and `site_url` are optional, but at least one is required. `jurisdictions` is optional: a list of `UK`, `EU`, `KZ` that limits the matrix and verdicts; leave it out for all three. Needs `mcp` 2.x (installed by `make setup`).
 
 ```sh
 uv run --project api python mcp/server.py
 ```
 
-To use it from an MCP client (Claude Desktop, Cursor and similar), add this to the client's MCP config:
-
-```json
-{
-  "mcpServers": {
-    "groundtruth": {
-      "command": "uv",
-      "args": ["run", "--project", "/absolute/path/to/repo/api", "python", "/absolute/path/to/repo/mcp/server.py"]
-    }
-  }
-}
-```
+To use it from Claude Code, Cursor or Claude Desktop, see [mcp/README.md](mcp/README.md). The repo ships `.mcp.json` and `.cursor/mcp.json`, so the first two need no configuration.
 
 Example prompt: "Audit https://github.com/acme/app and https://acme.example against https://acme.example/privacy with the groundtruth tool, then list the findings that need a code change."
+
+With `DEMO_MODE=cached` (in `.env` or the server's environment), inputs that match a saved audit in `api/data/audits/` return that report at once, without cloning or scanning. Other inputs still run a live audit.
+
+If the API is reachable by other people (a public deploy, judges pasting their own URLs), set `PUBLIC_MODE=1`. Local paths are then refused, and so is any URL that points at a private or local address (`localhost`, `10.x`, cloud metadata `169.254.169.254`), including after redirects. Leave it off for the local demo, which audits `localhost:4100`.
 
 ### Run it in CI
 

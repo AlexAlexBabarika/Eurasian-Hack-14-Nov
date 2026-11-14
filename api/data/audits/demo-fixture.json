@@ -46,8 +46,8 @@
     {
       "step": "site_scan",
       "status": "done",
-      "message": "4 requests before consent; trackers: Google Tag Manager, PostHog, Google Analytics",
-      "count": 3
+      "message": "4 requests before consent; trackers: Google Analytics, PostHog",
+      "count": 2
     },
     {
       "step": "policy_fetch",
@@ -395,7 +395,7 @@
       },
       {
         "id": "obs-6",
-        "vendor": "Google Tag Manager",
+        "vendor": "Google Analytics",
         "vendor_country": "US",
         "data_categories": [
           "usage",
@@ -408,28 +408,13 @@
         "evidence": [
           {
             "kind": "network",
-            "summary": "Request to Google Tag Manager before any consent interaction",
+            "summary": "Request to Google Analytics before any consent interaction",
             "file": null,
             "line": null,
             "snippet": null,
             "url": "https://www.googletagmanager.com/gtag/js?id=G-DEMO000000",
             "quote": null
-          }
-        ]
-      },
-      {
-        "id": "obs-7",
-        "vendor": "Google Analytics",
-        "vendor_country": "US",
-        "data_categories": [
-          "usage",
-          "device_id",
-          "ip"
-        ],
-        "purpose_guess": "analytics",
-        "is_ai": false,
-        "pre_consent": true,
-        "evidence": [
+          },
           {
             "kind": "network",
             "summary": "Request to Google Analytics before any consent interaction",
@@ -477,7 +462,7 @@
       {
         "id": "F1",
         "rule": "R1_UNDISCLOSED_PROCESSOR",
-        "title": "Sentry, Mixpanel, OpenAI and 4 more observed in code or network traffic; policy names no such recipients",
+        "title": "Sentry, Mixpanel, OpenAI and 3 more observed in code or network traffic; policy names no such recipients",
         "severity": "medium",
         "areas": [
           "personal_data"
@@ -488,8 +473,7 @@
           "obs-3",
           "obs-4",
           "obs-5",
-          "obs-6",
-          "obs-7"
+          "obs-6"
         ],
         "evidence": [
           {
@@ -539,20 +523,11 @@
           },
           {
             "kind": "network",
-            "summary": "Request to Google Tag Manager before any consent interaction",
-            "file": null,
-            "line": null,
-            "snippet": null,
-            "url": "https://www.googletagmanager.com/gtag/js?id=G-DEMO000000",
-            "quote": null
-          },
-          {
-            "kind": "network",
             "summary": "Request to Google Analytics before any consent interaction",
             "file": null,
             "line": null,
             "snippet": null,
-            "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-DEMO000000&en=page_view",
+            "url": "https://www.googletagmanager.com/gtag/js?id=G-DEMO000000",
             "quote": null
           },
           {
@@ -563,6 +538,15 @@
             "snippet": "});\n\nexport function setSentryUser(user: { id: string; email: string }) {\n  Sentry.setUser({ id: user.id, email: user.email });\n}",
             "url": null,
             "quote": null
+          },
+          {
+            "kind": "code",
+            "summary": "email handled in a file that calls Mixpanel",
+            "file": "src/lib/analytics.ts",
+            "line": 7,
+            "snippet": "posthog.init(\"phc_demo_key\", { api_host: \"https://eu.i.posthog.com\" });\n\nexport type User = { id: string; email: string; name: string };\n\nexport function identifyUser(user: User) {",
+            "url": null,
+            "quote": null
           }
         ],
         "policy_quote": null
@@ -570,7 +554,7 @@
       {
         "id": "F2",
         "rule": "R2_SHARING_CONTRADICTION",
-        "title": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+        "title": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
         "severity": "high",
         "areas": [
           "personal_data",
@@ -582,8 +566,7 @@
           "obs-3",
           "obs-4",
           "obs-5",
-          "obs-6",
-          "obs-7"
+          "obs-6"
         ],
         "evidence": [
           {
@@ -642,7 +625,7 @@
           },
           {
             "kind": "network",
-            "summary": "Request to Google Tag Manager before any consent interaction",
+            "summary": "Request to Google Analytics before any consent interaction",
             "file": null,
             "line": null,
             "snippet": null,
@@ -666,8 +649,7 @@
           "obs-3",
           "obs-4",
           "obs-5",
-          "obs-6",
-          "obs-7"
+          "obs-6"
         ],
         "evidence": [
           {
@@ -782,7 +764,7 @@
       {
         "id": "F5",
         "rule": "R5_TRACKING_BEFORE_CONSENT",
-        "title": "PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site",
+        "title": "PostHog and Google Analytics fire before any consent interaction on the site",
         "severity": "high",
         "areas": [
           "personal_data",
@@ -790,8 +772,7 @@
         ],
         "observation_ids": [
           "obs-4",
-          "obs-6",
-          "obs-7"
+          "obs-6"
         ],
         "evidence": [
           {
@@ -805,20 +786,11 @@
           },
           {
             "kind": "network",
-            "summary": "Request to Google Tag Manager before any consent interaction",
-            "file": null,
-            "line": null,
-            "snippet": null,
-            "url": "https://www.googletagmanager.com/gtag/js?id=G-DEMO000000",
-            "quote": null
-          },
-          {
-            "kind": "network",
             "summary": "Request to Google Analytics before any consent interaction",
             "file": null,
             "line": null,
             "snippet": null,
-            "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-DEMO000000&en=page_view",
+            "url": "https://www.googletagmanager.com/gtag/js?id=G-DEMO000000",
             "quote": null
           },
           {
@@ -828,6 +800,15 @@
             "line": null,
             "snippet": null,
             "url": "http://localhost:4100/public/index.html",
+            "quote": null
+          },
+          {
+            "kind": "network",
+            "summary": "Request to Google Analytics before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-DEMO000000&en=page_view",
             "quote": null
           },
           {
@@ -845,7 +826,7 @@
       {
         "id": "F6",
         "rule": "R6_TRANSFER_UNDISCLOSED",
-        "title": "Personal data goes to vendors based in US (Sentry, Mixpanel, OpenAI and 4 more); policy does not mention international transfers",
+        "title": "Personal data goes to vendors based in US (Sentry, Mixpanel, OpenAI and 3 more); policy does not mention international transfers",
         "severity": "medium",
         "areas": [
           "personal_data"
@@ -856,8 +837,7 @@
           "obs-3",
           "obs-4",
           "obs-5",
-          "obs-6",
-          "obs-7"
+          "obs-6"
         ],
         "evidence": [
           {
@@ -907,7 +887,7 @@
           },
           {
             "kind": "network",
-            "summary": "Request to Google Tag Manager before any consent interaction",
+            "summary": "Request to Google Analytics before any consent interaction",
             "file": null,
             "line": null,
             "snippet": null,
@@ -999,8 +979,8 @@
         "jurisdiction": "UK",
         "area": "personal_data",
         "status": "red",
-        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
-        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with UK GDPR Art. 13(1)(e); UK GDPR Art. 5(1)(a). User content is sent to OpenAI (AI provider); policy does not mention AI processing. Possible inconsistency with UK GDPR Art. 13(1)(c). Sentry, Mixpanel, OpenAI and 4 more observed in code or network traffic; policy names no such recipients. Possible inconsistency with UK GDPR Art. 13(1)(e); UK GDPR Art. 28. Data categories observed but not described in the policy: device_id, ip, name, payment, user_content. Possible inconsistency with UK GDPR Art. 13(1)(c); UK GDPR Art. 5(1)(a). 5 more findings are listed below.",
+        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with UK GDPR Art. 13(1)(e); UK GDPR Art. 5(1)(a). User content is sent to OpenAI (AI provider); policy does not mention AI processing. Possible inconsistency with UK GDPR Art. 13(1)(c). Sentry, Mixpanel, OpenAI and 3 more observed in code or network traffic; policy names no such recipients. Possible inconsistency with UK GDPR Art. 13(1)(e); UK GDPR Art. 28. Data categories observed but not described in the policy: device_id, ip, name, payment, user_content. Possible inconsistency with UK GDPR Art. 13(1)(c); UK GDPR Art. 5(1)(a). 5 more findings are listed below.",
         "finding_ids": [
           "F2",
           "F4",
@@ -1028,7 +1008,7 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
+            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
             "code_change": "Or stop the sharing: send a pseudonymous user id instead of email/name (see src/lib/sentry.ts:1)."
           },
           {
@@ -1036,7 +1016,7 @@
             "code_change": "Show a visible notice in the product that responses are AI-generated (feature at src/app/api/chat/route.ts:12)."
           },
           {
-            "policy_clause": "We use the following service providers to run our service: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). They process personal data on our behalf and only on our instructions.",
+            "policy_clause": "We use the following service providers to run our service: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Analytics (product analytics; receives usage, device id, ip). They process personal data on our behalf and only on our instructions.",
             "code_change": null
           },
           {
@@ -1044,11 +1024,11 @@
             "code_change": null
           },
           {
-            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. You can object to these cookies at any time in [cookie settings].",
-            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. You can object to these cookies at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
           },
           {
-            "policy_clause": "Some of our service providers are based outside the UK: Sentry (US), Mixpanel (US), OpenAI (US), PostHog (US), Stripe (US), Google Tag Manager (US), Google Analytics (US). When we transfer personal data to them we rely on [transfer mechanism].",
+            "policy_clause": "Some of our service providers are based outside the UK: Sentry (US), Mixpanel (US), OpenAI (US), PostHog (US), Stripe (US), Google Analytics (US). When we transfer personal data to them we rely on [transfer mechanism].",
             "code_change": null
           },
           {
@@ -1108,8 +1088,8 @@
         "jurisdiction": "UK",
         "area": "consumer",
         "status": "red",
-        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
-        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 226; Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 227. PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 225. UK: since the Data (Use and Access) Act 2025, analytics used solely for statistical purposes to improve the service may not need consent, if users get clear information and a simple way to object. The same evidence is treated more strictly in the EU. No way to delete an account or data: not in the policy, no route found in code. Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 227.",
+        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 226; Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 227. PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 225. UK: since the Data (Use and Access) Act 2025, analytics used solely for statistical purposes to improve the service may not need consent, if users get clear information and a simple way to object. The same evidence is treated more strictly in the EU. No way to delete an account or data: not in the policy, no route found in code. Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 227.",
         "finding_ids": [
           "F2",
           "F5",
@@ -1122,12 +1102,12 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
+            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
             "code_change": "Or stop the sharing: send a pseudonymous user id instead of email/name (see src/lib/sentry.ts:1)."
           },
           {
-            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. You can object to these cookies at any time in [cookie settings].",
-            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. You can object to these cookies at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
           },
           {
             "policy_clause": "You can delete your account and personal data at any time from [Settings > Account] or by emailing [contact address]. We delete your data within [period].",
@@ -1159,8 +1139,8 @@
         "jurisdiction": "EU",
         "area": "personal_data",
         "status": "red",
-        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
-        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Regulation Art. 5(1)(a); Regulation Art. 13(1)(e). User content is sent to OpenAI (AI provider); policy does not mention AI processing. Possible inconsistency with Regulation Art. 13(1)(c). PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Directive 2002/58/EC Art. 5(3); Regulation Art. 7; Regulation Art. 6(1). EU: consent is required before non-essential cookies or trackers, including analytics. Sentry, Mixpanel, OpenAI and 4 more observed in code or network traffic; policy names no such recipients. Possible inconsistency with Regulation Art. 13(1)(e); Regulation Art. 28. 5 more findings are listed below.",
+        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Regulation Art. 5(1)(a); Regulation Art. 13(1)(e). User content is sent to OpenAI (AI provider); policy does not mention AI processing. Possible inconsistency with Regulation Art. 13(1)(c). PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Directive 2002/58/EC Art. 5(3); Regulation Art. 7; Regulation Art. 6(1). EU: consent is required before non-essential cookies or trackers, including analytics. Sentry, Mixpanel, OpenAI and 3 more observed in code or network traffic; policy names no such recipients. Possible inconsistency with Regulation Art. 13(1)(e); Regulation Art. 28. 5 more findings are listed below.",
         "finding_ids": [
           "F2",
           "F4",
@@ -1190,7 +1170,7 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
+            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
             "code_change": "Or stop the sharing: send a pseudonymous user id instead of email/name (see src/lib/sentry.ts:1)."
           },
           {
@@ -1198,11 +1178,11 @@
             "code_change": "Show a visible notice in the product that responses are AI-generated (feature at src/app/api/chat/route.ts:12)."
           },
           {
-            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
-            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
           },
           {
-            "policy_clause": "We use the following service providers to run our service: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). They process personal data on our behalf and only on our instructions.",
+            "policy_clause": "We use the following service providers to run our service: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Analytics (product analytics; receives usage, device id, ip). They process personal data on our behalf and only on our instructions.",
             "code_change": null
           },
           {
@@ -1210,7 +1190,7 @@
             "code_change": null
           },
           {
-            "policy_clause": "Some of our service providers are based outside the European Economic Area: Sentry (US), Mixpanel (US), OpenAI (US), PostHog (US), Stripe (US), Google Tag Manager (US), Google Analytics (US). When we transfer personal data to them we rely on [transfer mechanism].",
+            "policy_clause": "Some of our service providers are based outside the European Economic Area: Sentry (US), Mixpanel (US), OpenAI (US), PostHog (US), Stripe (US), Google Analytics (US). When we transfer personal data to them we rely on [transfer mechanism].",
             "code_change": null
           },
           {
@@ -1270,8 +1250,8 @@
         "jurisdiction": "EU",
         "area": "consumer",
         "status": "red",
-        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
-        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Directive 2005/29/EC Art. 6; Directive 2005/29/EC Art. 7. PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Directive 2005/29/EC Art. 5. EU: consent is required before non-essential cookies or trackers, including analytics. No way to delete an account or data: not in the policy, no route found in code. Possible inconsistency with Directive 2005/29/EC Art. 7.",
+        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Directive 2005/29/EC Art. 6; Directive 2005/29/EC Art. 7. PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Directive 2005/29/EC Art. 5. EU: consent is required before non-essential cookies or trackers, including analytics. No way to delete an account or data: not in the policy, no route found in code. Possible inconsistency with Directive 2005/29/EC Art. 7.",
         "finding_ids": [
           "F2",
           "F5",
@@ -1284,12 +1264,12 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
+            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
             "code_change": "Or stop the sharing: send a pseudonymous user id instead of email/name (see src/lib/sentry.ts:1)."
           },
           {
-            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
-            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
           },
           {
             "policy_clause": "You can delete your account and personal data at any time from [Settings > Account] or by emailing [contact address]. We delete your data within [period].",
@@ -1321,8 +1301,8 @@
         "jurisdiction": "KZ",
         "area": "personal_data",
         "status": "red",
-        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
-        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Art. 7 (Conditions for collection and processing); Art. 8(4) (Required content of consent). User content is sent to OpenAI (AI provider); policy does not mention AI processing. Personal data goes to vendors based in US (Sentry, Mixpanel, OpenAI and 4 more); policy does not mention international transfers. Possible inconsistency with Art. 12(2) (Storage in Kazakhstan and retention period); Art. 16 (Cross-border transfer); Art. 8(4) (Required content of consent). Kazakhstan requires personal data to be stored in a database located in Kazakhstan and restricts cross-border transfer; confirm where data of Kazakhstan users is stored. Sentry, Mixpanel, OpenAI and 4 more observed in code or network traffic; policy names no such recipients. Possible inconsistency with Art. 8(4) (Required content of consent); Art. 7 (Conditions for collection and processing). 5 more findings are listed below.",
+        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Art. 7 (Conditions for collection and processing); Art. 8(4) (Required content of consent). User content is sent to OpenAI (AI provider); policy does not mention AI processing. Personal data goes to vendors based in US (Sentry, Mixpanel, OpenAI and 3 more); policy does not mention international transfers. Possible inconsistency with Art. 12(2) (Storage in Kazakhstan and retention period); Art. 16 (Cross-border transfer); Art. 8(4) (Required content of consent). Kazakhstan requires personal data to be stored in a database located in Kazakhstan and restricts cross-border transfer; confirm where data of Kazakhstan users is stored. Sentry, Mixpanel, OpenAI and 3 more observed in code or network traffic; policy names no such recipients. Possible inconsistency with Art. 8(4) (Required content of consent); Art. 7 (Conditions for collection and processing). 5 more findings are listed below.",
         "finding_ids": [
           "F2",
           "F4",
@@ -1344,7 +1324,7 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
+            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
             "code_change": "Or stop the sharing: send a pseudonymous user id instead of email/name (see src/lib/sentry.ts:1)."
           },
           {
@@ -1352,11 +1332,11 @@
             "code_change": "Show a visible notice in the product that responses are AI-generated (feature at src/app/api/chat/route.ts:12)."
           },
           {
-            "policy_clause": "Some of our service providers are based outside Kazakhstan: Sentry (US), Mixpanel (US), OpenAI (US), PostHog (US), Stripe (US), Google Tag Manager (US), Google Analytics (US). When we transfer personal data to them we rely on [transfer mechanism].",
+            "policy_clause": "Some of our service providers are based outside Kazakhstan: Sentry (US), Mixpanel (US), OpenAI (US), PostHog (US), Stripe (US), Google Analytics (US). When we transfer personal data to them we rely on [transfer mechanism].",
             "code_change": "Confirm that personal data of users in Kazakhstan is stored in a database located in Kazakhstan."
           },
           {
-            "policy_clause": "We use the following service providers to run our service: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). They process personal data on our behalf and only on our instructions.",
+            "policy_clause": "We use the following service providers to run our service: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Analytics (product analytics; receives usage, device id, ip). They process personal data on our behalf and only on our instructions.",
             "code_change": null
           },
           {
@@ -1364,8 +1344,8 @@
             "code_change": null
           },
           {
-            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
-            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
           },
           {
             "policy_clause": "You can delete your account and personal data at any time from [Settings > Account] or by emailing [contact address]. We delete your data within [period].",
@@ -1425,8 +1405,8 @@
         "jurisdiction": "KZ",
         "area": "consumer",
         "status": "red",
-        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
-        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 4 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Art. 10 (Consumer right to information); Art. 25 (Seller's duty to provide information). PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Art. 10 (Consumer right to information). Kazakhstan has no cookie-specific rule; general consent requirements for collection apply. No way to delete an account or data: not in the policy, no route found in code. Possible inconsistency with Art. 10 (Consumer right to information); Art. 25 (Seller's duty to provide information).",
+        "headline": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content)",
+        "reasoning": "Policy says data is not shared, but Sentry, Mixpanel, OpenAI and 3 more receive personal data (device_id, email, ip, name, payment, usage, user_content). Possible inconsistency with Art. 10 (Consumer right to information); Art. 25 (Seller's duty to provide information). PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Art. 10 (Consumer right to information). Kazakhstan has no cookie-specific rule; general consent requirements for collection apply. No way to delete an account or data: not in the policy, no route found in code. Possible inconsistency with Art. 10 (Consumer right to information); Art. 25 (Seller's duty to provide information).",
         "finding_ids": [
           "F2",
           "F5",
@@ -1438,12 +1418,12 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Tag Manager (product analytics; receives usage, device id, ip); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
+            "policy_clause": "We share personal data with service providers who process it on our behalf: Sentry (error monitoring; receives device id, ip, usage, email); Mixpanel (product analytics; receives usage, device id, ip, email, name); OpenAI (AI features; receives email, user content); PostHog (product analytics; receives usage, device id, ip, email, name); Stripe (payments; receives payment, email, name); Google Analytics (product analytics; receives usage, device id, ip). We do not sell your personal data.",
             "code_change": "Or stop the sharing: send a pseudonymous user id instead of email/name (see src/lib/sentry.ts:1)."
           },
           {
-            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
-            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
           },
           {
             "policy_clause": "You can delete your account and personal data at any time from [Settings > Account] or by emailing [contact address]. We delete your data within [period].",
@@ -2191,7 +2171,7 @@
       "files_scanned": 9,
       "bearer": false,
       "requests_pre_consent": 4,
-      "vendors_found": 7,
+      "vendors_found": 6,
       "claims_method": "heuristic",
       "verdict_method": "deterministic",
       "duration_s": 41.3

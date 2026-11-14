@@ -4,6 +4,7 @@ import re
 from pathlib import Path
 
 from app import llm
+from app.claims import ru_kz
 from app.detect.catalog import load_catalog, policy_names
 from app.models import PolicyClaims
 
@@ -26,7 +27,7 @@ def _sentences(text: str) -> list[str]:
     return [s for s in (_norm(p) for p in re.split(r"(?<=[.!?])\s+|\n+", text)) if len(s) > 15]
 
 
-def heuristic(policy_text: str) -> PolicyClaims:
+def _heuristic_en(policy_text: str) -> PolicyClaims:
     sents = _sentences(policy_text)
     quotes: dict[str, str] = {}
 
@@ -54,7 +55,8 @@ def heuristic(policy_text: str) -> PolicyClaims:
     no_share = re.compile(r"(?:never|do(?:es)? not|don't|will not|won't) (?:sell(?:,| or| nor) )?(?:rent or )?shar", re.I)
     qualified = re.compile(
         r"\bfor (?:[\w-]+,? ){0,4}(?:marketing|commercial|advertising|promotional)|\bexcept\b|\bunless\b|other than"
-        r"|\bwithout your (?:consent|permission)|\bonly (?:with|when|where|as)\b", re.I,
+        r"|\bwithout your (?:consent|permission)|\bonly (?:with|when|where|as)\b"
+        r"|\bs[eo]ll?d?(?:,| or| nor) (?:rent(?:ed)? or )?shar", re.I,  # "sell or share" is the CCPA term, not "no processors"
     )  # fmt: skip
     sells_rx = re.compile(r"\bwe (?:may )?sell\b|share .{0,60}advertis", re.I)
     blanket = next((s for s in sents if no_share.search(s) and not qualified.search(s)), None)
@@ -95,6 +97,13 @@ def heuristic(policy_text: str) -> PolicyClaims:
         cookie_consent_described=find("cookie_consent_described", r"cookie.{0,120}\bconsent|\bconsent.{0,120}cookie"),
         quotes=quotes,
     )
+
+
+def heuristic(policy_text: str) -> PolicyClaims:
+    claims = _heuristic_en(policy_text)
+    if ru_kz.is_cyrillic(policy_text):
+        claims = ru_kz.merge(claims, ru_kz.heuristic(policy_text))
+    return claims
 
 
 async def extract(policy_text: str) -> tuple[PolicyClaims, str]:

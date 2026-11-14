@@ -46,8 +46,8 @@
     {
       "step": "site_scan",
       "status": "done",
-      "message": "4 requests before consent; trackers: Google Tag Manager, PostHog, Google Analytics",
-      "count": 3
+      "message": "4 requests before consent; trackers: Google Analytics, PostHog",
+      "count": 2
     },
     {
       "step": "policy_fetch",
@@ -395,7 +395,7 @@
       },
       {
         "id": "obs-6",
-        "vendor": "Google Tag Manager",
+        "vendor": "Google Analytics",
         "vendor_country": "US",
         "data_categories": [
           "usage",
@@ -408,28 +408,13 @@
         "evidence": [
           {
             "kind": "network",
-            "summary": "Request to Google Tag Manager before any consent interaction",
+            "summary": "Request to Google Analytics before any consent interaction",
             "file": null,
             "line": null,
             "snippet": null,
             "url": "https://www.googletagmanager.com/gtag/js?id=G-DEMO000000",
             "quote": null
-          }
-        ]
-      },
-      {
-        "id": "obs-7",
-        "vendor": "Google Analytics",
-        "vendor_country": "US",
-        "data_categories": [
-          "usage",
-          "device_id",
-          "ip"
-        ],
-        "purpose_guess": "analytics",
-        "is_ai": false,
-        "pre_consent": true,
-        "evidence": [
+          },
           {
             "kind": "network",
             "summary": "Request to Google Analytics before any consent interaction",
@@ -503,7 +488,7 @@
       {
         "id": "F1",
         "rule": "R5_TRACKING_BEFORE_CONSENT",
-        "title": "PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site",
+        "title": "PostHog and Google Analytics fire before any consent interaction on the site",
         "severity": "high",
         "areas": [
           "personal_data",
@@ -511,8 +496,7 @@
         ],
         "observation_ids": [
           "obs-4",
-          "obs-6",
-          "obs-7"
+          "obs-6"
         ],
         "evidence": [
           {
@@ -526,20 +510,11 @@
           },
           {
             "kind": "network",
-            "summary": "Request to Google Tag Manager before any consent interaction",
-            "file": null,
-            "line": null,
-            "snippet": null,
-            "url": "https://www.googletagmanager.com/gtag/js?id=G-DEMO000000",
-            "quote": null
-          },
-          {
-            "kind": "network",
             "summary": "Request to Google Analytics before any consent interaction",
             "file": null,
             "line": null,
             "snippet": null,
-            "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-DEMO000000&en=page_view",
+            "url": "https://www.googletagmanager.com/gtag/js?id=G-DEMO000000",
             "quote": null
           },
           {
@@ -549,6 +524,15 @@
             "line": null,
             "snippet": null,
             "url": "http://localhost:4100/public/index.html",
+            "quote": null
+          },
+          {
+            "kind": "network",
+            "summary": "Request to Google Analytics before any consent interaction",
+            "file": null,
+            "line": null,
+            "snippet": null,
+            "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-DEMO000000&en=page_view",
             "quote": null
           },
           {
@@ -591,8 +575,8 @@
         "jurisdiction": "UK",
         "area": "personal_data",
         "status": "amber",
-        "headline": "PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site",
-        "reasoning": "PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site. Possible inconsistency with PECR Schedule A1, inserted by Data Sch. A1 para. 5; Privacy and Electronic Communications reg. 6(1), as substituted by Data (Use and Access) Act 2025 s. 112. UK: since the Data (Use and Access) Act 2025, analytics used solely for statistical purposes to improve the service may not need consent, if users get clear information and a simple way to object. The same evidence is treated more strictly in the EU. Personal data is written to application logs. Possible inconsistency with UK GDPR Art. 5(1)(f).",
+        "headline": "PostHog and Google Analytics fire before any consent interaction on the site",
+        "reasoning": "PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with PECR Schedule A1, inserted by Data Sch. A1 para. 5; Privacy and Electronic Communications reg. 6(1), as substituted by Data (Use and Access) Act 2025 s. 112. UK: since the Data (Use and Access) Act 2025, analytics used solely for statistical purposes to improve the service may not need consent, if users get clear information and a simple way to object. The same evidence is treated more strictly in the EU. Personal data is written to application logs. Possible inconsistency with UK GDPR Art. 5(1)(f).",
         "finding_ids": [
           "F1",
           "F2"
@@ -604,8 +588,8 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. You can object to these cookies at any time in [cookie settings].",
-            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. You can object to these cookies at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
           },
           {
             "policy_clause": null,
@@ -636,8 +620,8 @@
         "jurisdiction": "UK",
         "area": "consumer",
         "status": "amber",
-        "headline": "PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site",
-        "reasoning": "PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 225. UK: since the Data (Use and Access) Act 2025, analytics used solely for statistical purposes to improve the service may not need consent, if users get clear information and a simple way to object. The same evidence is treated more strictly in the EU.",
+        "headline": "PostHog and Google Analytics fire before any consent interaction on the site",
+        "reasoning": "PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1 s. 225. UK: since the Data (Use and Access) Act 2025, analytics used solely for statistical purposes to improve the service may not need consent, if users get clear information and a simple way to object. The same evidence is treated more strictly in the EU.",
         "finding_ids": [
           "F1"
         ],
@@ -646,8 +630,8 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. You can object to these cookies at any time in [cookie settings].",
-            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. You can object to these cookies at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
           }
         ],
         "unverified_notes": [
@@ -673,8 +657,8 @@
         "jurisdiction": "EU",
         "area": "personal_data",
         "status": "red",
-        "headline": "PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site",
-        "reasoning": "PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Directive 2002/58/EC Art. 5(3); Regulation Art. 7; Regulation Art. 6(1). EU: consent is required before non-essential cookies or trackers, including analytics. Personal data is written to application logs. Possible inconsistency with Regulation Art. 5(1)(f).",
+        "headline": "PostHog and Google Analytics fire before any consent interaction on the site",
+        "reasoning": "PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Directive 2002/58/EC Art. 5(3); Regulation Art. 7; Regulation Art. 6(1). EU: consent is required before non-essential cookies or trackers, including analytics. Personal data is written to application logs. Possible inconsistency with Regulation Art. 5(1)(f).",
         "finding_ids": [
           "F1",
           "F2"
@@ -687,8 +671,8 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
-            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
           },
           {
             "policy_clause": null,
@@ -719,8 +703,8 @@
         "jurisdiction": "EU",
         "area": "consumer",
         "status": "red",
-        "headline": "PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site",
-        "reasoning": "PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Directive 2005/29/EC Art. 5. EU: consent is required before non-essential cookies or trackers, including analytics.",
+        "headline": "PostHog and Google Analytics fire before any consent interaction on the site",
+        "reasoning": "PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Directive 2005/29/EC Art. 5. EU: consent is required before non-essential cookies or trackers, including analytics.",
         "finding_ids": [
           "F1"
         ],
@@ -729,8 +713,8 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
-            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
           }
         ],
         "unverified_notes": [
@@ -756,8 +740,8 @@
         "jurisdiction": "KZ",
         "area": "personal_data",
         "status": "amber",
-        "headline": "PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site",
-        "reasoning": "PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Art. 7 (Conditions for collection and processing). Kazakhstan has no cookie-specific rule; general consent requirements for collection apply. Personal data is written to application logs. Possible inconsistency with Art. 25 (Duties of the owner and operator).",
+        "headline": "PostHog and Google Analytics fire before any consent interaction on the site",
+        "reasoning": "PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Art. 7 (Conditions for collection and processing). Kazakhstan has no cookie-specific rule; general consent requirements for collection apply. Personal data is written to application logs. Possible inconsistency with Art. 25 (Duties of the owner and operator).",
         "finding_ids": [
           "F1",
           "F2"
@@ -768,8 +752,8 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
-            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
           },
           {
             "policy_clause": null,
@@ -800,8 +784,8 @@
         "jurisdiction": "KZ",
         "area": "consumer",
         "status": "amber",
-        "headline": "PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site",
-        "reasoning": "PostHog, Google Tag Manager and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Art. 10 (Consumer right to information). Kazakhstan has no cookie-specific rule; general consent requirements for collection apply.",
+        "headline": "PostHog and Google Analytics fire before any consent interaction on the site",
+        "reasoning": "PostHog and Google Analytics fire before any consent interaction on the site. Possible inconsistency with Art. 10 (Consumer right to information). Kazakhstan has no cookie-specific rule; general consent requirements for collection apply.",
         "finding_ids": [
           "F1"
         ],
@@ -810,8 +794,8 @@
         ],
         "fixes": [
           {
-            "policy_clause": "We use PostHog, Google Tag Manager, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
-            "code_change": "Load PostHog, Google Tag Manager, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
+            "policy_clause": "We use PostHog, Google Analytics to measure how our website is used. We only set them after you give consent, and you can withdraw consent at any time in [cookie settings].",
+            "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
           }
         ],
         "unverified_notes": [
@@ -1045,7 +1029,7 @@
       "files_scanned": 9,
       "bearer": false,
       "requests_pre_consent": 4,
-      "vendors_found": 7,
+      "vendors_found": 6,
       "claims_method": "heuristic",
       "verdict_method": "deterministic",
       "duration_s": 41.3

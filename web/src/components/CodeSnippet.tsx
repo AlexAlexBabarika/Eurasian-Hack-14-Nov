@@ -79,7 +79,7 @@ export function CodeSnippet({ code, file, line }: { code: string; file?: string 
   const start = line ? firstLineNumber(line, lines.length) : null;
 
   return (
-    <pre className="overflow-x-auto rounded-md border bg-background/60 py-2 font-mono text-xs leading-5">
+    <pre className="overflow-x-auto rounded-lg border border-white/10 bg-ink py-2 font-mono text-xs leading-5">
       <code className="grid min-w-max">
         {lines.map((text, i) => {
           const number = start === null ? null : start + i;

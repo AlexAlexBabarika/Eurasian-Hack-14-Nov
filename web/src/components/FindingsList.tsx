@@ -28,8 +28,8 @@ export function FindingsList({ findings, matrix }: { findings: Finding[]; matrix
               aria-pressed={active}
               onClick={() => setSeverity(value)}
               className={cn(
-                "rounded-md border px-2.5 py-1 text-xs transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-                active ? "border-foreground/40 bg-accent text-foreground" : "text-muted-foreground hover:text-foreground",
+                "rounded-full border px-3 py-1 text-xs transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                active ? "border-paper bg-paper text-paper-ink" : "text-muted-foreground hover:border-white/30 hover:text-foreground",
               )}
             >
               {value === "all" ? "All" : SEVERITY_LABEL[value]} <span className="tabular-nums opacity-70">{total}</span>

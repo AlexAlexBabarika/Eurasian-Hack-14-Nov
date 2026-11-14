@@ -146,8 +146,9 @@ def _prompt(cell: CellVerdict, findings: list[Finding], observations: list[Obser
         parts.append(f"[{f.id}] {f.rule} (status here: {cell.finding_statuses.get(f.id)}): {f.title}")
         for o in observations:
             if o.id in f.observation_ids:
+                seen = "; requests or cookies seen on the site before any consent interaction" if o.pre_consent else ""
                 parts.append(f"  vendor: {o.vendor} ({o.vendor_country}), purpose {o.purpose_guess}, "
-                             f"data {o.data_categories}, pre_consent={o.pre_consent}")  # fmt: skip
+                             f"data {o.data_categories}{seen}")  # fmt: skip
         for e in f.evidence[:6]:
             loc = f"{e.file}:{e.line}" if e.file else (e.url or "")
             parts.append(f"  evidence ({e.kind}) {loc}: {e.summary}" + (f' | quote: "{e.quote}"' if e.quote else ""))

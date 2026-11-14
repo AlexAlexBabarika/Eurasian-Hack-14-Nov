@@ -7,32 +7,55 @@ import { cn } from "cn";
 
 import { BeforeAfter } from "@/components/BeforeAfter";
 import { CellSheet } from "@/components/CellSheet";
+import { CountUp } from "@/components/CountUp";
 import { DataFlow } from "@/components/DataFlow";
 import { FindingsList } from "@/components/FindingsList";
 import type { CellKey } from "@/components/Matrix";
 import { Matrix } from "@/components/Matrix";
-import { ProgressTimeline } from "@/components/ProgressTimeline";
+import { latestByStep, progressPercent, ProgressTimeline } from "@/components/ProgressTimeline";
 import { RecheckForm } from "@/components/RecheckForm";
 import { ReportInputs } from "@/components/ReportInputs";
+import LetterGlitch from "@/components/reactbits/LetterGlitch";
+import SpotlightCard from "@/components/reactbits/SpotlightCard";
 import { ObservationsPanel, PolicyClaimsPanel } from "@/components/SaysVsDoes";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DEMO_ID, isBundledAudit, markdownUrl } from "@/lib/api";
 import type { Comparison } from "@/lib/compare";
 import { compareReports } from "@/lib/compare";
-import { STATUS_STYLE } from "@/lib/status";
+import { STEP_LABEL } from "@/lib/labels";
+import { SPOTLIGHT_COLOR, spotlightSurface, STATUS_STYLE } from "@/lib/status";
 import type { AuditReport, Status } from "@/lib/types";
+import { STEPS } from "@/lib/types";
 import { useAudit } from "@/lib/useAudit";
 
-function Stat({ value, label, tone }: { value: string; label: string; tone?: Status }) {
+// `stats` is an untyped dict in the API schema.
+function num(value: unknown, fallback = 0): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function Stat({ value, label, tone, index }: { value: number; label: string; tone?: Status; index: number }) {
   return (
-    <div className="rounded-lg border bg-card px-3.5 py-3">
-      <p className={cn("text-2xl font-semibold tracking-tight tabular-nums", tone ? STATUS_STYLE[tone].text : "text-foreground")}>
-        {value}
-      </p>
-      <p className="text-xs text-muted-foreground">{label}</p>
+    <div style={{ "--i": index } as React.CSSProperties} className={cn("animate-rise", tone && STATUS_STYLE[tone].tone)}>
+      <SpotlightCard
+        spotlightColor={tone ? SPOTLIGHT_COLOR[tone] : "#f4efe2"}
+        intensity={0.26}
+        spotlightSize={220}
+        borderGlow={1}
+        style={spotlightSurface(tone, "12px 16px")}
+        className="h-full"
+      >
+        <p
+          className={cn(
+            "text-3xl leading-none font-semibold tracking-tighter tabular-nums",
+            tone ? STATUS_STYLE[tone].text : "text-foreground",
+          )}
+        >
+          <CountUp value={value} />
+        </p>
+        <p className="mt-1.5 text-xs text-muted-foreground">{label}</p>
+      </SpotlightCard>
     </div>
   );
 }
@@ -47,18 +70,72 @@ function Shell({ children, actions }: { children: React.ReactNode; actions?: Rea
           New audit
         </Link>
       </SiteHeader>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">{children}</main>
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">{children}</main>
     </div>
   );
 }
 
-function Running({ id, events, skip }: { id: string; events: Parameters<typeof ProgressTimeline>[0]["events"]; skip?: () => void }) {
+type Events = Parameters<typeof ProgressTimeline>[0]["events"];
+
+// What the pipeline has reported so far, printed like a terminal session.
+function ScanConsole({ events }: { events: Events }) {
+  const latest = latestByStep(events);
+  const lines = STEPS.filter((step) => latest[step]).map((step) => latest[step]!);
+  return (
+    <div className="relative min-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-ink">
+      <LetterGlitch
+        aria-hidden
+        glitchColors={["#5db8ff", "#f4efe2"]}
+        baseOpacity={0.2}
+        glitchAmount={0.5}
+        centerFade={0.2}
+        interactive={false}
+        clickEffect="none"
+        className="absolute inset-0 size-full"
+      />
+      <ol aria-hidden className="relative space-y-2 p-5 font-mono text-[13px] leading-5 sm:p-6">
+        {lines.map((event) => (
+          <li key={event.step} className="animate-rise flex gap-3">
+            <span
+              className={cn(
+                "w-4 shrink-0",
+                event.status === "done" && "text-status-green",
+                event.status === "running" && "text-signal",
+                event.status === "error" && "text-status-red",
+                event.status === "skipped" && "text-muted-foreground",
+              )}
+            >
+              {event.status === "done" ? "✓" : event.status === "error" ? "×" : event.status === "skipped" ? "–" : ">"}
+            </span>
+            <span className="min-w-0">
+              <span className="text-muted-foreground">{STEP_LABEL[event.step].toLowerCase()}</span>
+              <span className="block break-words text-foreground">{event.message}</span>
+            </span>
+          </li>
+        ))}
+        <li className="flex gap-3 text-signal">
+          <span className="w-4 shrink-0">{">"}</span>
+          <span className="animate-caret inline-block h-5 w-2 bg-signal" />
+        </li>
+      </ol>
+    </div>
+  );
+}
+
+function Running({ id, events, skip }: { id: string; events: Events; skip?: () => void }) {
+  const { percent } = progressPercent(events);
   return (
     <Shell>
       <div className="grid gap-8 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:gap-12">
         <section className="space-y-6">
-          <div className="space-y-1.5">
-            <h1 className="text-xl font-semibold tracking-tight text-foreground">Audit in progress</h1>
+          <div className="space-y-2">
+            <p aria-hidden className="text-7xl leading-none font-semibold tracking-tighter text-signal tabular-nums">
+              {percent}
+              <span className="text-3xl text-signal/60">%</span>
+            </p>
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+              Audit in progress…
+            </h1>
             <p className="text-sm text-muted-foreground">
               {isBundledAudit(id)
                 ? "Replaying a recorded audit of the demo project."
@@ -72,14 +149,9 @@ function Running({ id, events, skip }: { id: string; events: Parameters<typeof P
             </Button>
           )}
         </section>
-        <section aria-hidden className="hidden space-y-3 opacity-60 lg:block">
-          <Skeleton className="h-5 w-64" />
-          <div className="grid grid-cols-4 gap-3">
-            {Array.from({ length: 12 }, (_, i) => (
-              <Skeleton key={i} className="h-[124px] rounded-lg" />
-            ))}
-          </div>
-          <p className="pt-2 text-xs text-muted-foreground">The results matrix appears here when the audit finishes.</p>
+        <section className="hidden space-y-3 lg:block">
+          <ScanConsole events={events} />
+          <p className="text-xs text-muted-foreground">The results matrix appears here when the audit finishes.</p>
         </section>
       </div>
     </Shell>
@@ -128,14 +200,15 @@ function Report({
   const vendors = report.observations.filter((observation) => observation.vendor).length;
   const { stats } = report;
 
-  const headline =
-    red > 0
-      ? `${red} of ${assessed} assessed areas show a possible inconsistency`
-      : amber > 0
-        ? `${amber} of ${assessed} assessed areas need review`
-        : assessed > 0
-          ? "No issues found in the assessed areas"
-          : "Nothing could be assessed";
+  // The count leads the headline; the rest of the sentence follows it.
+  const lead = red > 0 ? { count: red, tone: "red" as const } : amber > 0 ? { count: amber, tone: "amber" as const } : null;
+  const headline = lead
+    ? lead.tone === "red"
+      ? `of ${assessed} assessed areas show a possible inconsistency`
+      : `of ${assessed} assessed areas need review`
+    : assessed > 0
+      ? "No issues found in the assessed areas"
+      : "Nothing could be assessed";
 
   return (
     <Shell
@@ -148,26 +221,44 @@ function Report({
         )
       }
     >
-      <div className="space-y-10">
-        <section className="space-y-5">
-          <div className="space-y-3">
+      <div className="space-y-8">
+        <section className="grid grid-cols-[minmax(0,1fr)] items-end gap-x-10 gap-y-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)]">
+          <div className="min-w-0 space-y-4">
             {isBundledAudit(id) && (
-              <p className="inline-flex rounded-md border px-2 py-0.5 text-xs text-muted-foreground">
+              <p className="inline-flex rounded-full border border-white/15 px-2.5 py-0.5 text-xs text-muted-foreground">
                 Recorded audit of the demo project
               </p>
             )}
-            <h1 className="text-2xl font-semibold tracking-tight text-balance text-foreground sm:text-3xl">{headline}</h1>
+            <h1
+              aria-label={lead ? `${lead.count} ${headline}` : headline}
+              className="flex flex-wrap items-end gap-x-5 gap-y-2 text-foreground"
+            >
+              {lead && (
+                <span
+                  className={cn(
+                    "text-[clamp(5.5rem,13vw,10rem)] leading-[0.78] font-semibold tracking-tighter tabular-nums",
+                    STATUS_STYLE[lead.tone].text,
+                  )}
+                >
+                  <CountUp value={lead.count} duration={1100} />
+                </span>
+              )}{" "}
+              <span className="max-w-md text-[clamp(1.6rem,3vw,2.5rem)] leading-[1.05] font-semibold tracking-tight text-balance">
+                {headline}
+              </span>
+            </h1>
             <ReportInputs inputs={report.inputs} />
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Stat value={String(report.findings.length)} label="Findings with evidence" tone={report.findings.length ? "red" : undefined} />
-            <Stat value={String(stats.vendors_found ?? vendors)} label="Third parties receiving data" />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2">
+            <Stat index={0} value={report.findings.length} label="Findings with evidence" tone={report.findings.length ? "red" : undefined} />
+            <Stat index={1} value={num(stats.vendors_found, vendors)} label="Third parties receiving data" />
             <Stat
-              value={String(stats.requests_pre_consent ?? 0)}
+              index={2}
+              value={num(stats.requests_pre_consent)}
               label="Tracker requests before consent"
               tone={stats.requests_pre_consent ? "amber" : undefined}
             />
-            <Stat value={String(stats.files_scanned ?? 0)} label="Source files read" />
+            <Stat index={3} value={num(stats.files_scanned)} label="Source files read" />
           </div>
         </section>
 
@@ -177,7 +268,7 @@ function Report({
         <section className="space-y-4">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-1">
-              <h2 className="text-base font-medium text-foreground">Result by country and area of law</h2>
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground">Result by country and area of law</h2>
               <p className="text-sm text-muted-foreground">
                 Select a cell to see the evidence, the provision it relates to, and how to fix it.
               </p>
@@ -211,11 +302,11 @@ function Report({
           <TabsContent value="compare">
             <div className="grid gap-6 lg:grid-cols-2">
               <section className="space-y-3">
-                <h3 className="text-sm font-medium text-foreground">What the policy says</h3>
+                <h3 className="font-serif text-2xl text-paper">What the policy says</h3>
                 <PolicyClaimsPanel claims={report.claims} />
               </section>
               <section className="space-y-3">
-                <h3 className="text-sm font-medium text-foreground">What the product does</h3>
+                <h3 className="font-mono text-lg font-medium text-foreground">What the product does</h3>
                 <ObservationsPanel observations={report.observations} />
               </section>
             </div>

@@ -15,7 +15,13 @@ _DELETE = re.compile(
     re.I,
 )
 _LOG = re.compile(r"console\.(?:log|info|warn|error|debug)\(|\blogg?er\.\w+\(|\blogging\.\w+\(|\bprint\(|\blog\.\w+\(")
-_PII = re.compile(r"\be[-_]?mail\b|\bphone\b|\bpassword\b|\bpassport\b", re.I)
+# `email.subject` is a message object, not an address; `user.email` and `email.toLowerCase()` are addresses.
+_PII = re.compile(
+    r"\be[-_]?mail\b(?!\.(?!toLowerCase|trim|toString|lower|strip)\w)|\bphone\b|\bpassword\b|\bpassport\b", re.I
+)
+# One-off tooling prints to a developer's terminal, not to application logs.
+_TOOLING = re.compile(r"(?:^|/)(?:scripts?|seeds?|seeders?|migrations?|cli|docker|tools|bin|fixtures|e2e|__tests__|tests?)(?:/|$)"
+                      r"|(?:^|[/.-])seed[^/]*\.\w+$|\.(?:test|spec)\.\w+$", re.I)  # fmt: skip
 
 
 class CodeSignals(BaseModel):
@@ -30,6 +36,7 @@ def detect(files: list[RepoFile]) -> CodeSignals:
             continue
         lines = f.text.splitlines()
         code = code_lines(lines)
+        tooling = bool(_TOOLING.search(f.path))
         if _DELETE.search(f.path) and len(out.delete_route) < 3:
             out.delete_route.append(Evidence(kind="code", summary="Delete-account route file", file=f.path))
         for i, line in enumerate(lines):
@@ -39,7 +46,7 @@ def detect(files: list[RepoFile]) -> CodeSignals:
                     snippet=_snippet(lines, i),
                 ))  # fmt: skip
             # The identifier must be in code: "Queued email delivery failed" logs no personal data.
-            if _LOG.search(line) and (m := _PII.search(code[i])) and len(out.pii_logs) < 5:
+            if not tooling and _LOG.search(line) and (m := _PII.search(code[i])) and len(out.pii_logs) < 5:
                 out.pii_logs.append(Evidence(
                     kind="code", summary=f"`{m.group(0)}` written to application logs", file=f.path,
                     line=i + 1, snippet=_snippet(lines, i),

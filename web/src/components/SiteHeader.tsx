@@ -4,12 +4,17 @@ export function Wordmark() {
   return (
     <Link
       href="/"
-      className="flex items-center gap-2 rounded-md text-sm font-semibold tracking-tight text-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+      translate="no"
+      className="group flex items-center gap-2.5 rounded-md text-[15px] font-semibold tracking-tight text-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
     >
-      <span aria-hidden className="flex size-6 items-center justify-center rounded-md bg-foreground text-background">
-        <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      {/* Two lines of a document; the second one is struck through. */}
+      <span
+        aria-hidden
+        className="flex size-7 items-center justify-center rounded-md bg-paper text-paper-ink transition-transform duration-200 group-hover:-rotate-6"
+      >
+        <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <path d="M3 5h10M3 11h6" />
-          <path d="M11.5 9.5l3 3M14.5 9.5l-3 3" />
+          <path d="M11.5 9.5l3 3M14.5 9.5l-3 3" className="text-status-red" stroke="currentColor" />
         </svg>
       </span>
       Groundtruth
@@ -19,8 +24,8 @@ export function Wordmark() {
 
 export function SiteHeader({ children }: { children?: React.ReactNode }) {
   return (
-    <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur">
-      <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
+    <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-background/70 backdrop-blur-xl">
+      <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Wordmark />
         <div className="flex items-center gap-2">{children}</div>
       </div>
