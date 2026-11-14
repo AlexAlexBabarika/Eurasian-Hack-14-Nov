@@ -1,0 +1,58 @@
+name: Groundtruth privacy audit
+description: Compare a privacy policy with the code (and optionally the live site) and fail the job on possible inconsistencies.
+
+inputs:
+  policy:
+    description: Privacy policy, as a URL or a path relative to the workspace.
+    required: true
+  repo:
+    description: Code to scan, as a path relative to the workspace or a public GitHub URL.
+    default: "."
+  site:
+    description: Live site URL. Optional; when given, the site is loaded in headless Chromium.
+    default: ""
+  fail-on:
+    description: Fail if any matrix cell is at least this bad (red, amber or never).
+    default: red
+  jurisdictions:
+    description: Comma-separated jurisdictions.
+    default: UK,EU,KZ
+
+runs:
+  using: composite
+  steps:
+    - uses: astral-sh/setup-uv@v6
+
+    - name: Install Chromium
+      if: inputs.site != ''
+      shell: bash
+      run: |
+        cd "$GITHUB_ACTION_PATH/api"
+        uv run --no-dev playwright install --with-deps chromium
+
+    - name: Audit
+      shell: bash
+      env:
+        GT_POLICY: ${{ inputs.policy }}
+        GT_REPO: ${{ inputs.repo }}
+        GT_SITE: ${{ inputs.site }}
+        GT_FAIL_ON: ${{ inputs.fail-on }}
+        GT_JURISDICTIONS: ${{ inputs.jurisdictions }}
+      run: |
+        # URLs and absolute paths pass through; anything else is relative to the caller's workspace.
+        resolve() {
+          case "$1" in
+            http://*|https://*|/*) printf '%s' "$1" ;;
+            *) printf '%s' "$GITHUB_WORKSPACE/$1" ;;
+          esac
+        }
+        report="$RUNNER_TEMP/groundtruth-report.md"
+        rm -f "$report"
+        args=(--policy "$(resolve "$GT_POLICY")" --fail-on "$GT_FAIL_ON" --jurisdictions "$GT_JURISDICTIONS" --markdown "$report")
+        if [ -n "$GT_REPO" ]; then args+=(--repo "$(resolve "$GT_REPO")"); fi
+        if [ -n "$GT_SITE" ]; then args+=(--site "$GT_SITE"); fi
+        cd "$GITHUB_ACTION_PATH/api"
+        code=0
+        uv run --no-dev python -m app.cli "${args[@]}" || code=$?
+        if [ -f "$report" ]; then cat "$report" >> "$GITHUB_STEP_SUMMARY"; fi
+        exit "$code"

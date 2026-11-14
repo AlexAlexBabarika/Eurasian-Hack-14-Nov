@@ -24,6 +24,10 @@ make fixture              # serves demo/fixture-app on :4100
 
 Then open http://localhost:3000 and click "Use demo fixture".
 
+The repository field is optional: with only a site URL and a policy URL the audit compares the live site with the policy and marks what it could not see as not assessed.
+
+For a before/after rerun, the fixture also serves the same policy with the suggested fixes pasted in: http://localhost:4100/privacy-fixed.html. Run the audit again with that policy URL; only the two findings that need code changes remain.
+
 Without `LLM_API_KEY` the pipeline still runs end to end: policy claims come from keyword heuristics and verdict text from templates. With a key, the model extracts the claims and writes the verdict prose and fixes. Cell statuses are decided by deterministic rules either way.
 
 ### Docker
@@ -37,11 +41,57 @@ Inside the container `localhost` is the container itself. To audit something ser
 
 ### MCP server
 
-`mcp/server.py` exposes the audit as one tool, `audit_product(repo_url, site_url, policy_url)`, over stdio and returns the Markdown report. Needs `mcp` 2.x (installed by `make setup`).
+`mcp/server.py` exposes the audit as one tool, `audit_product(policy_url, repo_url, site_url)`, over stdio and returns the Markdown report. `repo_url` and `site_url` are optional, but at least one is required. Needs `mcp` 2.x (installed by `make setup`).
 
 ```sh
 uv run --project api python mcp/server.py
 ```
+
+To use it from an MCP client (Claude Desktop, Cursor and similar), add this to the client's MCP config:
+
+```json
+{
+  "mcpServers": {
+    "groundtruth": {
+      "command": "uv",
+      "args": ["run", "--project", "/absolute/path/to/repo/api", "python", "/absolute/path/to/repo/mcp/server.py"]
+    }
+  }
+}
+```
+
+Example prompt: "Audit https://github.com/acme/app and https://acme.example against https://acme.example/privacy with the groundtruth tool, then list the findings that need a code change."
+
+### Run it in CI
+
+The same audit runs from the command line and exits non-zero on a bad result. `--repo` and `--policy` take local paths or URLs; `--site` is optional and without it no browser is started.
+
+```sh
+uv run --project api python -m app.cli --repo . --policy docs/privacy.html --fail-on red --markdown report.md
+make audit repo=. policy=docs/privacy.html        # same thing; paths are relative to the repo root
+```
+
+Exit codes: `0` clean, `1` at least one matrix cell is `--fail-on` (`red`, `amber`) or worse, `2` a step failed (for example the policy could not be read), so the result is incomplete. `--fail-on never` only reports. Without `--site`, cells with no findings are grey (not assessed), not green.
+
+As a GitHub Action (the report is added to the job summary):
+
+```yaml
+name: Privacy audit
+on: pull_request
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: AlexAlexBabarika/Eurasian-Hack-14-Nov@main
+        with:
+          policy: docs/privacy.html
+          fail-on: red
+```
+
+Other inputs: `repo` (default `.`), `site`, `jurisdictions` (default `UK,EU,KZ`). This repository runs it on its own fixture in `.github/workflows/privacy-audit.yml`.
 
 ### LLM provider
 
@@ -53,7 +103,8 @@ uv run --project api python mcp/server.py
 |---|---|
 | `make test` | ruff + pytest (api), tsc + eslint (web). No network or API key needed. |
 | `make types` | Regenerate `web/src/lib/api-types.ts` from the FastAPI schema. |
-| `make sample` | Regenerate `contracts/sample_report.json` and the cached demo audit. |
+| `make sample` | Regenerate `contracts/sample_report.json` and the cached demo audits (original and fixed policy). |
+| `make audit repo=. policy=FILE_OR_URL` | Run one audit from the command line; non-zero exit on a red cell. Optional `site=`, `fail_on=`, `markdown=`. |
 | `make demo` | Run with `DEMO_MODE=cached`: matching inputs replay a cached audit. |
 | `docker compose up api` | API in a container with Chromium, git and Bearer. |
 

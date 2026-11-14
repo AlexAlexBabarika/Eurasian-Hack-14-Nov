@@ -5,6 +5,7 @@ import { cn } from "cn";
 
 import { StatusIcon } from "@/components/StatusBadge";
 import { AREA_LABEL, JURISDICTION_LABEL, STATUS_LABEL } from "@/lib/labels";
+import { previousStatus } from "@/lib/compare";
 import { STATUS_STYLE } from "@/lib/status";
 import type { Area, CellVerdict, Jurisdiction, Status } from "@/lib/types";
 import { AREAS, JURISDICTIONS } from "@/lib/types";
@@ -17,7 +18,15 @@ function plural(count: number, word: string) {
   return `${count} ${word}${count === 1 ? "" : "s"}`;
 }
 
-function Cell({ cell, onSelect }: { cell: CellVerdict; onSelect: (key: CellKey) => void }) {
+function Cell({
+  cell,
+  was,
+  onSelect,
+}: {
+  cell: CellVerdict;
+  was: Status | null;
+  onSelect: (key: CellKey) => void;
+}) {
   const style = STATUS_STYLE[cell.status];
   const area = AREA_LABEL[cell.area].name;
   const jurisdiction = JURISDICTION_LABEL[cell.jurisdiction].name;
@@ -25,7 +34,9 @@ function Cell({ cell, onSelect }: { cell: CellVerdict; onSelect: (key: CellKey) 
     <button
       type="button"
       onClick={() => onSelect({ jurisdiction: cell.jurisdiction, area: cell.area })}
-      aria-label={`${jurisdiction}, ${area}: ${STATUS_LABEL[cell.status].name}. ${cell.headline}. Open details.`}
+      aria-label={`${jurisdiction}, ${area}: ${STATUS_LABEL[cell.status].name}${
+        was ? `, previously ${STATUS_LABEL[was].name}` : ""
+      }. ${cell.headline}. Open details.`}
       className={cn(
         "group relative flex min-h-[124px] w-full flex-col gap-2 overflow-hidden rounded-lg border bg-card p-3 pl-4 text-left transition-colors outline-none",
         "hover:border-foreground/30 hover:bg-accent/40 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
@@ -38,6 +49,12 @@ function Cell({ cell, onSelect }: { cell: CellVerdict; onSelect: (key: CellKey) 
         <StatusIcon status={cell.status} className="size-3.5" />
         {STATUS_LABEL[cell.status].name}
       </span>
+      {was && (
+        <span className="-mt-1 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+          <span aria-hidden className={cn("size-1.5 shrink-0 rounded-full", STATUS_STYLE[was].dot)} />
+          Was: {STATUS_LABEL[was].name}
+        </span>
+      )}
       <span
         className={cn(
           "line-clamp-3 text-sm leading-snug",
@@ -63,10 +80,12 @@ function Cell({ cell, onSelect }: { cell: CellVerdict; onSelect: (key: CellKey) 
 
 export function Matrix({
   cells,
+  previous,
   jurisdictions = JURISDICTIONS,
   onSelect,
 }: {
   cells: CellVerdict[];
+  previous?: CellVerdict[];
   jurisdictions?: Jurisdiction[];
   onSelect: (key: CellKey) => void;
 }) {
@@ -97,7 +116,7 @@ export function Matrix({
             {AREAS.map((area) => {
               const cell = find(jurisdiction, area);
               return cell ? (
-                <Cell key={area} cell={cell} onSelect={onSelect} />
+                <Cell key={area} cell={cell} was={previousStatus(previous, cell)} onSelect={onSelect} />
               ) : (
                 <div key={area} className="hidden min-h-[124px] rounded-lg border border-dashed lg:block" />
               );

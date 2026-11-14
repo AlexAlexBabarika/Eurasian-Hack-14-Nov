@@ -1,4 +1,4 @@
-.PHONY: setup dev api web types test sample demo fixture
+.PHONY: setup dev api web types test sample demo fixture audit
 
 setup:
 	cd api && uv sync && uv run playwright install chromium
@@ -29,3 +29,13 @@ demo:
 
 fixture:
 	cd demo/fixture-app && python3 -m http.server 4100
+
+# make audit repo=. policy=docs/privacy.html [site=https://...] [fail_on=red|amber|never] [markdown=report.md]
+# Paths are relative to the repo root; URLs are passed through unchanged.
+from_root = $(if $(filter http://% https://%,$(1)),$(1),$(abspath $(1)))
+
+audit:
+	@test -n "$(policy)" || { echo "usage: make audit policy=PATH_OR_URL [repo=PATH_OR_URL] [site=URL] [fail_on=red|amber|never] [markdown=FILE]"; exit 2; }
+	cd api && uv run python -m app.cli --policy "$(call from_root,$(policy))" \
+		$(if $(repo),--repo "$(call from_root,$(repo))") $(if $(site),--site "$(site)") \
+		$(if $(markdown),--markdown "$(abspath $(markdown))") --fail-on $(or $(fail_on),red)

@@ -15,11 +15,14 @@ import { JURISDICTIONS } from "@/lib/types";
 
 type FieldName = "repo_url" | "site_url" | "policy_url";
 
-const FIELDS: { name: FieldName; label: string; hint: string; placeholder: string; icon: typeof Globe }[] = [
+type Field = { name: FieldName; label: string; hint: string; placeholder: string; icon: typeof Globe; optional?: boolean };
+
+const FIELDS: Field[] = [
   {
     name: "repo_url",
     label: "GitHub repository",
-    hint: "Public repository. We read the code, we never run it.",
+    hint: "Public repository. We read the code, we never run it. Without it only the live site is compared with the policy, so code-level findings are not available.",
+    optional: true,
     placeholder: "https://github.com/acme/app",
     icon: GitBranch,
   },
@@ -39,15 +42,23 @@ const FIELDS: { name: FieldName; label: string; hint: string; placeholder: strin
   },
 ];
 
-const DEMO_VALUES: Record<FieldName, string> = {
+type Values = Record<FieldName, string>;
+
+const DEMO_VALUES: Values = {
   repo_url: "https://github.com/AlexAlexBabarika/Eurasian-Hack-14-Nov/tree/main/demo/fixture-app",
   site_url: "http://localhost:4100/public/index.html",
   policy_url: "http://localhost:4100/privacy.html",
 };
 
-function validate(name: FieldName, raw: string): string | null {
+const PRESETS: { label: string; values: Values }[] = [
+  { label: "Use demo fixture", values: DEMO_VALUES },
+  { label: "Demo, fixed policy", values: { ...DEMO_VALUES, policy_url: "http://localhost:4100/privacy-fixed.html" } },
+];
+
+function validate(field: Field, raw: string): string | null {
+  const { name } = field;
   const value = raw.trim();
-  if (!value) return "This field is required.";
+  if (!value) return field.optional ? null : "This field is required.";
   let url: URL;
   try {
     url = new URL(value);
@@ -65,17 +76,17 @@ function validate(name: FieldName, raw: string): string | null {
 export function AuditForm() {
   const router = useRouter();
   const formId = useId();
-  const [values, setValues] = useState<Record<FieldName, string>>({ repo_url: "", site_url: "", policy_url: "" });
+  const [values, setValues] = useState<Values>({ repo_url: "", site_url: "", policy_url: "" });
   const [touched, setTouched] = useState<Partial<Record<FieldName, boolean>>>({});
   const [jurisdictions, setJurisdictions] = useState<Jurisdiction[]>(JURISDICTIONS);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<ApiError | Error | null>(null);
 
-  const errors = Object.fromEntries(FIELDS.map((field) => [field.name, validate(field.name, values[field.name])])) as Record<
+  const errors = Object.fromEntries(FIELDS.map((field) => [field.name, validate(field, values[field.name])])) as Record<
     FieldName,
     string | null
   >;
-  const isDemo = FIELDS.every((field) => values[field.name].trim() === DEMO_VALUES[field.name]);
+  const isDemo = PRESETS.some((preset) => FIELDS.every((field) => values[field.name].trim() === preset.values[field.name]));
 
   function toggle(jurisdiction: Jurisdiction) {
     setJurisdictions((current) =>
@@ -98,7 +109,7 @@ export function AuditForm() {
     setSubmitError(null);
     try {
       const { id } = await createAudit({
-        repo_url: values.repo_url.trim(),
+        repo_url: values.repo_url.trim() || null,
         site_url: values.site_url.trim(),
         policy_url: values.policy_url.trim(),
         jurisdictions,
@@ -112,32 +123,40 @@ export function AuditForm() {
 
   return (
     <form onSubmit={submit} noValidate className="rounded-2xl border bg-card p-5 shadow-2xl shadow-black/20 sm:p-6">
-      <div className="mb-5 flex items-center justify-between gap-3">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
         <h2 className="text-base font-medium text-foreground">Start an audit</h2>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="text-muted-foreground"
-          onClick={() => {
-            setValues(DEMO_VALUES);
-            setTouched({});
-            setSubmitError(null);
-          }}
-        >
-          Use demo fixture
-        </Button>
+        <div className="-mx-2.5 flex flex-wrap items-center">
+          {PRESETS.map((preset) => (
+            <Button
+              key={preset.label}
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground"
+              onClick={() => {
+                setValues(preset.values);
+                setTouched({});
+                setSubmitError(null);
+              }}
+            >
+              {preset.label}
+            </Button>
+          ))}
+        </div>
       </div>
 
       <div className="space-y-4">
         {FIELDS.map((field) => {
           const id = `${formId}-${field.name}`;
           const error = touched[field.name] ? errors[field.name] : null;
-          const valid = !errors[field.name];
+          const valid = !errors[field.name] && values[field.name].trim() !== "";
           const Icon = field.icon;
           return (
             <div key={field.name} className="space-y-1.5">
-              <Label htmlFor={id}>{field.label}</Label>
+              <Label htmlFor={id}>
+                {field.label}
+                {field.optional && <span className="font-normal text-muted-foreground">(optional)</span>}
+              </Label>
               <div className="relative">
                 <Icon aria-hidden className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input

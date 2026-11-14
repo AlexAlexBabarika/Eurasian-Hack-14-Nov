@@ -120,14 +120,14 @@
   official_url: "https://www.legislation.gov.uk/eur/2016/679/article/28"
   tags: [processors]
   verified: false
-- id: UK-GDPR-44
+- id: UK-GDPR-44A
   jurisdiction: UK
   area: personal_data
   instrument: "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)"
-  ref: "Art. 44"
-  title: "General principle for transfers"
-  summary: "Personal data may be transferred outside the UK only if the conditions of Chapter V are met."
-  official_url: "https://www.legislation.gov.uk/eur/2016/679/article/44"
+  ref: "Art. 44A"
+  title: "General principles for transfers"
+  summary: "A controller or processor may transfer personal data to a third country or international organisation only if the transfer is approved by regulations under Article 45A, is subject to appropriate safeguards (Article 46), or relies on a derogation (Article 49), and complies with the other provisions of the UK GDPR."
+  official_url: "https://www.legislation.gov.uk/eur/2016/679/article/44A"
   tags: [transfers]
   verified: false
 - id: UK-DPA-2018
@@ -156,7 +156,7 @@
   instrument: "PECR Schedule A1, inserted by Data (Use and Access) Act 2025 Sch. 12"
   ref: "Sch. A1 para. 5"
   title: "Statistical-purposes exception for analytics cookies"
-  summary: "Consent is not required where storage or access is solely to collect statistical information about how a service or website is used, with a view to improving it, provided the user is given clear information and a simple means to object. Advertising and cross-site tracking are outside the exception."
+  summary: "Consent is not required where the sole purpose of the storage or access is to collect information for statistical purposes about how the service or website is used, with a view to improving it, provided the information is not shared with anyone else except to help make those improvements, the user is given clear and comprehensive information about the purpose, and the user is given a simple, free means of objecting and does not object."
   official_url: "https://www.legislation.gov.uk/ukpga/2025/18/schedule/12"
   tags: [cookies, consent, tracking, statistical, analytics]
   verified: false
@@ -167,7 +167,7 @@
   ref: "Transparency in AI"
   title: "Be transparent about AI processing of personal data"
   summary: "The UK has no AI-specific statute. ICO guidance expects organisations to tell people when and how their personal data is processed by AI systems, as part of UK GDPR transparency. Guidance only, so status is capped at amber."
-  official_url: "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/guidance-on-ai-and-data-protection/"
+  official_url: "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/guidance-on-ai-and-data-protection/how-do-we-ensure-transparency-in-ai/"
   tags: [ai, transparency, chatbot]
   verified: false
 - id: UK-DMCC-225
@@ -186,7 +186,7 @@
   instrument: "Digital Markets, Competition and Consumers Act 2024, Part 4 Chapter 1"
   ref: "s. 226"
   title: "Misleading actions"
-  summary: "A practice involves a misleading action if it provides false or misleading information relating to the product or trader and is likely to cause the average consumer to take a transactional decision they would not otherwise take."
+  summary: "A practice involves a misleading action if it involves providing false or misleading information relating to a product, a trader or any other matter relevant to a transactional decision, or an overall presentation likely to deceive the average consumer. Under s. 225(4)(a) it is unfair if it is likely to cause the average consumer to take a transactional decision they would not otherwise have taken."
   official_url: "https://www.legislation.gov.uk/ukpga/2024/13/section/226"
   tags: [misleading, sharing, fairness]
   verified: false

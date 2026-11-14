@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Braces, Scale, ScanSearch } from "lucide-react";
 
 import { AuditForm } from "@/components/AuditForm";
+import { ExampleAudits } from "@/components/ExampleAudits";
 import { SiteHeader } from "@/components/SiteHeader";
 import { StatusIcon } from "@/components/StatusBadge";
 import { DEMO_ID } from "@/lib/api";
@@ -44,7 +45,7 @@ export default function Home() {
             Does your privacy policy match what your product actually does?
           </h1>
           <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
-            Paste three links. Groundtruth compares the code and the live site with the policy and shows every possible
+            Paste two or three links. Groundtruth compares the code and the live site with the policy and shows every possible
             inconsistency with evidence, the provision it relates to, and text you can paste to fix it.
           </p>
         </section>
@@ -89,6 +90,8 @@ export default function Home() {
             </ul>
           </div>
         </section>
+
+        <ExampleAudits className="lg:col-span-2 lg:pt-6" />
       </main>
 
       <footer className="border-t">
