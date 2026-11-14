@@ -144,10 +144,16 @@ async def run_audit(audit_id: str, req: AuditRequest, emit: Emit, use_llm: bool 
         gaps.append("no live site was given")
     if not policy_text:
         gaps.append("the policy could not be read")
-    matrix, provisions, method = await build_matrix(findings, observations, jurisdictions, use_llm=use_llm, gaps=gaps)
+    matrix, provisions, method, llm_cells, fallbacks = await build_matrix(
+        findings, observations, jurisdictions, use_llm=use_llm, gaps=gaps,
+        on_cell=lambda n, total: ev("verdict", "running", f"Writing verdicts: {n} of {total} cells", n),
+    )
     stats["verdict_method"] = method
+    if method == "llm":
+        stats["verdict_fallbacks"] = fallbacks
+    fell_back = f"; {fallbacks} of {llm_cells} LLM cells fell back to template text" if fallbacks else ""
     ev("law", "done", f"{len(provisions)} provisions cited", len(provisions))
-    ev("verdict", "done", f"{len(matrix)} matrix cells ({method})", len(matrix))
+    ev("verdict", "done", f"{len(matrix)} matrix cells ({method}{fell_back})", len(matrix))
 
     stats["duration_s"] = round(time.monotonic() - t0, 1)
     report = AuditReport(

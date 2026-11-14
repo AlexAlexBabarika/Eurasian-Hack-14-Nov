@@ -2,18 +2,21 @@
 
 import asyncio
 import re
+from collections.abc import Callable
 from pathlib import Path
+from typing import Annotated, NamedTuple
 
-from pydantic import BaseModel
+from pydantic import BaseModel, StringConstraints, model_validator
 
 from app import llm
 from app.law.retrieve import load_corpus, retrieve
 from app.models import AREAS, Area, CellVerdict, Finding, Fix, Jurisdiction, Observation, Provision, Status
-from app.verdict.fixes import template_fixes
+from app.verdict.fixes import PURPOSE, template_fixes
 
 PROMPTS = Path(__file__).parent / "prompts"
 SYSTEM = (PROMPTS / "verdict.md").read_text() + "\n" + (PROMPTS / "fix.md").read_text()
 BANNED = re.compile(r"\bviolat|\billegal|\bunlawful|\bbreach(?:es|ed)? (?:of )?(?:the )?(?:law|gdpr|act)", re.I)
+MAX_TOKENS = 1500  # a cell is a headline, 2-4 sentences and up to three fixes
 RANK: dict[Status, int] = {"grey": 0, "green": 1, "amber": 2, "red": 3}
 EU_EEA = {"AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU",
           "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "IS", "LI", "NO"}  # fmt: skip
@@ -22,11 +25,68 @@ AREA_LABEL = {"personal_data": "personal data", "ai_transparency": "AI transpare
               "financial": "financial licensing"}  # fmt: skip
 
 
+HEADLINE_MAX = 90
+DATA_LABEL = {"email": "email address", "name": "name", "phone": "phone number", "usage": "usage data",
+              "device_id": "device ID", "ip": "IP address", "user_content": "user content", "payment": "payment data",
+              "location": "location", "health": "health data"}  # fmt: skip
+_RAW_DATA_ID = re.compile(r"\b(?:device_id|user_content|ip)\b")
+_IDENTIFIER = re.compile(r"\b[A-Za-z0-9]+_\w+|\b(?:UK|EU|KZ)-[A-Z0-9]+-[\w-]+|\b[FR]\d+\b")
+_NUMBER_WORD = re.compile(r"\b(?:two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b", re.I)
+
+
+def humanize(text: str) -> str:
+    """Raw data-category ids in rule output → the labels a founder reads."""
+    return _RAW_DATA_ID.sub(lambda m: DATA_LABEL[m.group(0)], text)
+
+
+def headline_problems(headline: str) -> list[str]:
+    problems = []
+    if len(headline) > HEADLINE_MAX:
+        problems.append(f"headline is {len(headline)} characters; the limit is {HEADLINE_MAX}")
+    if m := _IDENTIFIER.search(headline):
+        problems.append(f"headline contains the identifier `{m.group(0)}`; use a human label instead")
+    if m := _NUMBER_WORD.search(headline):
+        problems.append(f'headline spells out the number "{m.group(0)}"; write numbers as digits')
+    return problems
+
+
+def short_headline(title: str) -> str:
+    """A finding title as a cell headline: human labels, no trailing list, at most HEADLINE_MAX characters."""
+    text = humanize(title)
+    if len(text) > HEADLINE_MAX:
+        text = re.sub(r"\s*\([^()]*\)$", "", text)
+    if len(text) > HEADLINE_MAX:
+        text = text[:HEADLINE_MAX].rsplit(" ", 1)[0].rstrip(",;:") + "…"
+    return text
+
+
 class CellProse(BaseModel):
-    headline: str
-    reasoning: str
+    headline: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+    reasoning: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
     provision_ids: list[str]
     fixes: list[Fix]
+
+    @model_validator(mode="after")
+    def _house_rules(self) -> "CellProse":
+        """Raising here sends the reasons back to the model for its one retry (see llm.structured)."""
+        problems = headline_problems(self.headline)
+        if BANNED.search(_prose_text(self)):
+            problems.append('text states that a law is broken; write "possible inconsistency with" instead')
+        if problems:
+            raise ValueError("; ".join(problems))
+        return self
+
+
+def _prose_text(prose: CellProse) -> str:
+    return " ".join([prose.headline, prose.reasoning, *(f"{fx.policy_clause} {fx.code_change}" for fx in prose.fixes)])
+
+
+class Matrix(NamedTuple):
+    cells: list[CellVerdict]
+    provisions: dict[str, Provision]  # every provision cited by a cell
+    method: str  # "llm" or "deterministic"
+    llm_cells: int = 0  # cells the LLM was asked to write
+    fallbacks: int = 0  # of those, cells that kept the template text (call failed twice or prose was rejected)
 
 
 def finding_status(f: Finding, j: Jurisdiction, area: Area, observations: list[Observation]) -> tuple[Status, str] | None:
@@ -114,7 +174,7 @@ def deterministic_cell(j: Jurisdiction, area: Area, findings: list[Finding], obs
         sentences.append(f"{len(rows) - 4} more findings are listed below.")
     fixes = [fx for f, *_ in rows for fx in template_fixes(f, j, observations)]
     return CellVerdict(
-        jurisdiction=j, area=area, status=status, headline=rows[0][0].title, reasoning=" ".join(sentences),
+        jurisdiction=j, area=area, status=status, headline=short_headline(rows[0][0].title), reasoning=" ".join(sentences),
         finding_ids=[r[0].id for r in rows], provision_ids=[p.id for p in provisions], fixes=fixes,
         unverified_notes=notes, finding_statuses={r[0].id: r[1] for r in rows},
     )  # fmt: skip
@@ -122,13 +182,12 @@ def deterministic_cell(j: Jurisdiction, area: Area, findings: list[Finding], obs
 
 def post_validate(cell: CellVerdict, prose: CellProse, allowed: list[str]) -> CellVerdict:
     """Enforce in code what the prompt asks for. Reject the prose entirely if it uses banned wording."""
-    text = " ".join([prose.headline, prose.reasoning, *(f"{fx.policy_clause} {fx.code_change}" for fx in prose.fixes)])
-    if BANNED.search(text) or not prose.headline.strip() or not prose.reasoning.strip():
+    if BANNED.search(_prose_text(prose)) or headline_problems(prose.headline):
         return cell
     kept = [pid for pid in prose.provision_ids if pid in allowed and pid in load_corpus()]
     dropped = [pid for pid in prose.provision_ids if pid not in kept]
     out = cell.model_copy(deep=True)
-    out.headline, out.reasoning = prose.headline.strip()[:200], prose.reasoning.strip()
+    out.headline, out.reasoning = prose.headline, prose.reasoning
     out.provision_ids = list(dict.fromkeys(kept)) or cell.provision_ids
     out.fixes = [fx for fx in prose.fixes if fx.policy_clause or fx.code_change][:4] or cell.fixes
     if dropped:
@@ -139,16 +198,17 @@ def post_validate(cell: CellVerdict, prose: CellProse, allowed: list[str]) -> Ce
 def _prompt(cell: CellVerdict, findings: list[Finding], observations: list[Observation]) -> str:
     corpus = load_corpus()
     parts = [f"Jurisdiction: {cell.jurisdiction}\nLegal area: {AREA_LABEL[cell.area]}\nCell status (fixed): {cell.status}",
-             f"Jurisdiction notes from the rules engine:\n{cell.reasoning}", "<findings>"]  # fmt: skip
+             f"Jurisdiction notes from the rules engine:\n{humanize(cell.reasoning)}", "<findings>"]  # fmt: skip
     for f in findings:
         if f.id not in cell.finding_ids:
             continue
-        parts.append(f"[{f.id}] {f.rule} (status here: {cell.finding_statuses.get(f.id)}): {f.title}")
+        parts.append(f"- {humanize(f.title)} (status here: {cell.finding_statuses.get(f.id)})")
         for o in observations:
             if o.id in f.observation_ids:
                 seen = "; requests or cookies seen on the site before any consent interaction" if o.pre_consent else ""
-                parts.append(f"  vendor: {o.vendor} ({o.vendor_country}), purpose {o.purpose_guess}, "
-                             f"data {o.data_categories}{seen}")  # fmt: skip
+                purpose = PURPOSE.get(o.purpose_guess or "", "service provider")
+                data = ", ".join(DATA_LABEL.get(c, c.replace("_", " ")) for c in o.data_categories) or "not known"
+                parts.append(f"  vendor: {o.vendor} ({o.vendor_country}), used for {purpose}, receives: {data}{seen}")  # fmt: skip
         for e in f.evidence[:6]:
             loc = f"{e.file}:{e.line}" if e.file else (e.url or "")
             parts.append(f"  evidence ({e.kind}) {loc}: {e.summary}" + (f' | quote: "{e.quote}"' if e.quote else ""))
@@ -160,23 +220,41 @@ def _prompt(cell: CellVerdict, findings: list[Finding], observations: list[Obser
 
 async def build_matrix(findings: list[Finding], observations: list[Observation], jurisdictions: list[Jurisdiction],
                        use_llm: bool = True, gaps: list[str] | None = None,
-                       ) -> tuple[list[CellVerdict], dict[str, Provision], str]:  # fmt: skip
-    """Returns (matrix, cited provisions, method) where method is 'llm' or 'deterministic'."""
+                       on_cell: Callable[[int, int], None] | None = None,
+                       ) -> Matrix:  # fmt: skip
+    """With an LLM, `on_cell(finished, total)` is called each time a cell is finished."""
     cells = [deterministic_cell(j, a, findings, observations, gaps) for j in jurisdictions for a in AREAS]
     method = "deterministic"
+    llm_cells = fallbacks = 0
 
     async def refine(cell: CellVerdict) -> CellVerdict:
+        nonlocal llm_cells, fallbacks
         if not cell.finding_ids or not cell.provision_ids:
             return cell
+        llm_cells += 1
         try:
-            prose = await llm.structured(SYSTEM, _prompt(cell, findings, observations), CellProse)
-            return post_validate(cell, prose, cell.provision_ids)
+            # Status and citations are decided in code; the model only writes prose, so it needs no reasoning pass.
+            prose = await llm.structured(SYSTEM, _prompt(cell, findings, observations), CellProse,
+                                         max_tokens=MAX_TOKENS, reasoning=False)  # fmt: skip
+            out = post_validate(cell, prose, cell.provision_ids)
         except Exception:  # noqa: BLE001 - deterministic cell is always a valid answer
-            return cell
+            out = cell
+        fallbacks += out is cell
+        return out
+
+    finished = 0
+
+    async def tracked(cell: CellVerdict) -> CellVerdict:
+        nonlocal finished
+        out = await refine(cell)
+        finished += 1
+        if on_cell:
+            on_cell(finished, len(cells))
+        return out
 
     if use_llm and llm.available():
-        cells = list(await asyncio.gather(*(refine(c) for c in cells)))
+        cells = list(await asyncio.gather(*(tracked(c) for c in cells)))
         method = "llm"
     corpus = load_corpus()
     cited = {pid: corpus[pid] for c in cells for pid in c.provision_ids}
-    return cells, cited, method
+    return Matrix(cells, cited, method, llm_cells, fallbacks)
