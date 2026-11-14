@@ -1,5 +1,6 @@
 import asyncio
 import importlib.util
+import json
 from pathlib import Path
 
 import pytest
@@ -43,12 +44,14 @@ def _text(result) -> str:
     return result.content[0].text
 
 
-def _no_live_audit(module, monkeypatch) -> list[str]:
-    """Replace the pipeline with a stub that records the repo URLs it was asked to audit."""
+def _no_live_audit(module, monkeypatch, requests: list[AuditRequest] | None = None) -> list[str]:
+    """Replace the pipeline with a stub that records the repo URLs (and requests) it was asked to audit."""
     calls: list[str] = []
 
     async def fake_run_audit(audit_id, req, emit, use_llm=True):
         calls.append(req.repo_url)
+        if requests is not None:
+            requests.append(req)
         return store.find_cached(AuditRequest(**DEMO)).report
 
     monkeypatch.setattr(module, "run_audit", fake_run_audit)
@@ -79,3 +82,44 @@ def test_live_mode_ignores_saved_audits(monkeypatch) -> None:
     monkeypatch.setenv("DEMO_MODE", "live")
     asyncio.run(module.server.call_tool("audit_product", DEMO))
     assert calls == [DEMO["repo_url"]]
+
+
+def _matrix_rows(text: str) -> list[str]:
+    return [line.split("**")[1] for line in text.splitlines() if line.startswith("| **")]
+
+
+def test_jurisdictions_is_an_optional_list_of_the_three_codes() -> None:
+    schema = asyncio.run(_load().server.list_tools())[0].input_schema
+    assert "jurisdictions" not in schema["required"]
+    assert '"enum": ["UK", "EU", "KZ"]' in json.dumps(schema)
+
+
+def test_live_audit_gets_the_selected_jurisdictions_in_matrix_order(monkeypatch) -> None:
+    module = _load()
+    requests: list[AuditRequest] = []
+    _no_live_audit(module, monkeypatch, requests)
+    monkeypatch.setenv("DEMO_MODE", "live")
+    asyncio.run(module.server.call_tool("audit_product", {**DEMO, "jurisdictions": ["KZ", "UK", "KZ"]}))
+    asyncio.run(module.server.call_tool("audit_product", DEMO))
+    asyncio.run(module.server.call_tool("audit_product", {**DEMO, "jurisdictions": []}))
+    assert [r.jurisdictions for r in requests] == [["UK", "KZ"], None, None]
+
+
+def test_cached_report_shows_only_the_selected_jurisdictions(monkeypatch) -> None:
+    module = _load()
+    _no_live_audit(module, monkeypatch)
+    monkeypatch.setenv("DEMO_MODE", "cached")
+    text = _text(asyncio.run(module.server.call_tool("audit_product", {**DEMO, "jurisdictions": ["EU"]})))
+    assert _matrix_rows(text) == ["EU"]
+    assert "### EU / " in text
+    assert "### UK / " not in text and "### KZ / " not in text
+    everything = _text(asyncio.run(module.server.call_tool("audit_product", DEMO)))
+    assert _matrix_rows(everything) == ["UK", "EU", "KZ"]
+
+
+def test_unknown_jurisdiction_is_rejected(monkeypatch) -> None:
+    module = _load()
+    calls = _no_live_audit(module, monkeypatch)
+    with pytest.raises(ToolError):
+        asyncio.run(module.server.call_tool("audit_product", {**DEMO, "jurisdictions": ["US"]}))
+    assert calls == []
