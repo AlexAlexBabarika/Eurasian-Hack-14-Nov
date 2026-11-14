@@ -7,8 +7,11 @@ from urllib.parse import urljoin, urlparse
 import httpx
 import trafilatura
 
+from app.ingest import safety
+
 TIMEOUT_S = 20
 MAX_CHARS = 40_000
+MAX_BYTES = 5 * 1024 * 1024
 MAX_LINKED_PAGES = 2
 LINKED_CHARS = 5_000  # budget reserved per linked page so a long policy cannot crowd it out
 LINKED_PAGE = "[Linked page:"  # marks where text from a linked subprocessor page starts
@@ -38,22 +41,43 @@ def subprocessor_links(html: str, base_url: str) -> list[str]:
     return out[:MAX_LINKED_PAGES]
 
 
+async def _get(client: httpx.AsyncClient, url: str) -> tuple[str, str]:
+    """(html, final url). Streams so an endless or huge response cannot exhaust memory."""
+    async with client.stream("GET", url) as resp:
+        resp.raise_for_status()
+        body = b""
+        async for chunk in resp.aiter_bytes():
+            body += chunk
+            if len(body) > MAX_BYTES:
+                raise ValueError(f"page is larger than {MAX_BYTES // 1024 // 1024} MB")
+        if "pdf" in resp.headers.get("content-type", "") or body.startswith(b"%PDF"):
+            raise ValueError("policy is a PDF; give the URL of the HTML policy page")
+        return body.decode(resp.encoding or "utf-8", errors="replace"), str(resp.url)
+
+
+async def _guard(request: httpx.Request) -> None:
+    await safety.check_url(str(request.url))  # every hop, including redirects and linked pages
+
+
 async def fetch(policy_url: str) -> str:
     local = Path(policy_url.removeprefix("file://")).expanduser()
-    if not policy_url.startswith("http") and local.is_file():
-        return html_to_text(local.read_text())[:MAX_CHARS]
+    if not policy_url.startswith("http"):
+        safety.check_local_path()
+        if local.is_file():
+            return html_to_text(local.read_text())[:MAX_CHARS]
     headers = {"User-Agent": "Mozilla/5.0 (Groundtruth policy fetcher)"}
-    async with httpx.AsyncClient(timeout=TIMEOUT_S, follow_redirects=True, transport=_transport, headers=headers) as client:
-        resp = await client.get(policy_url)
-        resp.raise_for_status()
-        text = html_to_text(resp.text)[: MAX_CHARS - MAX_LINKED_PAGES * LINKED_CHARS]
+    async with httpx.AsyncClient(
+        timeout=TIMEOUT_S, follow_redirects=True, transport=_transport, headers=headers,
+        event_hooks={"request": [_guard]},
+    ) as client:  # fmt: skip
+        html, final_url = await _get(client, policy_url)
+        text = html_to_text(html)[: MAX_CHARS - MAX_LINKED_PAGES * LINKED_CHARS]
         if len(text) < 100:
             raise ValueError("policy page has no extractable text (is it rendered client-side?)")
-        for url in subprocessor_links(resp.text, str(resp.url)):
+        for url in subprocessor_links(html, final_url):
             try:
-                page = await client.get(url)
-                page.raise_for_status()
-            except httpx.HTTPError:
+                page, _ = await _get(client, url)
+            except (httpx.HTTPError, ValueError):
                 continue  # the policy page alone is still a valid input
-            text += f"\n\n{LINKED_PAGE} {url}]\n{html_to_text(page.text)[:LINKED_CHARS]}"
+            text += f"\n\n{LINKED_PAGE} {url}]\n{html_to_text(page)[:LINKED_CHARS]}"
     return text
