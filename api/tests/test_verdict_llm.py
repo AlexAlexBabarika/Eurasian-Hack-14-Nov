@@ -72,3 +72,58 @@ def test_verdict_calls_skip_reasoning_and_cap_output(llm_audit, monkeypatch):
     monkeypatch.setenv("LLM_BASE_URL", "https://openrouter.ai/api/v1")
     _, _, bodies = llm_audit(lambda body: tool_reply(prose()))
     assert all(b["reasoning"] == {"enabled": False} and b["max_tokens"] <= 1500 for b in bodies)
+
+
+BAD_HEADLINES = [
+    "Policy says it never shares data, yet Sentry, Mixpanel, OpenAI, PostHog, Stripe and Google Analytics receive it",
+    "Mixpanel receives device_id and user_content",
+    "Six vendors receive personal data the policy says is never shared",
+    "Possible inconsistency with EU-GDPR-13-1-e: Mixpanel is not named",
+]
+
+
+@pytest.mark.parametrize("bad", BAD_HEADLINES)
+def test_a_headline_that_breaks_the_rules_is_sent_back_once_with_the_reason(llm_audit, bad):
+    def verdict(body: dict) -> httpx.Response:
+        retry = "failed validation" in body["messages"][1]["content"]
+        return tool_reply(prose("6 vendors receive personal data; policy says none is shared" if retry else bad))
+
+    report, _, bodies = llm_audit(verdict)
+    assert len(bodies) == 18
+    written = [c.headline for c in report.matrix if c.finding_ids]
+    assert set(written) == {"6 vendors receive personal data; policy says none is shared"}
+
+
+def test_headlines_obey_the_rules_even_when_the_model_never_does(llm_audit):
+    report, _, _ = llm_audit(lambda body: tool_reply(prose(BAD_HEADLINES[0] + " (device_id, ip)")))
+    for cell in report.matrix:
+        assert len(cell.headline) <= 90, cell.headline
+        assert "_" not in cell.headline, cell.headline
+
+
+def test_verdict_prompt_gives_human_labels_and_the_headline_rules(llm_audit):
+    _, _, bodies = llm_audit(lambda body: tool_reply(prose()))
+    system, user = bodies[0]["messages"][0]["content"], "\n".join(b["messages"][1]["content"] for b in bodies)
+    assert "90 characters" in system and "digits" in system
+    for raw in ["device_id", "user_content", "error_monitoring", "ai_processing", "['"]:
+        assert raw not in user, raw
+    assert "device ID" in user and "IP address" in user and "user content" in user
+
+
+def test_cells_that_fall_back_to_template_text_are_counted(llm_audit):
+    def verdict(body: dict) -> httpx.Response:
+        user = body["messages"][1]["content"]
+        if "Jurisdiction: KZ" in user:
+            return httpx.Response(500)  # the call fails twice
+        if "Jurisdiction: UK" in user and "AI transparency" in user:
+            return tool_reply(prose("This is illegal"))  # prose rejected for banned wording
+        return tool_reply(prose())
+
+    report, events, _ = llm_audit(verdict)
+    assert report.stats["verdict_fallbacks"] == 4
+    done = next(e for e in events if e.step == "verdict" and e.status == "done")
+    assert "4 of 9" in done.message and "template" in done.message
+
+    clean, events, _ = llm_audit(lambda body: tool_reply(prose()))
+    assert clean.stats["verdict_fallbacks"] == 0
+    assert "template" not in next(e for e in events if e.step == "verdict" and e.status == "done").message
