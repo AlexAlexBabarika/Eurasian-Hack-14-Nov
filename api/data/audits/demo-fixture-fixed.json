@@ -596,9 +596,7 @@
             "code_change": "Remove personal data from the log statement at src/app/api/chat/route.ts:8; log an internal user id instead."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F1": "amber",
           "F2": "amber"
@@ -634,9 +632,7 @@
             "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F1": "amber"
         }
@@ -679,9 +675,7 @@
             "code_change": "Remove personal data from the log statement at src/app/api/chat/route.ts:8; log an internal user id instead."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F1": "red",
           "F2": "amber"
@@ -717,9 +711,7 @@
             "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F1": "red"
         }
@@ -760,9 +752,7 @@
             "code_change": "Remove personal data from the log statement at src/app/api/chat/route.ts:8; log an internal user id instead."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F1": "amber",
           "F2": "amber"
@@ -798,9 +788,7 @@
             "code_change": "Load PostHog, Google Analytics only after the visitor makes a choice in the consent banner; do not set their cookies or send requests on first page load."
           }
         ],
-        "unverified_notes": [
-          "All cited provisions are awaiting human verification against the official text."
-        ],
+        "unverified_notes": [],
         "finding_statuses": {
           "F1": "amber"
         }
@@ -835,7 +823,7 @@
           "statistical",
           "analytics"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-PECR-6": {
         "id": "UK-PECR-6",
@@ -851,7 +839,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-GDPR-5-1-f": {
         "id": "UK-GDPR-5-1-f",
@@ -866,7 +854,7 @@
           "security",
           "logs"
         ],
-        "verified": false
+        "verified": true
       },
       "UK-DMCC-225": {
         "id": "UK-DMCC-225",
@@ -883,7 +871,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-EPRIVACY-5-3": {
         "id": "EU-EPRIVACY-5-3",
@@ -893,7 +881,7 @@
         "ref": "Art. 5(3)",
         "title": "Consent for cookies and similar technologies",
         "summary": "Storing information, or accessing information stored, on a user's device is only allowed with the user's consent after clear information, unless strictly necessary to provide a service the user requested. There is no exemption for analytics.",
-        "official_url": "https://eur-lex.europa.eu/eli/dir/2002/58/oj",
+        "official_url": "https://eur-lex.europa.eu/eli/dir/2002/58/2009-12-19",
         "tags": [
           "cookies",
           "consent",
@@ -914,7 +902,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-6": {
         "id": "EU-GDPR-6",
@@ -930,7 +918,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-GDPR-5-1-f": {
         "id": "EU-GDPR-5-1-f",
@@ -945,7 +933,7 @@
           "security",
           "logs"
         ],
-        "verified": false
+        "verified": true
       },
       "EU-UCPD-5": {
         "id": "EU-UCPD-5",
@@ -962,7 +950,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-PD-7": {
         "id": "KZ-PD-7",
@@ -982,7 +970,7 @@
           "cookies",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-PD-25": {
         "id": "KZ-PD-25",
@@ -1000,7 +988,7 @@
           "deletion",
           "consent"
         ],
-        "verified": false
+        "verified": true
       },
       "KZ-CP-10": {
         "id": "KZ-CP-10",
@@ -1021,7 +1009,7 @@
           "consent",
           "tracking"
         ],
-        "verified": false
+        "verified": true
       }
     },
     "stats": {

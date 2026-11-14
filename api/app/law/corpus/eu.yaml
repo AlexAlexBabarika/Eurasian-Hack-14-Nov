@@ -8,7 +8,7 @@
   summary: "Personal data must be processed lawfully, fairly and in a transparent manner in relation to the data subject. A policy statement that contradicts actual processing is hard to square with transparency."
   official_url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
   tags: [fairness, transparency, sharing, data_categories]
-  verified: false
+  verified: true
 - id: EU-GDPR-5-1-e
   jurisdiction: EU
   area: personal_data
@@ -18,7 +18,7 @@
   summary: "Personal data must be kept in identifiable form no longer than necessary for the purposes for which it is processed."
   official_url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
   tags: [retention]
-  verified: false
+  verified: true
 - id: EU-GDPR-5-1-f
   jurisdiction: EU
   area: personal_data
@@ -28,7 +28,7 @@
   summary: "Personal data must be processed with appropriate security, including protection against unauthorised access. Personal data written to application logs widens who can access it."
   official_url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
   tags: [security, logs]
-  verified: false
+  verified: true
 - id: EU-GDPR-6
   jurisdiction: EU
   area: personal_data
@@ -38,7 +38,7 @@
   summary: "Processing is lawful only if at least one legal basis applies, such as consent, contract, legal obligation or legitimate interests."
   official_url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
   tags: [lawfulness, consent, tracking]
-  verified: false
+  verified: true
 - id: EU-GDPR-7
   jurisdiction: EU
   area: personal_data
@@ -48,7 +48,7 @@
   summary: "Where processing relies on consent, the controller must be able to demonstrate that the person consented, and consent must be as easy to withdraw as to give."
   official_url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
   tags: [consent, tracking]
-  verified: false
+  verified: true
 - id: EU-GDPR-13-1-c
   jurisdiction: EU
   area: personal_data
@@ -58,7 +58,7 @@
   summary: "When collecting data from the person, the controller must state the purposes of the processing and its legal basis."
   official_url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
   tags: [purposes, transparency, data_categories, ai]
-  verified: false
+  verified: true
 - id: EU-GDPR-13-1-e
   jurisdiction: EU
   area: personal_data
@@ -68,7 +68,7 @@
   summary: "When collecting data, the controller must tell the person the recipients or categories of recipients of the personal data."
   official_url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
   tags: [processors, recipients, transparency, sharing]
-  verified: false
+  verified: true
 - id: EU-GDPR-13-1-f
   jurisdiction: EU
   area: personal_data
@@ -78,7 +78,7 @@
   summary: "The controller must tell the person if it intends to transfer personal data to a third country, and reference the adequacy decision or safeguards relied on."
   official_url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
   tags: [transfers, transparency]
-  verified: false
+  verified: true
 - id: EU-GDPR-13-2-a
   jurisdiction: EU
   area: personal_data
@@ -88,7 +88,7 @@
   summary: "The controller must state the period for which personal data will be stored or, if that is not possible, the criteria used to determine that period."
   official_url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
   tags: [retention, transparency]
-  verified: false
+  verified: true
 - id: EU-GDPR-13-2-b
   jurisdiction: EU
   area: personal_data
@@ -98,7 +98,7 @@
   summary: "The controller must inform the person of the rights to access, rectification, erasure, restriction, objection and data portability."
   official_url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
   tags: [erasure, rights, transparency]
-  verified: false
+  verified: true
 - id: EU-GDPR-17
   jurisdiction: EU
   area: personal_data
@@ -108,7 +108,7 @@
   summary: "The person has the right to have personal data erased without undue delay in listed cases, for example when it is no longer necessary or consent is withdrawn."
   official_url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
   tags: [erasure, deletion, rights]
-  verified: false
+  verified: true
 - id: EU-GDPR-22
   jurisdiction: EU
   area: personal_data
@@ -118,7 +118,7 @@
   summary: "The person has the right not to be subject to a decision based solely on automated processing that produces legal or similarly significant effects, subject to exceptions."
   official_url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
   tags: [automated_decisions]
-  verified: false
+  verified: true
 - id: EU-GDPR-28
   jurisdiction: EU
   area: personal_data
@@ -128,7 +128,7 @@
   summary: "A controller may only use processors that provide sufficient guarantees, under a contract that sets out the subject matter, duration, nature and purpose of the processing."
   official_url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
   tags: [processors]
-  verified: false
+  verified: true
 - id: EU-GDPR-44
   jurisdiction: EU
   area: personal_data
@@ -138,7 +138,7 @@
   summary: "Personal data may be transferred to a third country only if the conditions of Chapter V (adequacy decision, appropriate safeguards or a specific derogation) are met."
   official_url: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
   tags: [transfers]
-  verified: false
+  verified: true
 - id: EU-EPRIVACY-5-3
   jurisdiction: EU
   area: personal_data
@@ -146,7 +146,7 @@
   ref: "Art. 5(3)"
   title: "Consent for cookies and similar technologies"
   summary: "Storing information, or accessing information stored, on a user's device is only allowed with the user's consent after clear information, unless strictly necessary to provide a service the user requested. There is no exemption for analytics."
-  official_url: "https://eur-lex.europa.eu/eli/dir/2002/58/oj"
+  official_url: "https://eur-lex.europa.eu/eli/dir/2002/58/2009-12-19"
   tags: [cookies, consent, tracking]
   verified: false
 - id: EU-AIACT-50-1
@@ -158,7 +158,7 @@
   summary: "Providers must ensure AI systems intended to interact directly with people are designed so that people are informed they are interacting with an AI system, unless this is obvious from the context."
   official_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
   tags: [ai, transparency, chatbot]
-  verified: false
+  verified: true
 - id: EU-AIACT-50-2
   jurisdiction: EU
   area: ai_transparency
@@ -168,7 +168,7 @@
   summary: "Providers of AI systems that generate synthetic audio, image, video or text must ensure outputs are marked in a machine-readable format and detectable as artificially generated."
   official_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
   tags: [ai, synthetic]
-  verified: false
+  verified: true
 - id: EU-UCPD-5
   jurisdiction: EU
   area: consumer
@@ -178,7 +178,7 @@
   summary: "Unfair commercial practices are prohibited: practices contrary to professional diligence that materially distort, or are likely to materially distort, the economic behaviour of the average consumer."
   official_url: "https://eur-lex.europa.eu/eli/dir/2005/29/oj"
   tags: [fairness, dark_patterns, consent, tracking]
-  verified: false
+  verified: true
 - id: EU-UCPD-6
   jurisdiction: EU
   area: consumer
@@ -188,7 +188,7 @@
   summary: "A practice is misleading if it contains false information, or is likely to deceive the average consumer, and causes or is likely to cause a transactional decision the consumer would not otherwise have taken."
   official_url: "https://eur-lex.europa.eu/eli/dir/2005/29/oj"
   tags: [misleading, sharing, fairness]
-  verified: false
+  verified: true
 - id: EU-UCPD-7
   jurisdiction: EU
   area: consumer
@@ -198,4 +198,4 @@
   summary: "A practice is misleading if it omits or hides material information that the average consumer needs to take an informed transactional decision."
   official_url: "https://eur-lex.europa.eu/eli/dir/2005/29/oj"
   tags: [misleading, information, erasure, omission]
-  verified: false
+  verified: true

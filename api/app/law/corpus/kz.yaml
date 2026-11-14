@@ -9,7 +9,7 @@
   summary: "Collection and processing of personal data is carried out with the consent of the subject, except in cases set by law. Transfer to third parties and cross-border transfer are subject to consent."
   official_url: "https://adilet.zan.kz/eng/docs/Z1300000094"
   tags: [consent, lawfulness, sharing, recipients, processors, cookies, tracking]
-  verified: false
+  verified: true
 - id: KZ-PD-8
   jurisdiction: KZ
   area: personal_data
@@ -19,7 +19,7 @@
   summary: "Consent must state, among other things, its validity period, whether data may be transferred to third parties, whether cross-border transfer takes place, and the list of data collected."
   official_url: "https://adilet.zan.kz/eng/docs/Z1300000094"
   tags: [consent, recipients, processors, transfers, data_categories, retention, transparency, sharing]
-  verified: false
+  verified: true
 - id: KZ-PD-12-2
   jurisdiction: KZ
   area: personal_data
@@ -29,7 +29,7 @@
   summary: "Personal data must be stored in a database or digital facility located in the territory of Kazakhstan. The retention period is set by the date the purposes of collection and processing are achieved."
   official_url: "https://adilet.zan.kz/eng/docs/Z1300000094"
   tags: [localisation, transfers, retention]
-  verified: false
+  verified: true
 - id: KZ-PD-16
   jurisdiction: KZ
   area: personal_data
@@ -39,7 +39,7 @@
   summary: "Cross-border transfer is allowed only to states that ensure protection of personal data, or otherwise on limited grounds such as the subject's consent to the cross-border transfer."
   official_url: "https://adilet.zan.kz/eng/docs/Z1300000094"
   tags: [transfers]
-  verified: false
+  verified: true
 - id: KZ-PD-24
   jurisdiction: KZ
   area: personal_data
@@ -49,7 +49,7 @@
   summary: "The subject has rights including to know what personal data the owner or operator holds, to require changes, blocking and destruction of data in cases set by law, and to withdraw consent."
   official_url: "https://adilet.zan.kz/eng/docs/Z1300000094"
   tags: [erasure, deletion, rights]
-  verified: false
+  verified: true
 - id: KZ-PD-25
   jurisdiction: KZ
   area: personal_data
@@ -59,7 +59,7 @@
   summary: "The owner or operator must take legal, organisational and technical measures to protect personal data, be able to evidence consent, give the subject access to their data, and destroy data in the cases set by law."
   official_url: "https://adilet.zan.kz/eng/docs/Z1300000094"
   tags: [security, logs, erasure, deletion, consent]
-  verified: false
+  verified: true
 - id: KZ-AI-21-1
   jurisdiction: KZ
   area: ai_transparency
@@ -69,7 +69,7 @@
   summary: "Users must be informed that goods, works and services are produced or provided using artificial intelligence systems."
   official_url: "https://adilet.zan.kz/eng/docs/Z2500000230"
   tags: [ai, transparency, chatbot]
-  verified: false
+  verified: true
 - id: KZ-AI-21-2
   jurisdiction: KZ
   area: ai_transparency
@@ -79,7 +79,7 @@
   summary: "Synthetic results of AI systems may be distributed only with machine-readable labelling and a warning the user can perceive. Owners or holders of the AI system are responsible for informing users."
   official_url: "https://adilet.zan.kz/eng/docs/Z2500000230"
   tags: [ai, synthetic]
-  verified: false
+  verified: true
 - id: KZ-AI-16
   jurisdiction: KZ
   area: ai_transparency
@@ -89,7 +89,7 @@
   summary: "Users have the right to read the user agreement of the AI system, to protection of their personal data processed by it, to explanations of results affecting their rights, and to refuse to interact with an AI system where interaction is not mandatory by law."
   official_url: "https://adilet.zan.kz/eng/docs/Z2500000230"
   tags: [ai, transparency, rights, chatbot]
-  verified: false
+  verified: true
 - id: KZ-CP-10
   jurisdiction: KZ
   area: consumer
@@ -99,7 +99,7 @@
   summary: "The consumer has the right to receive full, reliable and timely information about goods, works and services and about the seller or provider."
   official_url: "https://adilet.zan.kz/eng/docs/Z100000274_"
   tags: [information, misleading, sharing, fairness, erasure, omission, consent, tracking]
-  verified: false
+  verified: true
 - id: KZ-CP-25
   jurisdiction: KZ
   area: consumer
@@ -109,4 +109,4 @@
   summary: "The seller or provider must give the consumer the mandatory information about the goods, works or services, including their main consumer properties."
   official_url: "https://adilet.zan.kz/eng/docs/Z100000274_"
   tags: [information, misleading, omission]
-  verified: false
+  verified: true
