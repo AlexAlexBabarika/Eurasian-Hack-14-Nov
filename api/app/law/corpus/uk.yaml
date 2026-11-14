@@ -106,7 +106,7 @@
   instrument: "UK GDPR (Regulation (EU) 2016/679 as retained in UK law)"
   ref: "Arts. 22A-22C"
   title: "Automated decision-making"
-  summary: "A significant decision (one with a legal or similarly significant effect) taken solely by automated processing, with no meaningful human involvement, requires safeguards: the person must be given information about it and be able to make representations, obtain human intervention and contest the decision (Art. 22C). Such decisions based on special category data are restricted further (Art. 22B). Arts. 22A-22D replaced Art. 22 on 5 February 2026 (Data (Use and Access) Act 2025, s. 80)."
+  summary: "A significant decision (one with a legal or similarly significant effect) taken solely by automated processing, with no meaningful human involvement, requires safeguards: the person must be given information about it and be able to make representations, obtain human intervention and contest the decision (Art. 22C). Such decisions based on special category data are restricted further (Art. 22B). Arts. 22A-22D were substituted for Art. 22 by the Data (Use and Access) Act 2025, s. 80: on 19 June 2025 for specified purposes and on 5 February 2026 for the rest."
   official_url: "https://www.legislation.gov.uk/eur/2016/679/article/22C"
   tags: [automated_decisions]
   verified: false
@@ -147,7 +147,7 @@
   ref: "reg. 6(1), as substituted by Data (Use and Access) Act 2025 s. 112"
   title: "Storing or accessing information on a user's device"
   summary: "A person must not store information, or gain access to information stored, in a user's terminal equipment unless an exception in Schedule A1 applies (for example consent, or strict necessity)."
-  official_url: "https://www.legislation.gov.uk/ukpga/2025/18/section/112"
+  official_url: "https://www.legislation.gov.uk/uksi/2003/2426/regulation/6"
   tags: [cookies, consent, tracking]
   verified: true
 - id: UK-PECR-SCHA1-5
@@ -157,7 +157,7 @@
   ref: "Sch. A1 para. 5"
   title: "Statistical-purposes exception for analytics cookies"
   summary: "Consent is not required where the sole purpose of the storage or access is to collect information for statistical purposes about how the service or website is used, with a view to improving it, provided the information is not shared with anyone else except to help make those improvements, the user is given clear and comprehensive information about the purpose, and the user is given a simple, free means of objecting and does not object."
-  official_url: "https://www.legislation.gov.uk/ukpga/2025/18/schedule/12"
+  official_url: "https://www.legislation.gov.uk/uksi/2003/2426/schedule/A1"
   tags: [cookies, consent, tracking, statistical, analytics]
   verified: true
 - id: UK-ICO-AI-GUIDANCE
@@ -166,7 +166,7 @@
   instrument: "ICO Guidance on AI and data protection (regulator guidance, not statute)"
   ref: "Transparency in AI"
   title: "Be transparent about AI processing of personal data"
-  summary: "The UK has no AI-specific statute. ICO guidance expects organisations to tell people when and how their personal data is processed by AI systems, as part of UK GDPR transparency. Guidance only, so status is capped at amber."
+  summary: "The UK has no AI-specific statute. ICO guidance expects organisations to tell people when and how their personal data is processed by AI systems, as part of UK GDPR transparency."
   official_url: "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/guidance-on-ai-and-data-protection/how-do-we-ensure-transparency-in-ai/"
   tags: [ai, transparency, chatbot]
   verified: true

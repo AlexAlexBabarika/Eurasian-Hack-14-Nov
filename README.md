@@ -112,4 +112,6 @@ Other inputs: `repo` (default `.`), `site`, `jurisdictions` (default `UK,EU,KZ`)
 
 ## Status of the law corpus
 
-All provisions currently have `verified: false`. A human must open each `official_url`, confirm the reference and summary, and only then set `verified: true`.
+The corpus has 51 provisions (EU 20, UK 20, KZ 11). 47 have `verified: true` and 4 have `verified: false` (`EU-EPRIVACY-5-3`, `UK-GDPR-22`, `UK-GDPR-44A`, `UK-DPA-2018`); the report flags citations that are not verified.
+
+The 47 were checked against their `official_url` on 14 November 2026 by an AI agent, not yet by a person. The rule at the top of each corpus file still applies: a human opens each `official_url`, confirms the reference and summary, and only then is `verified: true` final. Entries that nobody confirms go back to `false`.
